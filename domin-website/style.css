@@ -1,0 +1,611 @@
+/* ========== Global ========== */
+* {
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+}
+
+body {
+  font-family: system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI",
+    sans-serif;
+  color: #ffffff;
+  background: #05081a url("assets/logo-bg.jpg") center top fixed;
+  background-size: cover;
+}
+
+a {
+  color: inherit;
+  text-decoration: none;
+}
+
+.page {
+  min-height: 100vh;
+  display: flex;
+  flex-direction: column;
+}
+
+/* ========== Header & Nav ========== */
+
+.site-header {
+  position: sticky;
+  top: 0;
+  z-index: 50;
+  background: linear-gradient(
+    to bottom,
+    rgba(5, 0, 40, 0.82),
+    rgba(5, 0, 30, 0.5)
+  );
+  border-bottom: 1px solid rgba(255, 255, 255, 0.08);
+  backdrop-filter: blur(12px);
+}
+
+.header-inner {
+  max-width: 1200px;
+  margin: 0 auto;
+  padding: 10px 20px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+
+.header-left {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.header-logo {
+  height: 34px;
+  filter: brightness(0) invert(1);
+  opacity: 0.55;
+}
+
+.site-title-small {
+  font-size: 0.8rem;
+  letter-spacing: 0.25em;
+  text-transform: uppercase;
+  color: rgba(255, 255, 255, 0.7);
+  white-space: nowrap;
+}
+
+/* Desktop nav */
+.nav {
+  display: flex;
+  align-items: center;
+  gap: 20px;
+  font-size: 0.98rem;
+  font-weight: 600;
+}
+
+.nav a {
+  position: relative;
+  padding: 4px 0;
+  color: rgba(255, 255, 255, 0.88);
+  transition: color 0.2s ease;
+}
+
+.nav a::after {
+  content: "";
+  position: absolute;
+  left: 0;
+  bottom: -4px;
+  width: 0;
+  height: 2px;
+  background: linear-gradient(90deg, #ff4fd3, #44e3ff);
+  box-shadow: 0 0 10px rgba(127, 255, 255, 0.8);
+  transition: width 0.25s ease;
+}
+
+.nav a:hover,
+.nav a.active {
+  color: #ffffff;
+}
+
+.nav a:hover::after,
+.nav a.active::after {
+  width: 100%;
+}
+
+/* Hamburger button (mobile) */
+.nav-toggle {
+  display: none;
+  flex-direction: column;
+  gap: 4px;
+  background: none;
+  border: none;
+  cursor: pointer;
+  padding: 4px;
+}
+
+.nav-toggle span {
+  width: 22px;
+  height: 2px;
+  border-radius: 999px;
+  background: #ffffff;
+  transition: transform 0.2s ease, opacity 0.2s ease;
+}
+
+.nav-toggle.open span:nth-child(1) {
+  transform: translateY(6px) rotate(45deg);
+}
+.nav-toggle.open span:nth-child(2) {
+  opacity: 0;
+}
+.nav-toggle.open span:nth-child(3) {
+  transform: translateY(-6px) rotate(-45deg);
+}
+
+/* ========== Layout ========== */
+
+.main-content {
+  flex: 1;
+  padding: 90px 20px 40px;
+}
+
+/* 首页特殊：让 hero 真正垂直居中 */
+.home .main-content {
+  padding: 0 20px 40px;
+}
+
+/* 通用窄版 section */
+.section-narrow {
+  max-width: 1000px;
+  margin: 0 auto 50px;
+}
+
+.page-header {
+  text-align: center;
+  margin-bottom: 30px;
+}
+
+.page-header h1 {
+  font-size: 2.2rem;
+  letter-spacing: 0.18em;
+  text-transform: uppercase;
+  margin-bottom: 10px;
+}
+
+.page-header p {
+  color: rgba(255, 255, 255, 0.75);
+}
+
+/* Panel style */
+.panel {
+  background: rgba(5, 0, 30, 0.72);
+  border-radius: 18px;
+  padding: 24px 24px 28px;
+  box-shadow: 0 18px 45px rgba(0, 0, 0, 0.65);
+  border: 1px solid rgba(255, 255, 255, 0.06);
+}
+
+/* ========== Hero (Home) ========== */
+
+.hero {
+  min-height: calc(100vh - 150px); /* 粗略减去 header + footer 高度 */
+  padding: 100px 20px 60px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  text-align: center;
+
+  background: radial-gradient(
+      circle at top,
+      rgba(255, 111, 244, 0.55),
+      transparent 55%
+    ),
+    radial-gradient(circle at bottom, rgba(0, 196, 255, 0.45), transparent 55%);
+}
+
+.hero-inner {
+  max-width: 1050px;
+  margin: 0 auto;
+}
+
+/* LOGO 容器：漂浮 + 霓虹扫描 + 背光 */
+.hero-logo-wrap {
+  position: relative;
+  display: inline-block;
+  animation: logoFloat 6s ease-in-out infinite;
+}
+
+/* LOGO 图本身 */
+.hero-logo {
+  max-width: 100%;
+  width: 900px;
+  position: relative;
+  z-index: 1;
+  filter: drop-shadow(0 0 25px rgba(0, 0, 0, 0.7));
+}
+
+/* 背后柔和的霓虹光晕 */
+.hero-logo-wrap::before {
+  content: "";
+  position: absolute;
+  inset: -10%;
+  border-radius: 40px;
+  background:
+    radial-gradient(circle at 20% 0%, rgba(255, 255, 255, 0.18), transparent 60%),
+    radial-gradient(circle at 80% 100%, rgba(0, 255, 234, 0.2), transparent 60%);
+  filter: blur(18px);
+  opacity: 0.9;
+  z-index: 0;
+}
+
+/* 霓虹扫描线 */
+.hero-logo-wrap::after {
+  content: "";
+  position: absolute;
+  inset: -18%;
+  border-radius: 40px;
+  background: linear-gradient(
+    115deg,
+    transparent 0%,
+    rgba(255, 255, 255, 0.0) 40%,
+    rgba(255, 255, 255, 0.95) 50%,
+    rgba(255, 255, 255, 0.0) 60%,
+    transparent 100%
+  );
+  mix-blend-mode: screen;
+  opacity: 0;
+  z-index: 2;
+  animation: logoScan 4s linear infinite;
+}
+
+/* LOGO 轻微上下浮动 */
+@keyframes logoFloat {
+  0%   { transform: translateY(0px); }
+  50%  { transform: translateY(-8px); }
+  100% { transform: translateY(0px); }
+}
+
+/* 扫描线从左往右扫 */
+@keyframes logoScan {
+  0% {
+    opacity: 0;
+    transform: translateX(-160%);
+  }
+  15% {
+    opacity: 0.9;
+  }
+  50% {
+    opacity: 0.3;
+    transform: translateX(160%);
+  }
+  100% {
+    opacity: 0;
+    transform: translateX(160%);
+  }
+}
+
+/* tagline & 按钮 */
+.hero-tagline {
+  margin-top: 26px;
+  font-size: 1.4rem;
+  letter-spacing: 0.25em;
+  text-transform: uppercase;
+  color: rgba(255, 255, 255, 0.9);
+}
+
+.hero-buttons {
+  margin-top: 32px;
+  display: flex;
+  justify-content: center;
+  gap: 16px;
+  flex-wrap: wrap;
+}
+
+/* Buttons */
+.btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-width: 160px;
+  padding: 10px 22px;
+  border-radius: 999px;
+  font-weight: 600;
+  font-size: 1rem;
+  border: 1px solid transparent;
+  cursor: pointer;
+  transition: transform 0.15s ease, box-shadow 0.15s ease, opacity 0.15s ease,
+    background 0.2s ease;
+}
+
+.btn-primary {
+  background: linear-gradient(90deg, #ff4fd3, #44e3ff);
+  box-shadow: 0 12px 30px rgba(0, 0, 0, 0.6);
+  color: #05081a;
+}
+
+.btn-secondary {
+  background: rgba(10, 13, 40, 0.8);
+  border-color: rgba(255, 255, 255, 0.3);
+  color: #ffffff;
+}
+
+.btn:hover {
+  transform: translateY(-1px);
+  box-shadow: 0 18px 35px rgba(0, 0, 0, 0.75);
+  opacity: 0.96;
+}
+
+/* ========== Members ========== */
+
+.members-grid-top {
+  display: grid;
+  grid-template-columns: minmax(250px, 360px);
+  justify-content: center;
+  gap: 24px;
+  margin-bottom: 30px;
+}
+
+.members-grid-bottom {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+  gap: 24px;
+}
+
+.member-card {
+  text-align: center;
+  background: radial-gradient(
+      circle at top,
+      rgba(255, 111, 244, 0.2),
+      transparent 60%
+    ),
+    radial-gradient(circle at bottom, rgba(0, 196, 255, 0.2), transparent 60%),
+    rgba(5, 0, 30, 0.9);
+  padding: 18px 16px 22px;
+  border-radius: 16px;
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  box-shadow: 0 12px 30px rgba(0, 0, 0, 0.65);
+}
+
+.member-photo {
+  width: 100%;
+  max-width: 260px;
+  height: 260px;
+  border-radius: 18px;
+  background: rgba(0, 0, 0, 0.32);
+  margin: 0 auto 14px;
+  object-fit: cover;
+}
+
+.member-name {
+  font-size: 1.15rem;
+  font-weight: 700;
+  margin-bottom: 4px;
+}
+
+.member-role {
+  font-size: 0.95rem;
+  letter-spacing: 0.18em;
+  text-transform: uppercase;
+  color: rgba(255, 255, 255, 0.76);
+  margin-bottom: 8px;
+}
+
+.member-bio {
+  font-size: 0.9rem;
+  color: rgba(255, 255, 255, 0.8);
+}
+
+/* ========== Artists We Cover ========== */
+
+.artists-intro {
+  margin-bottom: 18px;
+  font-size: 0.98rem;
+  color: rgba(255, 255, 255, 0.8);
+}
+
+.artists-list {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(170px, 1fr));
+  gap: 6px 34px;
+  padding-left: 0;
+}
+
+.artists-list li {
+  list-style: none;
+  padding: 2px 0;
+  color: rgba(255, 255, 255, 0.9);
+}
+
+/* ========== Videos ========== */
+
+.video-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+  gap: 24px;
+}
+
+.video-item {
+  border-radius: 16px;
+  overflow: hidden;
+  background: rgba(5, 0, 30, 0.85);
+  border: 1px solid rgba(255, 255, 255, 0.07);
+  box-shadow: 0 14px 35px rgba(0, 0, 0, 0.7);
+}
+
+.video-title {
+  padding: 10px 14px 6px;
+  font-size: 0.95rem;
+  color: rgba(255, 255, 255, 0.85);
+}
+
+.video-frame-wrap {
+  position: relative;
+  padding-bottom: 56.25%;
+  height: 0;
+}
+
+.video-frame-wrap iframe {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  border: 0;
+}
+
+/* ========== Photos ========== */
+
+.photo-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+  gap: 16px;
+}
+
+.photo-grid img {
+  width: 100%;
+  height: 220px;
+  border-radius: 18px;
+  object-fit: cover;
+  box-shadow: 0 14px 32px rgba(0, 0, 0, 0.7);
+}
+
+/* ========== Schedule (2026 calendar) ========== */
+
+.calendar-wrapper {
+  max-width: 900px;
+  margin: 0 auto 50px;
+}
+
+.month-tabs {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  margin-bottom: 16px;
+}
+
+.month-tab {
+  flex: 1 1 80px;
+  min-width: 80px;
+  padding: 6px 10px;
+  font-size: 0.85rem;
+  text-align: center;
+  border-radius: 999px;
+  border: 1px solid rgba(255, 255, 255, 0.25);
+  background: rgba(5, 0, 30, 0.85);
+  cursor: pointer;
+  color: rgba(255, 255, 255, 0.8);
+  transition: background 0.2s ease, color 0.2s ease, border-color 0.2s ease;
+}
+
+.month-tab.active {
+  background: linear-gradient(90deg, #ff4fd3, #44e3ff);
+  color: #05081a;
+  border-color: transparent;
+}
+
+.calendar-panel {
+  background: rgba(5, 0, 30, 0.9);
+  border-radius: 18px;
+  padding: 16px 18px 20px;
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  box-shadow: 0 18px 40px rgba(0, 0, 0, 0.75);
+}
+
+.calendar-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 12px;
+  font-size: 0.95rem;
+  color: rgba(255, 255, 255, 0.85);
+}
+
+.calendar-grid {
+  display: grid;
+  grid-template-columns: repeat(7, 1fr);
+  gap: 6px;
+  text-align: center;
+  font-size: 0.82rem;
+}
+
+.calendar-grid .dow {
+  font-weight: 600;
+  color: rgba(255, 255, 255, 0.82);
+  padding-bottom: 4px;
+}
+
+.calendar-grid .day {
+  padding: 6px 2px;
+  border-radius: 10px;
+  background: rgba(255, 255, 255, 0.03);
+  min-height: 28px;
+  color: rgba(255, 255, 255, 0.86);
+}
+
+/* ========== Contact ========== */
+
+.contact-info {
+  font-size: 1rem;
+  line-height: 1.9;
+  color: rgba(255, 255, 255, 0.9);
+}
+
+.contact-info a {
+  color: #7de8ff;
+}
+
+.contact-info a:hover {
+  text-decoration: underline;
+}
+
+/* ========== Footer ========== */
+
+.site-footer {
+  padding: 14px 20px 18px;
+  text-align: center;
+  font-size: 0.82rem;
+  color: rgba(255, 255, 255, 0.75);
+  background: linear-gradient(
+    to top,
+    rgba(5, 0, 25, 0.92),
+    rgba(5, 0, 25, 0.7)
+  );
+  border-top: 1px solid rgba(255, 255, 255, 0.08);
+}
+
+/* ========== Responsive ========== */
+@media (max-width: 768px) {
+
+  /* header 小标题缩小一点 */
+  .site-title-small {
+    font-size: 0.65rem;
+    letter-spacing: 0.18em;
+  }
+
+  /* 手机才显示汉堡按钮（桌面是 display:none） */
+  .nav-toggle {
+    display: flex;
+    z-index: 1001;
+  }
+
+  /* 手机端默认隐藏导航菜单 */
+  .nav {
+    display: none;              /* 先藏起来，等 .nav-open 再显示 */
+    position: absolute;
+    top: 60px;
+    right: 14px;
+    width: 180px;
+    flex-direction: column;
+    gap: 12px;
+    padding: 18px 20px;
+    background: rgba(5, 0, 30, 0.92);
+    border-radius: 14px;
+    border: 1px solid rgba(255,255,255,0.15);
+    box-shadow: 0 10px 25px rgba(0,0,0,0.65);
+    z-index: 1000;
+  }
+
+  /* 点击汉堡按钮后，JS 会给 nav 加上 nav-open，这里让它显示出来 */
+  .nav.nav-open {
+    display: flex;
+  }
+
+  /* 手机版菜单里面每一条链接样式 */
+  .nav a {
+    font-size: 1rem;
+    padding: 6px 0;
+    width: 100%;
+  }
+}

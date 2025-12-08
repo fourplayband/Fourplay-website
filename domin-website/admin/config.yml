@@ -1,0 +1,131 @@
+backend:
+  name: git-gateway          # 使用 Netlify Identity + Git Gateway
+  branch: main               # 如果你仓库默认分支叫 master，就把 main 改成 master
+
+local_backend: true          # 可选，本地调试用，不需要可以删掉
+
+media_folder: "assets/uploads"   # 上传的图片实际存放路径（相对于仓库根目录）
+public_folder: "/assets/uploads" # 网页里引用图片时使用的路径
+
+collections:
+  # ========== 单页文案（首页 / Photos 页 / Videos 页 / Schedule 页 / Contact 页）==========
+  - name: "pages"
+    label: "Pages 页面文案"
+    editor:
+      preview: false
+    files:
+      - file: "content/pages/home.md"
+        label: "Home 首页"
+        name: "home"
+        fields:
+          - { label: "Browser Title（浏览器标签名）", name: "title", widget: "string", default: "FOURPLAY Dance Band" }
+          - { label: "Hero 主标题", name: "hero_title", widget: "string" }
+          - { label: "Hero 副标题 / Slogan", name: "hero_subtitle", widget: "string", required: false }
+          - { label: "Hero 按钮文字", name: "hero_button_text", widget: "string", required: false }
+          - { label: "Hero 背景图（可选）", name: "hero_background", widget: "image", required: false }
+          - { label: "Intro 文本（首页介绍）", name: "intro", widget: "markdown", required: false }
+
+      - file: "content/pages/photos.md"
+        label: "Photos 照片页文案"
+        name: "photos_page"
+        fields:
+          - { label: "页面标题", name: "title", widget: "string", default: "Photos" }
+          - { label: "顶部说明文字", name: "intro", widget: "markdown", required: false }
+
+      - file: "content/pages/videos.md"
+        label: "Videos 视频页文案"
+        name: "videos_page"
+        fields:
+          - { label: "页面标题", name: "title", widget: "string", default: "Videos" }
+          - { label: "顶部说明文字", name: "intro", widget: "markdown", required: false }
+
+      - file: "content/pages/shows.md"
+        label: "Shows / Schedule 演出页文案"
+        name: "shows_page"
+        fields:
+          - { label: "页面标题", name: "title", widget: "string", default: "Shows" }
+          - { label: "顶部说明文字", name: "intro", widget: "markdown", required: false }
+
+      - file: "content/pages/contact.md"
+        label: "Contact 联系页文案"
+        name: "contact_page"
+        fields:
+          - { label: "页面标题", name: "title", widget: "string", default: "Contact" }
+          - { label: "顶部说明文字", name: "intro", widget: "markdown", required: false }
+          - { label: "额外说明（比如 booking 信息）", name: "extra", widget: "markdown", required: false }
+
+  # ========== 乐队成员 ==========
+  - name: "members"
+    label: "Band Members 乐队成员"
+    folder: "content/members"
+    create: true
+    slug: "{{slug}}"
+    sort: "order:asc"
+    fields:
+      - { label: "姓名 Name", name: "name", widget: "string" }
+      - { label: "角色 / 乐器 Role", name: "role", widget: "string" }
+      - { label: "头像照片 Photo", name: "photo", widget: "image", required: false }
+      - { label: "简短介绍 Bio", name: "bio", widget: "markdown", required: false }
+      - { label: "排序号（数字小的排前面）", name: "order", widget: "number", value_type: "int", default: 1 }
+
+  # ========== 照片墙 ==========
+  - name: "photos"
+    label: "Photo Gallery 照片"
+    folder: "content/photos"
+    create: true
+    slug: "{{slug}}"
+    sort: "order:asc"
+    fields:
+      - { label: "标题 / 说明文字", name: "title", widget: "string", required: false }
+      - { label: "照片 Image", name: "image", widget: "image" }
+      - { label: "拍摄场合 / 活动名（可选）", name: "event", widget: "string", required: false }
+      - { label: "日期（可选）", name: "date", widget: "datetime", required: false }
+      - { label: "排序号（数字小的排前面）", name: "order", widget: "number", value_type: "int", default: 1 }
+
+  # ========== 视频 ==========
+  - name: "videos"
+    label: "Videos 视频"
+    folder: "content/videos"
+    create: true
+    slug: "{{slug}}"
+    sort: "order:asc"
+    fields:
+      - { label: "标题 Title", name: "title", widget: "string" }
+      - { label: "YouTube 链接", name: "youtube_url", widget: "string" }
+      - { label: "简介（可选）", name: "description", widget: "markdown", required: false }
+      - { label: "封面图 Thumbnail（可选）", name: "thumbnail", widget: "image", required: false }
+      - { label: "排序号（数字小的排前面）", name: "order", widget: "number", value_type: "int", default: 1 }
+
+  # ========== 演出日程 ==========
+  - name: "shows"
+    label: "Shows / Schedule 演出日程"
+    folder: "content/shows"
+    create: true
+    slug: "{{year}}{{month}}{{day}}-{{slug}}"
+    sort: "date:asc"
+    fields:
+      - { label: "演出日期时间", name: "date", widget: "datetime", format: "YYYY-MM-DD HH:mm", time_format: "HH:mm" }
+      - { label: "场地 Venue", name: "venue", widget: "string" }
+      - { label: "地址 Address（可选）", name: "address", widget: "string", required: false }
+      - { label: "城市 / 地区（可选）", name: "city", widget: "string", required: false }
+      - { label: "描述 / 亮点（可选）", name: "description", widget: "markdown", required: false }
+      - { label: "购票链接（可选）", name: "ticket_url", widget: "string", required: false }
+      - { label: "是否在首页突出显示", name: "featured", widget: "boolean", default: false }
+
+  # ========== 全站设置 ==========
+  - name: "settings"
+    label: "Site Settings 站点设置"
+    editor:
+      preview: false
+    files:
+      - file: "content/settings/global.json"
+        label: "全站设置 Global"
+        name: "global"
+        fields:
+          - { label: "站点名称 Site Name", name: "site_name", widget: "string", default: "FOURPLAY Dance Band" }
+          - { label: "主 Logo", name: "logo", widget: "image", required: false }
+          - { label: "页脚文字 Footer Text（可选）", name: "footer", widget: "string", required: false }
+          - { label: "Contact / Booking Email", name: "contact_email", widget: "string", required: false }
+          - { label: "Instagram 链接", name: "instagram", widget: "string", required: false }
+          - { label: "Facebook 链接", name: "facebook", widget: "string", required: false }
+          - { label: "YouTube 链接", name: "youtube", widget: "string", required: false }

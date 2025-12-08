@@ -1,0 +1,85 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <title>Schedule 2026 | Fourplay Dance Band</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <link rel="stylesheet" href="style.css" />
+</head>
+<body>
+<div class="page">
+
+ <!-- Header -->
+<header class="site-header">
+  <div class="header-inner">
+    <div class="header-left">
+      <a href="index.html">
+        <img src="assets/logo.png" alt="Fourplay Dance Band" class="header-logo" />
+      </a>
+      <div class="site-title-small">FOURPLAY DANCE BAND</div>
+    </div>
+
+    <!-- 汉堡菜单按钮 -->
+    <button class="nav-toggle" aria-label="Toggle navigation">
+      <span></span>
+      <span></span>
+      <span></span>
+    </button>
+
+    <!-- 导航菜单 -->
+    <nav class="nav">
+      <a href="index.html" class="active">Home</a>
+      <a href="members.html">Members</a>
+      <a href="artists.html">Artists We Cover</a>
+      <a href="videos.html">Videos</a>
+      <a href="photos.html">Photos</a>
+      <a href="schedule.html">Schedule</a>
+      <a href="contact.html">Contact</a>
+    </nav>
+  </div>
+</header>
+
+
+  <main class="main-content">
+    <section class="section-narrow">
+      <div class="page-header">
+        <h1>Schedule</h1>
+        <p>2026 performance calendar. Click a month to view the dates.</p>
+      </div>
+
+      <div class="calendar-wrapper">
+        <div class="month-tabs" id="month-tabs"></div>
+
+        <div class="calendar-panel">
+          <div class="calendar-header">
+            <div id="calendar-month-label">January 2026</div>
+            <div>More dates added as shows are confirmed.</div>
+          </div>
+          <div class="calendar-grid" id="calendar-grid"></div>
+        </div>
+      </div>
+    </section>
+  </main>
+
+  <footer class="site-footer">
+    © 2025 Fourplay Dance Band. All rights reserved.
+  </footer>
+</div>
+
+<script>
+document.addEventListener('DOMContentLoaded', () => {
+  const navToggle = document.querySelector('.nav-toggle');
+  const nav = document.querySelector('.nav');
+
+  if (!navToggle || !nav) return;
+
+  navToggle.addEventListener('click', () => {
+    navToggle.classList.toggle('open');   // 控制汉堡变 X
+    nav.classList.toggle('nav-open');     // 控制菜单显示/隐藏
+  });
+});
+</script></body>
+</html>
+
+</body>
+</html>
