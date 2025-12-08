@@ -6,48 +6,46 @@
   <meta name="viewport" content="width=device-width, initial-scale=1" />
   <link rel="stylesheet" href="style.css" />
 </head>
+
 <body class="home">
 <div class="page">
 
   <!-- Header -->
-<header class="site-header">
-  <div class="header-inner">
-    <div class="header-left">
-      <a href="index.html">
-        <img src="assets/logo.png" alt="Fourplay Dance Band" class="header-logo" />
-      </a>
-      <div class="site-title-small">FOURPLAY DANCE BAND</div>
+  <header class="site-header">
+    <div class="header-inner">
+      <div class="header-left">
+        <a href="index.html">
+          <img src="assets/logo.png" alt="Fourplay Dance Band" class="header-logo" />
+        </a>
+        <div class="site-title-small">FOURPLAY DANCE BAND</div>
+      </div>
+
+      <!-- Hamburger Menu -->
+      <button class="nav-toggle" aria-label="Toggle navigation">
+        <span></span>
+        <span></span>
+        <span></span>
+      </button>
+
+      <!-- Navigation -->
+      <nav class="nav">
+        <a href="index.html" class="active">Home</a>
+        <a href="members.html">Members</a>
+        <a href="artists.html">Artists We Cover</a>
+        <a href="videos.html">Videos</a>
+        <a href="photos.html">Photos</a>
+        <a href="schedule.html">Schedule</a>
+        <a href="contact.html">Contact</a>
+      </nav>
     </div>
-
-    <!-- 汉堡菜单按钮 -->
-    <button class="nav-toggle" aria-label="Toggle navigation">
-      <span></span>
-      <span></span>
-      <span></span>
-    </button>
-
-    <!-- 导航菜单 -->
-    <nav class="nav">
-      <a href="index.html" class="active">Home</a>
-      <a href="members.html">Members</a>
-      <a href="artists.html">Artists We Cover</a>
-      <a href="videos.html">Videos</a>
-      <a href="photos.html">Photos</a>
-      <a href="schedule.html">Schedule</a>
-      <a href="contact.html">Contact</a>
-    </nav>
-  </div>
-</header>
-
-</header>
-
+  </header>
 
   <!-- Main -->
   <main class="main-content">
     <section class="hero">
       <div class="hero-inner">
 
-        <!-- 带霓虹扫描 & 漂浮效果的 LOGO -->
+        <!-- Logo -->
         <div class="hero-logo-wrap">
           <img src="assets/logo.png" alt="Fourplay Dance Band logo" class="hero-logo" />
         </div>
@@ -66,8 +64,13 @@
   <footer class="site-footer">
     © 2025 Fourplay Dance Band. All rights reserved.
   </footer>
-</div>
 
+</div> <!-- end .page -->
+
+
+<!-- ========================= -->
+<!--  Navigation toggle script -->
+<!-- ========================= -->
 <script>
 document.addEventListener('DOMContentLoaded', () => {
   const navToggle = document.querySelector('.nav-toggle');
@@ -76,13 +79,48 @@ document.addEventListener('DOMContentLoaded', () => {
   if (!navToggle || !nav) return;
 
   navToggle.addEventListener('click', () => {
-    navToggle.classList.toggle('open');   // 控制汉堡变 X
-    nav.classList.toggle('nav-open');     // 控制菜单显示/隐藏
+    navToggle.classList.toggle('open');
+    nav.classList.toggle('nav-open');
   });
 });
 </script>
-</body>
-</html>
->
+
+
+<!-- ================================================= -->
+<!--  Netlify Identity Library (needed for CMS login)  -->
+<!-- ================================================= -->
+<script src="https://identity.netlify.com/v1/netlify-identity-widget.js"></script>
+
+
+<!-- =============================================================== -->
+<!--  Email Confirmation Handler (THIS FIXES THE “jump to homepage”) -->
+<!-- =============================================================== -->
+<script>
+  // If URL contains #confirmation_token from email click
+  if (window.location.hash.includes("confirmation_token")) {
+
+    // Wait for Identity system to initialize
+    netlifyIdentity.on("init", function () {
+
+      // Attempt to confirm email
+      netlifyIdentity
+        .confirm()
+        .then(function () {
+          console.log("Email confirmed!");
+
+          // Redirect to CMS login
+          window.location.href = "/admin/";
+        })
+        .catch(function (err) {
+          console.error("Confirmation error:", err);
+        });
+    });
+
+    // Manually initialize Identity system
+    netlifyIdentity.init();
+  }
+</script>
+
+
 </body>
 </html>
