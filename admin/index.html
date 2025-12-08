@@ -3,30 +3,9 @@
   <head>
     <meta charset="utf-8" />
     <title>CMS</title>
-
-    <!-- Netlify Identity Widget -->
     <script src="https://identity.netlify.com/v1/netlify-identity-widget.js"></script>
   </head>
   <body>
-
-    <!-- 处理 Email Confirmation Token -->
-    <script>
-      // 如果 URL 里带有 #confirmation_token=xxxxx
-      if (window.location.hash.includes("confirmation_token")) {
-        netlifyIdentity.on("init", () => {
-          netlifyIdentity
-            .confirm()
-            .then(() => {
-              console.log("Email confirmed");
-              // 邮箱确认后自动打开登录框
-              netlifyIdentity.open("login");
-            })
-            .catch(err => console.error("Confirmation error:", err));
-        });
-      }
-    </script>
-
-    <!-- 原本的登录跳转逻辑 -->
     <script>
       if (window.netlifyIdentity) {
         window.netlifyIdentity.on("init", user => {
@@ -38,8 +17,6 @@
         });
       }
     </script>
-
-    <!-- Netlify CMS -->
     <script src="https://unpkg.com/netlify-cms@^2.0.0/dist/netlify-cms.js"></script>
   </body>
 </html>
