@@ -2,131 +2,101 @@
 <html lang="en">
 <head>
   <meta charset="UTF-8" />
-  <title>Members | Fourplay Dance Band</title>
+  <title>Band Members | Fourplay Dance Band</title>
   <meta name="viewport" content="width=device-width, initial-scale=1" />
   <link rel="stylesheet" href="style.css" />
 </head>
+
 <body>
 <div class="page">
 
- <!-- Header -->
-<header class="site-header">
-  <div class="header-inner">
-    <div class="header-left">
-      <a href="index.html">
-        <img src="assets/logo.png" alt="Fourplay Dance Band" class="header-logo" />
-      </a>
-      <div class="site-title-small">FOURPLAY DANCE BAND</div>
+  <!-- Header -->
+  <header class="site-header">
+    <div class="header-inner">
+      <div class="header-left">
+        <a href="index.html">
+          <img src="assets/logo.png" alt="Logo" class="header-logo" />
+        </a>
+        <div class="site-title-small">FOURPLAY DANCE BAND</div>
+      </div>
+      <button class="nav-toggle" aria-label="Toggle navigation">
+        <span></span><span></span><span></span>
+      </button>
+      <nav class="nav">
+        <a href="index.html">Home</a>
+        <a href="members.html" class="active">Members</a>
+        <a href="artists.html">Artists</a>
+        <a href="videos.html">Videos</a>
+        <a href="photos.html">Photos</a>
+        <a href="schedule.html">Schedule</a>
+        <a href="contact.html">Contact</a>
+      </nav>
     </div>
+  </header>
 
-    <!-- 汉堡菜单按钮 -->
-    <button class="nav-toggle" aria-label="Toggle navigation">
-      <span></span>
-      <span></span>
-      <span></span>
-    </button>
+  <main class="main-content members-page">
 
-    <!-- 导航菜单 -->
-    <nav class="nav">
-      <a href="index.html" class="active">Home</a>
-      <a href="members.html">Members</a>
-      <a href="artists.html">Artists We Cover</a>
-      <a href="videos.html">Videos</a>
-      <a href="photos.html">Photos</a>
-      <a href="schedule.html">Schedule</a>
-      <a href="contact.html">Contact</a>
-    </nav>
-  </div>
-</header>
-
-
-  <main class="main-content">
-    <section class="section-narrow">
-      <div class="page-header">
-        <h1>Band Members</h1>
-        <p>Five-piece dance band — one lead vocalist and a tight four-piece rhythm section.</p>
-      </div>
-
-      <div class="panel">
-        <!-- 第一排：Singer 单独一排 -->
-        <div class="members-grid-top">
-          <div class="member-card">
-            <img src="assets/member-singer.jpg" alt="Lead vocalist" class="member-photo" />
-            <div class="member-name">Lead Vocalist</div>
-            <div class="member-role">Singer</div>
-            <p class="member-bio">
-              High-energy front vocalist leading the crowd with current top-40
-              hits, sing-alongs, and dance-floor anthems.
-            </p>
-          </div>
-        </div>
-
-        <!-- 下面各两人一排 -->
-        <div class="members-grid-bottom">
-          <div class="member-card">
-            <img src="assets/member-2.jpg" alt="Guitar / Vocals" class="member-photo" />
-            <div class="member-name">Guitar</div>
-            <div class="member-role">Guitar &amp; Vocals</div>
-            <p class="member-bio">
-              Rhythm and lead guitar tones that move from funky disco chops to
-              modern pop textures.
-            </p>
-          </div>
-
-          <div class="member-card">
-            <img src="assets/member-3.jpg" alt="Keys / Synth" class="member-photo" />
-            <div class="member-name">Keys</div>
-            <div class="member-role">Keys &amp; Synth</div>
-            <p class="member-bio">
-              Synths, pads, and hooks that recreate radio-ready sounds and big
-              pop textures on stage.
-            </p>
-          </div>
-
-          <div class="member-card">
-            <img src="assets/member-4.jpg" alt="Bass" class="member-photo" />
-            <div class="member-name">Bass</div>
-            <div class="member-role">Bass</div>
-            <p class="member-bio">
-              Solid low-end groove that keeps every dance track locked in with
-              the drums.
-            </p>
-          </div>
-
-          <div class="member-card">
-            <img src="assets/member-5.jpg" alt="Drums" class="member-photo" />
-            <div class="member-name">Drums</div>
-            <div class="member-role">Drums</div>
-            <p class="member-bio">
-              Modern, punchy drum sounds driving every chorus, drop, and dance
-              break.
-            </p>
-          </div>
-        </div>
-      </div>
+    <!-- Band Photo -->
+    <section class="band-photo-wrap">
+      <img id="band-photo" class="band-photo" src="" alt="Band Photo" />
     </section>
+
+    <!-- Band Bio -->
+    <section class="band-bio-section">
+      <p id="band-bio" class="band-bio"></p>
+    </section>
+
+    <!-- 4 Musicians -->
+    <section class="musicians-grid" id="musicians-grid"></section>
+
+    <!-- Singer Featured -->
+    <section class="featured-singer-section">
+      <h2 id="singer-name"></h2>
+      <img id="singer-photo" class="singer-photo" src="" alt="Lead Singer" />
+      <p id="singer-role"></p>
+      <p id="singer-bio"></p>
+    </section>
+
   </main>
 
   <footer class="site-footer">
-    © 2025 Fourplay Dance Band. All rights reserved.
+    © 2025 Fourplay Dance Band
   </footer>
 </div>
 
 <script>
-document.addEventListener('DOMContentLoaded', () => {
-  const navToggle = document.querySelector('.nav-toggle');
-  const nav = document.querySelector('.nav');
+fetch('/content/members.json')
+  .then(r => r.json())
+  .then(data => {
+    if (!data) return;
 
-  if (!navToggle || !nav) return;
+    // Band photo
+    document.getElementById('band-photo').src = data.bandPhoto;
 
-  navToggle.addEventListener('click', () => {
-    navToggle.classList.toggle('open');   // 控制汉堡变 X
-    nav.classList.toggle('nav-open');     // 控制菜单显示/隐藏
+    // Band bio
+    document.getElementById('band-bio').textContent = data.bandBio;
+
+    // 4 musicians
+    const grid = document.getElementById('musicians-grid');
+    data.musicians.forEach(m => {
+      const card = document.createElement('div');
+      card.className = 'musician-card';
+      card.innerHTML = `
+        <img src="${m.photo}" alt="${m.name}" class="musician-photo" />
+        <h3>${m.name}</h3>
+        <p class="role">${m.role}</p>
+        <p class="bio">${m.bio || ""}</p>
+      `;
+      grid.appendChild(card);
+    });
+
+    // Singer featured in center
+    document.getElementById('singer-name').textContent = data.singer.name;
+    document.getElementById('singer-photo').src = data.singer.photo;
+    document.getElementById('singer-role').textContent = data.singer.role;
+    document.getElementById('singer-bio').textContent = data.singer.bio;
   });
-});
 </script>
-</body>
-</html>
 
 </body>
 </html>
