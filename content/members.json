@@ -1,0 +1,31 @@
+{
+  "bandPhoto": "/assets/uploads/fourplay-flyer-front.jpg",
+  "bandBio": "FOURPLAY Dance Band with songstress Taryn McCallum is a rocking, dancing good time! Playing the greater Bay Area for over 7 years, these talented musicians bring their infectious enthusiasm for today’s dance hits along with humor for an always enjoyable event. The band mixes today’s greatest dance hits by artists such as Lizzo, Dua Lipa and Pink with an assortment of classics by Whitney Houston, Donna Summer and Gloria Gaynor. Taryn is an accomplished vocalist embracing some of the most iconic artists and genres to each performance. She sings a range of hits including country artists Gretchen Wilson and Dolly Parton. Her band mates bring decades of musical experience and fun to every entertainment event. Bring your dancing shoes and a smile to a unique and outstanding musical experience with the FOURPLAY Dance Band.",
+  "members": [
+    {
+      "name": "Jeff Pavon",
+      "role": "Drummer",
+      "photo": "/assets/uploads/member-1-adam.jpg"
+    },
+    {
+      "name": "Robby Rottin",
+      "role": "Guitar",
+      "photo": "/assets/uploads/rob.jpg"
+    },
+    {
+      "name": "Taryn McCallum",
+      "role": "Singer",
+      "photo": "/assets/uploads/tayrn.jpg"
+    },
+    {
+      "name": "Adam Rogers",
+      "role": "Keyboard",
+      "photo": "/assets/uploads/member-2-adam2.jpg"
+    },
+    {
+      "name": "Mark Carlson",
+      "role": "Bass",
+      "photo": "/assets/uploads/mark-caroson.jpg"
+    }
+  ]
+}
