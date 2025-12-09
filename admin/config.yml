@@ -54,7 +54,7 @@ collections:
           - { label: "顶部说明文字", name: "intro", widget: "markdown", required: false }
           - { label: "额外说明（比如 booking 信息）", name: "extra", widget: "markdown", required: false }
 
-    # ========== Band Members Page ==========
+# ========== Band Members Page ==========
   - name: "members"
     label: "Band Members"
     format: "json"
@@ -64,13 +64,14 @@ collections:
         name: "members_page"
         file: "content/members.json"
         fields:
-          - { label: "Band Photo", name: "bandPhoto", widget: "image" }
-          - { label: "Band Bio", name: "bandBio", widget: "text" }
+          - { label: "Band Photo", name: "bandPhoto", widget: "image", required: false }
+          - { label: "Band Bio", name: "bandBio", widget: "text", required: false }
 
-          - label: "Band Members (4 people)"
-            name: "musicians"
+          - label: "Members (up to 5 people)"
+            name: "members"
             widget: "list"
-            max: 4
+            min: 1
+            max: 5
             summary: "{{fields.name}} – {{fields.role}}"
             fields:
               - { label: "Name", name: "name", widget: "string" }
@@ -78,14 +79,6 @@ collections:
               - { label: "Photo", name: "photo", widget: "image" }
               - { label: "Bio", name: "bio", widget: "text", required: false }
 
-          - label: "Singer (Featured)"
-            name: "singer"
-            widget: "object"
-            fields:
-              - { label: "Name", name: "name", widget: "string" }
-              - { label: "Role", name: "role", widget: "string", default: "Lead Vocal" }
-              - { label: "Photo", name: "photo", widget: "image" }
-              - { label: "Bio", name: "bio", widget: "text", required: false }
 
 
   # ========== 照片墙 ==========
