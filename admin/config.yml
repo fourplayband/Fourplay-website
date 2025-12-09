@@ -81,19 +81,26 @@ collections:
 
 
 
-  # ========== 照片墙 ==========
+  # ========== 照片墙（JSON 文件 + 一次管理多张图） ==========
   - name: "photos"
     label: "Photo Gallery 照片"
-    folder: "content/photos"
-    create: true
-    slug: "{{slug}}"
-    sort: "order:asc"
+    format: "json"
+    extension: "json"
+    file: "content/photos.json"
+    editor:
+      preview: false
     fields:
-      - { label: "标题 / 说明文字", name: "title", widget: "string", required: false }
-      - { label: "照片 Image", name: "image", widget: "image" }
-      - { label: "拍摄场合 / 活动名（可选）", name: "event", widget: "string", required: false }
-      - { label: "日期（可选）", name: "date", widget: "datetime", required: false }
-      - { label: "排序号（数字小的排前面）", name: "order", widget: "number", value_type: "int", default: 1 }
+      - label: "Photos"
+        name: "items"
+        widget: "list"
+        summary: "{{fields.title}}"
+        fields:
+          - { label: "标题 / 说明文字（可选）", name: "title", widget: "string", required: false }
+          - { label: "照片 Image", name: "image", widget: "image" }
+          - { label: "拍摄场合 / 活动名（可选）", name: "event", widget: "string", required: false }
+          - { label: "日期（可选）", name: "date", widget: "datetime", required: false }
+          - { label: "排序号（数字小的排前面）", name: "order", widget: "number", value_type: "int", default: 1 }
+
 
   # ========== 视频 ==========
   - name: "videos"
@@ -142,3 +149,4 @@ collections:
           - { label: "Instagram 链接", name: "instagram", widget: "string", required: false }
           - { label: "Facebook 链接", name: "facebook", widget: "string", required: false }
           - { label: "YouTube 链接", name: "youtube", widget: "string", required: false }
+
