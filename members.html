@@ -2,80 +2,127 @@
 <html lang="en">
 <head>
   <meta charset="UTF-8" />
-  <title>Members | FOURPLAY</title>
+  <title>Members | Fourplay Dance Band</title>
   <meta name="viewport" content="width=device-width, initial-scale=1" />
   <link rel="stylesheet" href="style.css" />
 </head>
-<body>
-
+<body class="members-page">
 <div class="page">
 
-  <!-- 你的 header 保持原样（如果 members.html 里已经有就留着） -->
-
-
-  <main class="main-content members-page">
-
-    <!-- Top: 左图右文 -->
-    <section class="members-hero">
-      <div class="members-hero-photoWrap">
-        <img id="bandPhoto" class="members-hero-photo" alt="Band Photo" />
+  <!-- 你如果有统一 Header，可以把这里替换成你的 header -->
+  <header class="site-header">
+    <div class="header-inner">
+      <div class="header-left">
+        <a href="index.html">
+          <img src="assets/logo.png" alt="Fourplay Dance Band" class="header-logo" />
+        </a>
+        <div class="site-title-small">FOURPLAY DANCE BAND</div>
       </div>
 
+      <button class="nav-toggle" aria-label="Toggle navigation">
+        <span></span><span></span><span></span>
+      </button>
+
+      <nav class="nav">
+        <a href="index.html">Home</a>
+        <a href="members.html" class="active">Members</a>
+        <a href="artists.html">Artists</a>
+        <a href="videos.html">Videos</a>
+        <a href="photos.html">Photos</a>
+        <a href="schedule.html">Schedule</a>
+        <a href="contact.html">Contact</a>
+      </nav>
+    </div>
+  </header>
+
+  <main class="main-content members-main">
+
+    <!-- 左图右文 -->
+    <section class="members-hero">
+      <div class="members-hero-photoWrap">
+        <img id="bandPhoto" class="members-hero-photo" alt="Band photo" />
+      </div>
       <div class="members-hero-text">
-        <h1 class="members-hero-title">The Players</h1>
+        <h1 class="members-hero-title">Band Members</h1>
         <p id="bandBio" class="members-hero-bio"></p>
       </div>
     </section>
 
-    <!-- 5 人并排 -->
+    <!-- 5人并排 -->
     <section class="members-grid" id="membersGrid"></section>
 
   </main>
 
-  <!-- 你的 footer 保持原样 -->
-
+  <footer class="site-footer">
+    © 2025 Fourplay Dance Band. All rights reserved.
+  </footer>
 </div>
 
 <script>
-fetch('/content/members.json')
-  .then(r => r.json())
-  .then(data => {
-    // top section
-    const bandPhotoEl = document.getElementById('bandPhoto');
-    const bandBioEl = document.getElementById('bandBio');
-
-    bandPhotoEl.src = data.bandPhoto || '';
-    bandBioEl.textContent = data.bandBio || '';
-
-    // order members: singer in center
-    const singer = (data.members || []).find(m => m.isSinger);
-    const others = (data.members || []).filter(m => !m.isSinger);
-
-    // fallback: 如果没标 singer，就按原顺序
-    const ordered = singer && others.length >= 4
-      ? [others[0], others[1], singer, others[2], others[3]]
-      : (data.members || []);
-
-    const grid = document.getElementById('membersGrid');
-    grid.innerHTML = '';
-
-    ordered.forEach(m => {
-      const card = document.createElement('article');
-      card.className = 'member-card' + (m.isSinger ? ' singer' : '');
-
-      card.innerHTML = `
-        <div class="member-avatarWrap">
-          <img class="member-avatar" src="${m.photo || ''}" alt="${m.name || ''}">
-        </div>
-
-        <h3 class="member-name">${m.name || ''}</h3>
-        <div class="member-role">${m.role || ''}</div>
-        <p class="member-bio">${m.bio || ''}</p>
-      `;
-
-      grid.appendChild(card);
+document.addEventListener('DOMContentLoaded', () => {
+  // Mobile hamburger
+  const navToggle = document.querySelector('.nav-toggle');
+  const nav = document.querySelector('.nav');
+  if (navToggle && nav) {
+    navToggle.addEventListener('click', () => {
+      navToggle.classList.toggle('open');
+      nav.classList.toggle('nav-open');
     });
-  });
+  }
+
+  // Normalize image paths: supports "/assets/..." and "assets/..."
+  const normalizeImgPath = (p) => {
+    if (!p) return "";
+    if (p.startsWith("http://") || p.startsWith("https://")) return p;
+    return p.startsWith("/") ? p : "/" + p;
+  };
+
+  fetch('/content/members.json?_=' + Date.now())
+    .then(r => r.json())
+    .then(data => {
+      // Top section
+      const bandPhotoEl = document.getElementById('bandPhoto');
+      const bandBioEl = document.getElementById('bandBio');
+
+      if (bandPhotoEl) bandPhotoEl.src = normalizeImgPath(data.bandPhoto);
+      if (bandBioEl) bandBioEl.textContent = data.bandBio || "";
+
+      // Grid
+      const grid = document.getElementById('membersGrid');
+      grid.innerHTML = "";
+
+      const members = Array.isArray(data.members) ? data.members : [];
+
+      // 如果你将来用 isSinger 标记，就会自动把 singer 放中间；否则保持原顺序
+      const singer = members.find(m => m.isSinger);
+      const others = members.filter(m => !m.isSinger);
+      const ordered = singer && others.length >= 4
+        ? [others[0], others[1], singer, others[2], others[3]]
+        : members;
+
+      ordered.forEach(m => {
+        const card = document.createElement('article');
+        card.className = 'member-card' + (m.isSinger ? ' singer' : '');
+
+        const photo = normalizeImgPath(m.photo);
+        const name = m.name || "";
+        const role = m.role || "";
+        const bio = m.bio || ""; // ✅ 你加 bio 后这里会显示
+
+        card.innerHTML = `
+          <div class="member-avatarWrap">
+            <img class="member-avatar" src="${photo}" alt="${name}">
+          </div>
+          <h3 class="member-name">${name}</h3>
+          <div class="member-role">${role}</div>
+          <p class="member-bio">${bio}</p>
+        `;
+
+        grid.appendChild(card);
+      });
+    })
+    .catch(err => console.error('Failed to load members.json', err));
+});
 </script>
 
 </body>
