@@ -6,35 +6,33 @@
   <meta name="viewport" content="width=device-width, initial-scale=1" />
   <link rel="stylesheet" href="style.css" />
 
-  <!-- nav.js 负责你现有的 header / footer / hamburger -->
+  <!-- 你的汉堡菜单脚本 -->
   <script src="nav.js" defer></script>
 
   <style>
-    /* ===== Only for Members page ===== */
-
-    /* 1) Make footer stick to bottom & header sticky */
+    /* ===== Members page layout fixes (only this page) ===== */
     body.members-page .page{
       min-height: 100vh;
       display: flex;
       flex-direction: column;
     }
-    body.members-page .main-content{
-      flex: 1;
-    }
+    body.members-page .main-content{ flex: 1; }
 
+    /* Sticky header */
     body.members-page header.site-header{
       position: sticky;
       top: 0;
       z-index: 9999;
     }
 
-    /* 2) Layout */
+    /* Content wrap */
     body.members-page .members-wrap{
       max-width: 1200px;
       margin: 0 auto;
-      padding: 40px 18px 60px;
+      padding: 36px 18px 60px;
     }
 
+    /* Top band photo + bio */
     body.members-page .band-top{
       display: grid;
       grid-template-columns: 1.1fr 0.9fr;
@@ -42,14 +40,12 @@
       align-items: start;
       margin-bottom: 18px;
     }
-
     body.members-page .band-photo{
       width: 100%;
       display: block;
       border-radius: 18px;
       box-shadow: 0 18px 40px rgba(0,0,0,.28);
     }
-
     body.members-page .band-bio-card{
       border-radius: 18px;
       padding: 18px 18px 16px;
@@ -58,7 +54,6 @@
       box-shadow: 0 18px 40px rgba(0,0,0,.22);
       border: 1px solid rgba(255,255,255,.10);
     }
-
     body.members-page .band-title{
       margin: 0 0 10px;
       letter-spacing: 2px;
@@ -66,7 +61,6 @@
       text-transform: uppercase;
       font-size: 28px;
     }
-
     body.members-page .band-bio{
       margin: 0;
       line-height: 1.55;
@@ -75,14 +69,13 @@
       white-space: pre-wrap;
     }
 
-    /* 3) Members grid (5 across on desktop) */
+    /* Members grid: 5 across desktop */
     body.members-page .members-grid{
       display: grid;
       grid-template-columns: repeat(5, minmax(0, 1fr));
       gap: 18px;
       margin-top: 14px;
     }
-
     body.members-page .member-card{
       border-radius: 18px;
       padding: 16px 14px 14px;
@@ -95,7 +88,6 @@
       flex-direction: column;
       align-items: center;
     }
-
     body.members-page .member-avatar{
       width: 86px;
       height: 86px;
@@ -104,10 +96,9 @@
       display: block;
       box-shadow: 0 10px 22px rgba(0,0,0,.35);
       border: 3px solid rgba(255,255,255,.12);
-      margin-top: -28px; /* pop up */
+      margin-top: -28px;
       background: rgba(0,0,0,.2);
     }
-
     body.members-page .member-name{
       margin: 12px 0 2px;
       font-weight: 900;
@@ -115,7 +106,6 @@
       text-transform: uppercase;
       font-size: 14px;
     }
-
     body.members-page .member-role{
       margin: 0 0 10px;
       letter-spacing: 2px;
@@ -123,7 +113,6 @@
       font-size: 12px;
       opacity: .75;
     }
-
     body.members-page .member-bio{
       margin: 0;
       font-size: 12.5px;
@@ -147,11 +136,37 @@
 <body class="members-page">
   <div class="page">
 
-    <!-- IMPORTANT: keep the same header element/class your other pages use -->
-    <header class="site-header"></header>
+    <!-- ✅ REAL header (same structure as your other pages) -->
+    <header class="site-header">
+      <div class="header-inner">
+        <div class="header-left">
+          <a href="index.html">
+            <img src="assets/logo.png" alt="Fourplay Dance Band" class="header-logo" />
+          </a>
+          <div class="site-title-small">FOURPLAY DANCE BAND</div>
+        </div>
+
+        <!-- 汉堡菜单按钮 -->
+        <button class="nav-toggle" aria-label="Toggle navigation">
+          <span></span><span></span><span></span>
+        </button>
+
+        <!-- 导航菜单 -->
+        <nav class="nav">
+          <a href="index.html">Home</a>
+          <a href="members.html" class="active">Members</a>
+          <a href="artists.html">Artists</a>
+          <a href="videos.html">Videos</a>
+          <a href="photos.html">Photos</a>
+          <a href="schedule.html">Schedule</a>
+          <a href="contact.html">Contact</a>
+        </nav>
+      </div>
+    </header>
 
     <main class="main-content">
       <div class="members-wrap">
+
         <section class="band-top">
           <div>
             <img id="bandPhoto" class="band-photo" alt="Fourplay Dance Band" />
@@ -166,11 +181,14 @@
         <section>
           <div id="membersGrid" class="members-grid"></div>
         </section>
+
       </div>
     </main>
 
-    <!-- IMPORTANT: keep same footer element/class your other pages use -->
-    <footer class="site-footer"></footer>
+    <!-- ✅ REAL footer -->
+    <footer class="site-footer">
+      © 2025 Fourplay Dance Band. All rights reserved.
+    </footer>
 
   </div>
 
@@ -206,7 +224,7 @@
 
         const bio = document.createElement("p");
         bio.className = "member-bio";
-        bio.textContent = m.bio || "";
+        bio.textContent = m.bio || "";   // ✅ 这里就是每个人的 bio
 
         card.appendChild(img);
         card.appendChild(name);
