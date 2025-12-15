@@ -2,128 +2,209 @@
 <html lang="en">
 <head>
   <meta charset="UTF-8" />
-  <title>Members | Fourplay Dance Band</title>
+  <title>Fourplay Dance Band | Members</title>
   <meta name="viewport" content="width=device-width, initial-scale=1" />
   <link rel="stylesheet" href="style.css" />
+
+  <!-- IMPORTANT: load nav.js so header/footer (and hamburger) work the same as other pages -->
+  <script src="nav.js" defer></script>
+
+  <style>
+    /* ===== Members page layout only (safe, won't affect other pages) ===== */
+    .members-page-wrap{
+      max-width: 1200px;
+      margin: 0 auto;
+      padding: 44px 18px 60px;
+    }
+
+    /* Top band section: left photo + right bio */
+    .band-top{
+      display: grid;
+      grid-template-columns: 1.1fr 0.9fr;
+      gap: 26px;
+      align-items: start;
+      margin-bottom: 26px;
+    }
+    .band-photo{
+      width: 100%;
+      border-radius: 18px;
+      display: block;
+      box-shadow: 0 18px 40px rgba(0,0,0,.28);
+    }
+    .band-bio-card{
+      border-radius: 18px;
+      padding: 18px 18px 16px;
+      background: rgba(10, 10, 30, 0.42);
+      backdrop-filter: blur(8px);
+      box-shadow: 0 18px 40px rgba(0,0,0,.22);
+      border: 1px solid rgba(255,255,255,.10);
+    }
+    .band-bio-title{
+      margin: 0 0 10px;
+      letter-spacing: 2px;
+      font-weight: 800;
+      text-transform: uppercase;
+    }
+    .band-bio-text{
+      margin: 0;
+      line-height: 1.55;
+      font-size: 14px; /* smaller than before */
+      opacity: .95;
+      white-space: pre-wrap;
+    }
+
+    /* Members row (5 across on desktop) */
+    .members-grid{
+      display: grid;
+      grid-template-columns: repeat(5, minmax(0, 1fr));
+      gap: 18px;
+      margin-top: 18px;
+    }
+
+    .member-card{
+      border-radius: 18px;
+      padding: 16px 14px 14px;
+      text-align: center;
+      background: rgba(10, 10, 30, 0.42);
+      backdrop-filter: blur(8px);
+      box-shadow: 0 18px 40px rgba(0,0,0,.22);
+      border: 1px solid rgba(255,255,255,.10);
+      min-height: 210px;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+    }
+
+    .member-avatar{
+      width: 86px;
+      height: 86px;
+      border-radius: 999px;
+      object-fit: cover;
+      display: block;
+      box-shadow: 0 10px 22px rgba(0,0,0,.35);
+      border: 3px solid rgba(255,255,255,.12);
+      margin-top: -28px; /* pop up like your screenshot */
+      background: rgba(0,0,0,.2);
+    }
+
+    .member-name{
+      margin: 12px 0 2px;
+      font-weight: 900;
+      letter-spacing: 1px;
+      text-transform: uppercase;
+      font-size: 14px;
+    }
+
+    .member-role{
+      margin: 0 0 10px;
+      letter-spacing: 2px;
+      text-transform: uppercase;
+      font-size: 12px;
+      opacity: .75;
+    }
+
+    .member-bio{
+      margin: 0;
+      font-size: 12.5px;
+      line-height: 1.45;
+      opacity: .92;
+      white-space: pre-wrap;
+    }
+
+    /* Responsive */
+    @media (max-width: 1024px){
+      .band-top{ grid-template-columns: 1fr; }
+      .members-grid{ grid-template-columns: repeat(2, minmax(0, 1fr)); }
+      .member-avatar{ margin-top: 0; }
+    }
+    @media (max-width: 560px){
+      .members-grid{ grid-template-columns: 1fr; }
+    }
+  </style>
 </head>
-<body class="members-page">
-<div class="page">
 
-  <!-- 你如果有统一 Header，可以把这里替换成你的 header -->
-  <header class="site-header">
-    <div class="header-inner">
-      <div class="header-left">
-        <a href="index.html">
-          <img src="assets/logo.png" alt="Fourplay Dance Band" class="header-logo" />
-        </a>
-        <div class="site-title-small">FOURPLAY DANCE BAND</div>
+<body class="members">
+  <div class="page">
+    <!-- Header injected by nav.js -->
+    <header id="site-header"></header>
+
+    <main class="main-content">
+      <div class="members-page-wrap">
+        <section class="band-top">
+          <div>
+            <img id="bandPhoto" class="band-photo" alt="Fourplay Dance Band" />
+          </div>
+
+          <div class="band-bio-card">
+            <h2 class="band-bio-title">The Players</h2>
+            <p id="bandBio" class="band-bio-text"></p>
+          </div>
+        </section>
+
+        <section>
+          <div id="membersGrid" class="members-grid"></div>
+        </section>
       </div>
+    </main>
 
-      <button class="nav-toggle" aria-label="Toggle navigation">
-        <span></span><span></span><span></span>
-      </button>
+    <!-- Footer injected by nav.js -->
+    <footer id="site-footer"></footer>
+  </div>
 
-      <nav class="nav">
-        <a href="index.html">Home</a>
-        <a href="members.html" class="active">Members</a>
-        <a href="artists.html">Artists</a>
-        <a href="videos.html">Videos</a>
-        <a href="photos.html">Photos</a>
-        <a href="schedule.html">Schedule</a>
-        <a href="contact.html">Contact</a>
-      </nav>
-    </div>
-  </header>
+  <script>
+    async function loadMembers() {
+      // Your JSON lives at: content/members.json (repo root)
+      // Netlify serves it at: /content/members.json
+      const res = await fetch("/content/members.json", { cache: "no-store" });
+      if (!res.ok) throw new Error("Failed to load /content/members.json");
+      const data = await res.json();
 
-  <main class="main-content members-main">
+      // Top band content
+      const bandPhotoEl = document.getElementById("bandPhoto");
+      const bandBioEl = document.getElementById("bandBio");
 
-    <!-- 左图右文 -->
-    <section class="members-hero">
-      <div class="members-hero-photoWrap">
-        <img id="bandPhoto" class="members-hero-photo" alt="Band photo" />
-      </div>
-      <div class="members-hero-text">
-        <h1 class="members-hero-title">Band Members</h1>
-        <p id="bandBio" class="members-hero-bio"></p>
-      </div>
-    </section>
+      bandPhotoEl.src = data.bandPhoto || "";
+      bandBioEl.textContent = data.bandBio || "";
 
-    <!-- 5人并排 -->
-    <section class="members-grid" id="membersGrid"></section>
-
-  </main>
-
-  <footer class="site-footer">
-    © 2025 Fourplay Dance Band. All rights reserved.
-  </footer>
-</div>
-
-<script>
-document.addEventListener('DOMContentLoaded', () => {
-  // Mobile hamburger
-  const navToggle = document.querySelector('.nav-toggle');
-  const nav = document.querySelector('.nav');
-  if (navToggle && nav) {
-    navToggle.addEventListener('click', () => {
-      navToggle.classList.toggle('open');
-      nav.classList.toggle('nav-open');
-    });
-  }
-
-  // Normalize image paths: supports "/assets/..." and "assets/..."
-  const normalizeImgPath = (p) => {
-    if (!p) return "";
-    if (p.startsWith("http://") || p.startsWith("https://")) return p;
-    return p.startsWith("/") ? p : "/" + p;
-  };
-
-  fetch('/content/members.json?_=' + Date.now())
-    .then(r => r.json())
-    .then(data => {
-      // Top section
-      const bandPhotoEl = document.getElementById('bandPhoto');
-      const bandBioEl = document.getElementById('bandBio');
-
-      if (bandPhotoEl) bandPhotoEl.src = normalizeImgPath(data.bandPhoto);
-      if (bandBioEl) bandBioEl.textContent = data.bandBio || "";
-
-      // Grid
-      const grid = document.getElementById('membersGrid');
+      // Members cards
+      const grid = document.getElementById("membersGrid");
       grid.innerHTML = "";
 
       const members = Array.isArray(data.members) ? data.members : [];
+      members.forEach(m => {
+        const card = document.createElement("div");
+        card.className = "member-card";
 
-      // 如果你将来用 isSinger 标记，就会自动把 singer 放中间；否则保持原顺序
-      const singer = members.find(m => m.isSinger);
-      const others = members.filter(m => !m.isSinger);
-      const ordered = singer && others.length >= 4
-        ? [others[0], others[1], singer, others[2], others[3]]
-        : members;
+        const img = document.createElement("img");
+        img.className = "member-avatar";
+        img.alt = m.name || "Member";
+        img.src = m.photo || "";
 
-      ordered.forEach(m => {
-        const card = document.createElement('article');
-        card.className = 'member-card' + (m.isSinger ? ' singer' : '');
+        const name = document.createElement("div");
+        name.className = "member-name";
+        name.textContent = (m.name || "").toUpperCase();
 
-        const photo = normalizeImgPath(m.photo);
-        const name = m.name || "";
-        const role = m.role || "";
-        const bio = m.bio || ""; // ✅ 你加 bio 后这里会显示
+        const role = document.createElement("div");
+        role.className = "member-role";
+        role.textContent = (m.role || "").toUpperCase();
 
-        card.innerHTML = `
-          <div class="member-avatarWrap">
-            <img class="member-avatar" src="${photo}" alt="${name}">
-          </div>
-          <h3 class="member-name">${name}</h3>
-          <div class="member-role">${role}</div>
-          <p class="member-bio">${bio}</p>
-        `;
+        const bio = document.createElement("p");
+        bio.className = "member-bio";
+        bio.textContent = m.bio || "";   // <-- bio will show here
+
+        card.appendChild(img);
+        card.appendChild(name);
+        card.appendChild(role);
+        card.appendChild(bio);
 
         grid.appendChild(card);
       });
-    })
-    .catch(err => console.error('Failed to load members.json', err));
-});
-</script>
+    }
 
+    loadMembers().catch(err => {
+      console.error(err);
+      // keep page usable even if json fails
+    });
+  </script>
 </body>
 </html>
