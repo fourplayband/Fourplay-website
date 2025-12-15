@@ -6,32 +6,51 @@
   <meta name="viewport" content="width=device-width, initial-scale=1" />
   <link rel="stylesheet" href="style.css" />
 
-  <!-- IMPORTANT: load nav.js so header/footer (and hamburger) work the same as other pages -->
+  <!-- nav.js 负责你现有的 header / footer / hamburger -->
   <script src="nav.js" defer></script>
 
   <style>
-    /* ===== Members page layout only (safe, won't affect other pages) ===== */
-    .members-page-wrap{
-      max-width: 1200px;
-      margin: 0 auto;
-      padding: 44px 18px 60px;
+    /* ===== Only for Members page ===== */
+
+    /* 1) Make footer stick to bottom & header sticky */
+    body.members-page .page{
+      min-height: 100vh;
+      display: flex;
+      flex-direction: column;
+    }
+    body.members-page .main-content{
+      flex: 1;
     }
 
-    /* Top band section: left photo + right bio */
-    .band-top{
+    body.members-page header.site-header{
+      position: sticky;
+      top: 0;
+      z-index: 9999;
+    }
+
+    /* 2) Layout */
+    body.members-page .members-wrap{
+      max-width: 1200px;
+      margin: 0 auto;
+      padding: 40px 18px 60px;
+    }
+
+    body.members-page .band-top{
       display: grid;
       grid-template-columns: 1.1fr 0.9fr;
       gap: 26px;
       align-items: start;
-      margin-bottom: 26px;
+      margin-bottom: 18px;
     }
-    .band-photo{
+
+    body.members-page .band-photo{
       width: 100%;
-      border-radius: 18px;
       display: block;
+      border-radius: 18px;
       box-shadow: 0 18px 40px rgba(0,0,0,.28);
     }
-    .band-bio-card{
+
+    body.members-page .band-bio-card{
       border-radius: 18px;
       padding: 18px 18px 16px;
       background: rgba(10, 10, 30, 0.42);
@@ -39,29 +58,32 @@
       box-shadow: 0 18px 40px rgba(0,0,0,.22);
       border: 1px solid rgba(255,255,255,.10);
     }
-    .band-bio-title{
+
+    body.members-page .band-title{
       margin: 0 0 10px;
       letter-spacing: 2px;
-      font-weight: 800;
+      font-weight: 900;
       text-transform: uppercase;
+      font-size: 28px;
     }
-    .band-bio-text{
+
+    body.members-page .band-bio{
       margin: 0;
       line-height: 1.55;
-      font-size: 14px; /* smaller than before */
+      font-size: 14px; /* smaller */
       opacity: .95;
       white-space: pre-wrap;
     }
 
-    /* Members row (5 across on desktop) */
-    .members-grid{
+    /* 3) Members grid (5 across on desktop) */
+    body.members-page .members-grid{
       display: grid;
       grid-template-columns: repeat(5, minmax(0, 1fr));
       gap: 18px;
-      margin-top: 18px;
+      margin-top: 14px;
     }
 
-    .member-card{
+    body.members-page .member-card{
       border-radius: 18px;
       padding: 16px 14px 14px;
       text-align: center;
@@ -69,13 +91,12 @@
       backdrop-filter: blur(8px);
       box-shadow: 0 18px 40px rgba(0,0,0,.22);
       border: 1px solid rgba(255,255,255,.10);
-      min-height: 210px;
       display: flex;
       flex-direction: column;
       align-items: center;
     }
 
-    .member-avatar{
+    body.members-page .member-avatar{
       width: 86px;
       height: 86px;
       border-radius: 999px;
@@ -83,11 +104,11 @@
       display: block;
       box-shadow: 0 10px 22px rgba(0,0,0,.35);
       border: 3px solid rgba(255,255,255,.12);
-      margin-top: -28px; /* pop up like your screenshot */
+      margin-top: -28px; /* pop up */
       background: rgba(0,0,0,.2);
     }
 
-    .member-name{
+    body.members-page .member-name{
       margin: 12px 0 2px;
       font-weight: 900;
       letter-spacing: 1px;
@@ -95,7 +116,7 @@
       font-size: 14px;
     }
 
-    .member-role{
+    body.members-page .member-role{
       margin: 0 0 10px;
       letter-spacing: 2px;
       text-transform: uppercase;
@@ -103,7 +124,7 @@
       opacity: .75;
     }
 
-    .member-bio{
+    body.members-page .member-bio{
       margin: 0;
       font-size: 12.5px;
       line-height: 1.45;
@@ -113,31 +134,32 @@
 
     /* Responsive */
     @media (max-width: 1024px){
-      .band-top{ grid-template-columns: 1fr; }
-      .members-grid{ grid-template-columns: repeat(2, minmax(0, 1fr)); }
-      .member-avatar{ margin-top: 0; }
+      body.members-page .band-top{ grid-template-columns: 1fr; }
+      body.members-page .members-grid{ grid-template-columns: repeat(2, minmax(0, 1fr)); }
+      body.members-page .member-avatar{ margin-top: 0; }
     }
     @media (max-width: 560px){
-      .members-grid{ grid-template-columns: 1fr; }
+      body.members-page .members-grid{ grid-template-columns: 1fr; }
     }
   </style>
 </head>
 
-<body class="members">
+<body class="members-page">
   <div class="page">
-    <!-- Header injected by nav.js -->
-    <header id="site-header"></header>
+
+    <!-- IMPORTANT: keep the same header element/class your other pages use -->
+    <header class="site-header"></header>
 
     <main class="main-content">
-      <div class="members-page-wrap">
+      <div class="members-wrap">
         <section class="band-top">
           <div>
             <img id="bandPhoto" class="band-photo" alt="Fourplay Dance Band" />
           </div>
 
           <div class="band-bio-card">
-            <h2 class="band-bio-title">The Players</h2>
-            <p id="bandBio" class="band-bio-text"></p>
+            <h2 class="band-title">Band Members</h2>
+            <p id="bandBio" class="band-bio"></p>
           </div>
         </section>
 
@@ -147,26 +169,20 @@
       </div>
     </main>
 
-    <!-- Footer injected by nav.js -->
-    <footer id="site-footer"></footer>
+    <!-- IMPORTANT: keep same footer element/class your other pages use -->
+    <footer class="site-footer"></footer>
+
   </div>
 
   <script>
     async function loadMembers() {
-      // Your JSON lives at: content/members.json (repo root)
-      // Netlify serves it at: /content/members.json
       const res = await fetch("/content/members.json", { cache: "no-store" });
       if (!res.ok) throw new Error("Failed to load /content/members.json");
       const data = await res.json();
 
-      // Top band content
-      const bandPhotoEl = document.getElementById("bandPhoto");
-      const bandBioEl = document.getElementById("bandBio");
+      document.getElementById("bandPhoto").src = data.bandPhoto || "";
+      document.getElementById("bandBio").textContent = data.bandBio || "";
 
-      bandPhotoEl.src = data.bandPhoto || "";
-      bandBioEl.textContent = data.bandBio || "";
-
-      // Members cards
       const grid = document.getElementById("membersGrid");
       grid.innerHTML = "";
 
@@ -190,7 +206,7 @@
 
         const bio = document.createElement("p");
         bio.className = "member-bio";
-        bio.textContent = m.bio || "";   // <-- bio will show here
+        bio.textContent = m.bio || "";
 
         card.appendChild(img);
         card.appendChild(name);
@@ -201,10 +217,7 @@
       });
     }
 
-    loadMembers().catch(err => {
-      console.error(err);
-      // keep page usable even if json fails
-    });
+    loadMembers().catch(console.error);
   </script>
 </body>
 </html>
