@@ -654,3 +654,129 @@ a {
   border-radius: 12px;
   margin: 20px 0;
 }
+/* ===== Members Page ===== */
+.members-page{
+  padding: 60px 20px;
+}
+
+/* Top row: left photo / right bio */
+.members-hero{
+  max-width: 1200px;
+  margin: 0 auto 50px;
+  display: flex;
+  gap: 28px;
+  align-items: center;
+}
+
+.members-hero-photoWrap{
+  flex: 0 0 52%;
+}
+
+.members-hero-photo{
+  width: 100%;
+  height: auto;
+  display: block;
+  border-radius: 14px;
+  box-shadow: 0 10px 30px rgba(0,0,0,0.35);
+}
+
+.members-hero-text{
+  flex: 1;
+}
+
+.members-hero-title{
+  margin: 0 0 12px;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+}
+
+.members-hero-bio{
+  margin: 0;
+  font-size: 0.95rem;          /* 比现在小一点 */
+  line-height: 1.6;
+  opacity: 0.9;
+}
+
+/* Grid 5 across */
+.members-grid{
+  max-width: 1200px;
+  margin: 0 auto;
+  display: grid;
+  grid-template-columns: repeat(5, 1fr);
+  gap: 22px;
+}
+
+/* Card style like screenshot */
+.member-card{
+  position: relative;
+  background: rgba(255,255,255,0.10);
+  border: 1px solid rgba(255,255,255,0.14);
+  border-radius: 16px;
+  padding: 56px 16px 18px; /* top padding for avatar overlap */
+  text-align: center;
+  backdrop-filter: blur(8px);
+  -webkit-backdrop-filter: blur(8px);
+  box-shadow: 0 12px 30px rgba(0,0,0,0.28);
+}
+
+.member-avatarWrap{
+  position: absolute;
+  top: -34px;
+  left: 50%;
+  transform: translateX(-50%);
+  width: 76px;
+  height: 76px;
+  border-radius: 999px;
+  padding: 4px;
+  background: rgba(0,0,0,0.35);
+  border: 1px solid rgba(255,255,255,0.22);
+}
+
+.member-avatar{
+  width: 100%;
+  height: 100%;
+  border-radius: 999px;
+  object-fit: cover;
+  display: block;
+}
+
+.member-name{
+  margin: 6px 0 6px;
+  font-size: 0.95rem;
+  letter-spacing: 0.02em;
+  text-transform: uppercase;
+}
+
+.member-role{
+  font-size: 0.85rem;
+  opacity: 0.75;
+  margin-bottom: 10px;
+}
+
+.member-bio{
+  margin: 0;
+  font-size: 0.85rem;
+  line-height: 1.5;
+  opacity: 0.9;
+}
+
+/* optional: singer slightly highlighted */
+.member-card.singer{
+  transform: translateY(-4px);
+  border-color: rgba(255,255,255,0.28);
+}
+
+/* Responsive */
+@media (max-width: 980px){
+  .members-hero{
+    flex-direction: column;
+    align-items: stretch;
+  }
+  .members-hero-photoWrap{
+    flex: auto;
+  }
+  .members-grid{
+    grid-template-columns: 1fr; /* 手机一人一行 */
+  }
+}
+
