@@ -2,99 +2,79 @@
 <html lang="en">
 <head>
   <meta charset="UTF-8" />
-  <title>Band Members | Fourplay Dance Band</title>
+  <title>Members | FOURPLAY</title>
   <meta name="viewport" content="width=device-width, initial-scale=1" />
   <link rel="stylesheet" href="style.css" />
 </head>
-
 <body>
+
 <div class="page">
 
-  <!-- Header -->
-  <header class="site-header">
-    <div class="header-inner">
-      <div class="header-left">
-        <a href="index.html">
-          <img src="assets/logo.png" alt="Logo" class="header-logo" />
-        </a>
-        <div class="site-title-small">FOURPLAY DANCE BAND</div>
-      </div>
-      <button class="nav-toggle" aria-label="Toggle navigation">
-        <span></span><span></span><span></span>
-      </button>
-      <nav class="nav">
-        <a href="index.html">Home</a>
-        <a href="members.html" class="active">Members</a>
-        <a href="artists.html">Artists</a>
-        <a href="videos.html">Videos</a>
-        <a href="photos.html">Photos</a>
-        <a href="schedule.html">Schedule</a>
-        <a href="contact.html">Contact</a>
-      </nav>
-    </div>
-  </header>
+  <!-- 你的 header 保持原样（如果 members.html 里已经有就留着） -->
+
 
   <main class="main-content members-page">
 
-    <!-- Band Photo -->
-    <section class="band-photo-wrap">
-      <img id="band-photo" class="band-photo" src="" alt="Band Photo" />
+    <!-- Top: 左图右文 -->
+    <section class="members-hero">
+      <div class="members-hero-photoWrap">
+        <img id="bandPhoto" class="members-hero-photo" alt="Band Photo" />
+      </div>
+
+      <div class="members-hero-text">
+        <h1 class="members-hero-title">The Players</h1>
+        <p id="bandBio" class="members-hero-bio"></p>
+      </div>
     </section>
 
-    <!-- Band Bio -->
-    <section class="band-bio-section">
-      <p id="band-bio" class="band-bio"></p>
-    </section>
-
-    <!-- 4 Musicians -->
-    <section class="musicians-grid" id="musicians-grid"></section>
-
-    <!-- Singer Featured -->
-    <section class="featured-singer-section">
-      <h2 id="singer-name"></h2>
-      <img id="singer-photo" class="singer-photo" src="" alt="Lead Singer" />
-      <p id="singer-role"></p>
-      <p id="singer-bio"></p>
-    </section>
+    <!-- 5 人并排 -->
+    <section class="members-grid" id="membersGrid"></section>
 
   </main>
 
-  <footer class="site-footer">
-    © 2025 Fourplay Dance Band
-  </footer>
+  <!-- 你的 footer 保持原样 -->
+
 </div>
 
 <script>
 fetch('/content/members.json')
   .then(r => r.json())
   .then(data => {
-    if (!data) return;
+    // top section
+    const bandPhotoEl = document.getElementById('bandPhoto');
+    const bandBioEl = document.getElementById('bandBio');
 
-    // Band photo
-    document.getElementById('band-photo').src = data.bandPhoto;
+    bandPhotoEl.src = data.bandPhoto || '';
+    bandBioEl.textContent = data.bandBio || '';
 
-    // Band bio
-    document.getElementById('band-bio').textContent = data.bandBio;
+    // order members: singer in center
+    const singer = (data.members || []).find(m => m.isSinger);
+    const others = (data.members || []).filter(m => !m.isSinger);
 
-    // 4 musicians
-    const grid = document.getElementById('musicians-grid');
-    data.musicians.forEach(m => {
-      const card = document.createElement('div');
-      card.className = 'musician-card';
+    // fallback: 如果没标 singer，就按原顺序
+    const ordered = singer && others.length >= 4
+      ? [others[0], others[1], singer, others[2], others[3]]
+      : (data.members || []);
+
+    const grid = document.getElementById('membersGrid');
+    grid.innerHTML = '';
+
+    ordered.forEach(m => {
+      const card = document.createElement('article');
+      card.className = 'member-card' + (m.isSinger ? ' singer' : '');
+
       card.innerHTML = `
-        <img src="${m.photo}" alt="${m.name}" class="musician-photo" />
-        <h3>${m.name}</h3>
-        <p class="role">${m.role}</p>
-        <p class="bio">${m.bio || ""}</p>
+        <div class="member-avatarWrap">
+          <img class="member-avatar" src="${m.photo || ''}" alt="${m.name || ''}">
+        </div>
+
+        <h3 class="member-name">${m.name || ''}</h3>
+        <div class="member-role">${m.role || ''}</div>
+        <p class="member-bio">${m.bio || ''}</p>
       `;
+
       grid.appendChild(card);
     });
-
-    // Singer featured in center
-    document.getElementById('singer-name').textContent = data.singer.name;
-    document.getElementById('singer-photo').src = data.singer.photo;
-    document.getElementById('singer-role').textContent = data.singer.role;
-    document.getElementById('singer-bio').textContent = data.singer.bio;
   });
 </script>
 
