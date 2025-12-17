@@ -1111,3 +1111,157 @@ body.members-page{
   opacity: 0.92;
   white-space: pre-wrap;
 }
+
+/* ================= Members page: FORCE header/footer full-bleed & fix overlaps ================= */
+
+/* 1) Members 页：让 footer 真正贴底（且不影响别的页） */
+body.members-page{
+  min-height: 100vh;
+  display: flex;
+  flex-direction: column;
+}
+
+/* 2) Header：固定贴顶 + 全宽贴左右（你的 header-inner 继续 max-width 居中即可） */
+.site-header.site-header--fixed{
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  width: 100%;
+  z-index: 9999;
+}
+
+/* 3) Members 主内容：不要用 .main-content 的 90px 影响布局
+      只给 members-main 加正确的顶距，避免你看到“header 不贴顶”的错觉 */
+main.members-main{
+  flex: 1;
+  padding-top: 92px;   /* = header 高度 */
+  padding-bottom: 40px;
+}
+
+/* 如果你不想影响别的页面，别改 .main-content，只改 members-main */
+
+/* 4) Footer：全宽贴左右 + 内容居中 */
+.site-footer.site-footer--fullbleed{
+  width: 100%;
+  margin: 0;
+  padding: 0;          /* 外层不留边 */
+}
+
+.site-footer.site-footer--fullbleed .footer-inner{
+  max-width: 1200px;
+  margin: 0 auto;
+  padding: 14px 20px 18px;
+  text-align: center;
+}
+
+/* 5) 顶部两块对齐（合照不裁剪保留） */
+.members-hero{
+  max-width: 1200px;
+  margin: 0 auto 44px;     /* ✅ 多给点底部空间 */
+  display: flex;
+  gap: 28px;
+  align-items: stretch;
+}
+
+.members-hero-photoWrap{
+  flex: 0 0 52%;
+  display: flex;
+  background: rgba(10,10,30,.42);
+  border: 1px solid rgba(255,255,255,.12);
+  border-radius: 18px;
+  padding: 14px;
+  backdrop-filter: blur(10px);
+}
+
+.members-hero-photo{
+  width: 100%;
+  height: auto;
+  display: block;
+  border-radius: 14px;
+  object-fit: contain;      /* ✅ 不裁剪 */
+  background: rgba(0,0,0,.25);
+}
+
+/* 6) 5个 member 整排下移一点 + 给“大头像”留空间，避免压到合照 */
+.members-grid{
+  max-width: 1200px;
+  margin: 26px auto 52px;   /* ✅ 整排往下 */
+  display: flex;
+  gap: 22px;
+  align-items: stretch;
+}
+
+/* 卡片 */
+.member-card{
+  flex: 1 1 0;
+  min-width: 0;
+  position: relative;
+  border: 1px solid rgba(255,255,255,0.14);
+  border-radius: 16px;
+  padding: 72px 16px 18px;  /* ✅ 给头像更多空间（原来 62） */
+  text-align: center;
+  backdrop-filter: blur(8px);
+  -webkit-backdrop-filter: blur(8px);
+  background: rgba(255,255,255,0.10);
+  box-shadow: 0 12px 30px rgba(0,0,0,0.28);
+  cursor: pointer;
+  order: var(--order-desktop, 99);
+}
+
+/* 头像上浮 */
+.member-avatarWrap{
+  position: absolute;
+  top: -30px;               /* ✅ 少往上浮一点，减少撞击概率 */
+  left: 50%;
+  transform: translateX(-50%);
+  width: 92px;
+  height: 92px;
+  border-radius: 999px;
+  padding: 4px;
+  background: rgba(0,0,0,0.35);
+  border: 1px solid rgba(255,255,255,0.22);
+}
+
+.member-avatar{
+  width: 100%;
+  height: 100%;
+  border-radius: 999px;
+  object-fit: cover;
+  display: block;
+}
+
+/* Taryn 更大：但不要顶到合照（降低上浮高度 + 增加卡片padding-top 已做） */
+.member-card.featured{
+  transform: translateY(0);  /* ✅ 不再整体往上飘 */
+  border-color: rgba(255,255,255,0.28);
+  box-shadow:
+    0 0 0 1px rgba(255,255,255,0.22),
+    0 18px 40px rgba(127,255,255,0.20);
+  z-index: 2;
+}
+
+.member-card.featured .member-avatarWrap{
+  width: 118px;
+  height: 118px;
+  top: -34px;               /* ✅ 比原来 -48 下来一点，避免压到上面 */
+}
+
+/* Band intro 左对齐 */
+.members-hero-bio{
+  text-align: left;
+}
+
+/* 手机：一人一行 + Taryn 第一 */
+@media (max-width: 980px){
+  .members-hero{
+    flex-direction: column;
+  }
+  .members-grid{
+    flex-direction: column;
+    margin-top: 18px;
+  }
+  .member-card{
+    order: var(--order-mobile, 99);
+  }
+}
