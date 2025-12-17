@@ -10,7 +10,7 @@
 <body class="members-page">
 
   <!-- ================= HEADER ================= -->
-  <header class="site-header fixed">
+  <header class="site-header">
     <div class="header-inner">
       <div class="header-left">
         <a href="index.html">
@@ -36,44 +36,36 @@
   </header>
 
   <!-- ================= MAIN ================= -->
-  <main class="main-content">
+  <main class="main-content members-main">
     <!-- ===== Top Band Section ===== -->
-    <section class="band-top">
-      <div class="band-photo-card">
-        <img id="bandPhoto" class="band-photo" alt="Fourplay Dance Band" />
+    <section class="members-hero">
+      <div class="members-hero-photoWrap">
+        <img id="bandPhoto" class="members-hero-photo" alt="Fourplay Dance Band" />
       </div>
 
-      <div class="band-bio-card">
-        <h2 class="band-title">Band Intro</h2>
-        <p id="bandBio" class="band-bio"></p>
+      <div class="members-hero-text panel-soft">
+        <h2 class="members-hero-title">Band Members</h2>
+        <p id="bandBio" class="members-hero-bio"></p>
       </div>
     </section>
 
-    <!-- ===== Members Grid ===== -->
+    <!-- ===== Members Row ===== -->
     <section class="members-grid" id="membersGrid"></section>
   </main>
 
   <!-- ================= FOOTER ================= -->
-  <footer class="site-footer">
+  <footer class="site-footer site-footer--sticky">
     © 2025 Fourplay Dance Band. All rights reserved.
   </footer>
 
-  <!-- ================= BIO MODAL ================= -->
+  <!-- ================= MODAL (Bio Popup) ================= -->
   <div class="bio-modal" id="bioModal" aria-hidden="true">
-    <div class="bio-backdrop" id="bioBackdrop"></div>
-
-    <div class="bio-panel" role="dialog" aria-modal="true" aria-labelledby="bioTitle">
-      <button class="bio-close" id="bioClose" aria-label="Close">×</button>
-
-      <div class="bio-head">
-        <img id="bioPhoto" class="bio-photo" alt="" />
-        <div class="bio-head-text">
-          <div id="bioTitle" class="bio-name"></div>
-          <div id="bioRole" class="bio-role"></div>
-        </div>
-      </div>
-
-      <div id="bioText" class="bio-text"></div>
+    <div class="bio-modal__backdrop" data-close="1"></div>
+    <div class="bio-modal__panel" role="dialog" aria-modal="true" aria-labelledby="bioTitle">
+      <button class="bio-modal__close" aria-label="Close" data-close="1">✕</button>
+      <h3 class="bio-modal__title" id="bioTitle"></h3>
+      <div class="bio-modal__role" id="bioRole"></div>
+      <div class="bio-modal__text" id="bioText"></div>
     </div>
   </div>
 
@@ -81,338 +73,97 @@
   <script src="nav.js"></script>
 
   <script>
-    // ---------- Modal controls ----------
-    const modal = document.getElementById('bioModal');
-    const backdrop = document.getElementById('bioBackdrop');
-    const closeBtn = document.getElementById('bioClose');
+    const FEATURED_NAME = "Taryn McCallum";
 
-    const bioPhoto = document.getElementById('bioPhoto');
-    const bioTitle = document.getElementById('bioTitle');
-    const bioRole  = document.getElementById('bioRole');
-    const bioText  = document.getElementById('bioText');
+    function normalizeMembersForLayout(members) {
+      // 桌面：Taryn 必须在中间（第3个）
+      // 手机：Taryn 必须排第一
+      const featured = members.find(x => x.name === FEATURED_NAME);
+      const others = members.filter(x => x.name !== FEATURED_NAME);
 
-    function openBio(member) {
-      bioPhoto.src = member.photo || '';
-      bioPhoto.alt = member.name || 'Member photo';
-      bioTitle.textContent = member.name || '';
-      bioRole.textContent  = member.role || '';
-      bioText.textContent  = member.bio || '';
+      // 桌面顺序：前2个 + Taryn + 后2个（保持其它人原顺序）
+      const desktopOrder = [];
+      desktopOrder.push(...others.slice(0, 2));
+      if (featured) desktopOrder.push(featured);
+      desktopOrder.push(...others.slice(2));
 
-      modal.classList.add('open');
-      modal.setAttribute('aria-hidden', 'false');
-      document.body.classList.add('modal-open');
+      // 手机顺序：Taryn + 其他人
+      const mobileOrder = [];
+      if (featured) mobileOrder.push(featured);
+      mobileOrder.push(...others);
+
+      // 给每个人打上两个 order（用于 CSS flex order）
+      const desktopMap = new Map(desktopOrder.map((m, i) => [m.name, i + 1]));
+      const mobileMap  = new Map(mobileOrder.map((m, i) => [m.name, i + 1]));
+
+      return members.map(m => ({
+        ...m,
+        orderDesktop: desktopMap.get(m.name) || 99,
+        orderMobile: mobileMap.get(m.name) || 99,
+        isFeatured: m.name === FEATURED_NAME
+      }));
     }
 
-    function closeBio() {
-      modal.classList.remove('open');
-      modal.setAttribute('aria-hidden', 'true');
-      document.body.classList.remove('modal-open');
+    function openBioModal(member) {
+      const modal = document.getElementById("bioModal");
+      document.getElementById("bioTitle").textContent = member.name || "";
+      document.getElementById("bioRole").textContent = member.role || "";
+      document.getElementById("bioText").textContent = member.bio || "Bio coming soon.";
+      modal.classList.add("is-open");
+      modal.setAttribute("aria-hidden", "false");
+      document.body.classList.add("no-scroll");
     }
 
-    backdrop.addEventListener('click', closeBio);
-    closeBtn.addEventListener('click', closeBio);
-    document.addEventListener('keydown', (e) => {
-      if (e.key === 'Escape' && modal.classList.contains('open')) closeBio();
+    function closeBioModal() {
+      const modal = document.getElementById("bioModal");
+      modal.classList.remove("is-open");
+      modal.setAttribute("aria-hidden", "true");
+      document.body.classList.remove("no-scroll");
+    }
+
+    // Close modal handlers
+    document.addEventListener("click", (e) => {
+      if (e.target && e.target.dataset && e.target.dataset.close) closeBioModal();
+    });
+    document.addEventListener("keydown", (e) => {
+      if (e.key === "Escape") closeBioModal();
     });
 
-    // ---------- Data render ----------
-    fetch('/content/members.json')
+    fetch("/content/members.json")
       .then(res => res.json())
       .then(data => {
-        document.getElementById('bandPhoto').src = data.bandPhoto || '';
-        document.getElementById('bandBio').textContent = data.bandBio || '';
+        document.getElementById("bandPhoto").src = data.bandPhoto;
+        document.getElementById("bandBio").textContent = data.bandBio;
 
-        const grid = document.getElementById('membersGrid');
-        grid.innerHTML = '';
+        const grid = document.getElementById("membersGrid");
+        grid.innerHTML = "";
 
-        (data.members || []).forEach(m => {
-          const card = document.createElement('button');
-          card.type = 'button';
-          card.className = 'member-card';
+        const normalized = normalizeMembersForLayout(data.members || []);
 
-          const hasBio = !!(m.bio && m.bio.trim());
-          card.setAttribute('aria-label', hasBio ? `Open bio for ${m.name}` : `${m.name}`);
-          if (!hasBio) card.classList.add('no-bio');
+        normalized.forEach(m => {
+          const card = document.createElement("button");
+          card.type = "button";
+          card.className = "member-card" + (m.isFeatured ? " featured" : "");
+          card.style.setProperty("--order-desktop", m.orderDesktop);
+          card.style.setProperty("--order-mobile", m.orderMobile);
 
           card.innerHTML = `
-            <div class="avatar-wrap">
-              <img class="avatar" src="${m.photo || ''}" alt="${m.name || ''}">
+            <div class="member-avatarWrap">
+              <img class="member-avatar" src="${m.photo || ""}" alt="${m.name || ""}">
             </div>
-            <h3>${m.name || ''}</h3>
-            <p class="role">${m.role || ''}</p>
-            <p class="hint">${hasBio ? 'Click for bio' : ''}</p>
+            <div class="member-name">${m.name || ""}</div>
+            <div class="member-role">${m.role || ""}</div>
+            <div class="member-clickHint">Click for bio</div>
           `;
 
-          if (hasBio) {
-            card.addEventListener('click', () => openBio(m));
-          }
-
+          card.addEventListener("click", () => openBioModal(m));
           grid.appendChild(card);
         });
       })
-      .catch(err => console.error('Failed to load members.json', err));
+      .catch(err => {
+        console.error("Failed to load members.json", err);
+      });
   </script>
-
-  <!-- ================= PAGE STYLE (members only) ================= -->
-  <style>
-    /* ===== Layout base ===== */
-    body.members-page {
-      min-height: 100vh;
-      display: flex;
-      flex-direction: column;
-    }
-
-    main.main-content {
-      flex: 1;
-      padding-top: 96px; /* fixed header spacing */
-      padding-left: 20px;
-      padding-right: 20px;
-    }
-
-    /* prevent background scroll when modal open */
-    body.modal-open {
-      overflow: hidden;
-    }
-
-    /* ===== Header fixed + full-width background ===== */
-    .site-header.fixed {
-      position: fixed;
-      top: 0;
-      left: 0;
-      width: 100%;
-      z-index: 1000;
-
-      /* make sure header background goes edge-to-edge */
-      background: rgba(5, 8, 26, 0.55);
-      backdrop-filter: blur(10px);
-      border-bottom: 1px solid rgba(255,255,255,.08);
-    }
-
-    /* keep inner content centered but header bg full width */
-    .site-header .header-inner {
-      max-width: 1200px;
-      margin: 0 auto;
-      padding: 14px 20px;
-    }
-
-    /* ===== Footer sticks to bottom ===== */
-    .site-footer {
-      width: 100%;
-      margin-top: auto;
-    }
-
-    /* ===== Top section ===== */
-    .band-top {
-      max-width: 1200px;
-      margin: 0 auto 34px;
-      display: grid;
-      grid-template-columns: 1.1fr 0.9fr;
-      gap: 28px;
-      align-items: stretch;
-    }
-
-    .band-photo-card,
-    .band-bio-card {
-      background: rgba(10,10,30,.42);
-      backdrop-filter: blur(8px);
-      border-radius: 18px;
-      border: 1px solid rgba(255,255,255,.1);
-      box-shadow: 0 18px 40px rgba(0,0,0,.22);
-    }
-
-    .band-photo-card {
-      padding: 14px;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-    }
-
-    /* IMPORTANT: do NOT crop the band photo */
-    .band-photo {
-      width: 100%;
-      height: auto;
-      max-height: 420px;
-      object-fit: contain; /* no crop */
-      border-radius: 14px;
-      display: block;
-    }
-
-    .band-bio-card {
-      padding: 22px 22px;
-      text-align: left; /* <-- left aligned */
-    }
-
-    .band-title {
-      margin: 0 0 12px;
-    }
-
-    .band-bio {
-      font-size: 0.95rem;
-      line-height: 1.65;
-      opacity: .95;
-      text-align: left; /* <-- left aligned */
-    }
-
-    /* ===== Members grid ===== */
-    .members-grid {
-      max-width: 1200px;
-      margin: 0 auto 60px;
-      display: grid;
-      grid-template-columns: repeat(5, 1fr);
-      gap: 22px;
-    }
-
-    .member-card {
-      background: rgba(20,20,60,.45);
-      border: 1px solid rgba(255,255,255,.08);
-      border-radius: 18px;
-      padding: 46px 14px 18px; /* extra top space for lifted avatar */
-      text-align: center;
-      backdrop-filter: blur(10px);
-      box-shadow: 0 10px 30px rgba(0,0,0,.25);
-      cursor: pointer;
-      color: inherit;
-    }
-
-    .member-card.no-bio {
-      cursor: default;
-      opacity: .92;
-    }
-
-    /* avatar lifted upward */
-    .avatar-wrap {
-      width: 112px;
-      height: 112px;
-      margin: 0 auto;
-      margin-top: -78px; /* <-- offset up */
-      border-radius: 999px;
-      padding: 4px;
-      background: rgba(255,255,255,.10);
-      box-shadow: 0 10px 24px rgba(0,0,0,.35);
-    }
-
-    .avatar {
-      width: 100%;
-      height: 100%;
-      border-radius: 999px;
-      object-fit: cover;
-      display: block;
-    }
-
-    .member-card h3 {
-      font-size: .95rem;
-      margin: 12px 0 2px;
-      letter-spacing: .3px;
-    }
-
-    .member-card .role {
-      font-size: .8rem;
-      opacity: .85;
-      margin: 0 0 8px;
-    }
-
-    .member-card .hint {
-      margin: 0;
-      font-size: .75rem;
-      opacity: .65;
-    }
-
-    /* ===== Modal ===== */
-    .bio-modal {
-      position: fixed;
-      inset: 0;
-      display: none;
-      z-index: 2000;
-    }
-
-    .bio-modal.open {
-      display: block;
-    }
-
-    .bio-backdrop {
-      position: absolute;
-      inset: 0;
-      background: rgba(0,0,0,.55);
-      backdrop-filter: blur(4px);
-    }
-
-    .bio-panel {
-      position: relative;
-      width: min(720px, calc(100vw - 32px));
-      margin: 90px auto 0;
-      background: rgba(10,10,30,.82);
-      border: 1px solid rgba(255,255,255,.12);
-      border-radius: 18px;
-      box-shadow: 0 30px 80px rgba(0,0,0,.5);
-      padding: 18px 18px 20px;
-    }
-
-    .bio-close {
-      position: absolute;
-      right: 10px;
-      top: 10px;
-      width: 36px;
-      height: 36px;
-      border-radius: 10px;
-      border: 1px solid rgba(255,255,255,.15);
-      background: rgba(255,255,255,.06);
-      color: #fff;
-      font-size: 22px;
-      cursor: pointer;
-      line-height: 1;
-    }
-
-    .bio-head {
-      display: flex;
-      align-items: center;
-      gap: 14px;
-      padding-right: 44px;
-      margin-bottom: 12px;
-    }
-
-    .bio-photo {
-      width: 76px;
-      height: 76px;
-      border-radius: 999px;
-      object-fit: cover;
-      border: 1px solid rgba(255,255,255,.15);
-    }
-
-    .bio-name {
-      font-size: 1.15rem;
-      font-weight: 700;
-      letter-spacing: .4px;
-    }
-
-    .bio-role {
-      font-size: .9rem;
-      opacity: .85;
-      margin-top: 2px;
-    }
-
-    .bio-text {
-      font-size: .95rem;
-      line-height: 1.65;
-      opacity: .95;
-      white-space: pre-wrap;
-    }
-
-    /* ===== Responsive ===== */
-    @media (max-width: 900px) {
-      .band-top {
-        grid-template-columns: 1fr;
-      }
-
-      .members-grid {
-        grid-template-columns: 1fr;
-      }
-
-      .bio-panel {
-        margin-top: 76px;
-      }
-    }
-  </style>
 
 </body>
 </html>
-
