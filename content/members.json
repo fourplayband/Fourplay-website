@@ -5,27 +5,32 @@
     {
       "name": "Jeff Pavon",
       "role": "Drummer",
-      "photo": "/assets/uploads/member-1-adam.jpg"
+      "photo": "/assets/uploads/member-1-adam.jpg",
+      "bio": ""
     },
     {
       "name": "Robby Rottin",
       "role": "Guitar & Vocals",
-      "photo": "/assets/uploads/rob.jpg"
+      "photo": "/assets/uploads/rob.jpg",
+      "bio": "Robby Rottin’s love of music began while the earth was still cooling. Learning early that banging rocks together was not particularly musical, he eventually discovered that guitars existed. Once his parents could no longer keep secret that guitars could be electrified and amplified, life in the Rottin household was never the same. Robby has been performing professionally since 2000 in various cover bands. Had his SAT scores been higher, he might have missed this incredible calling of dance music. Come see him in the Fourplay Dance Band as he finds unique ways to meld low grades, humor and great music for your enjoyment. Robby never met a puppy or a party he didn’t like."
     },
     {
       "name": "Taryn McCallum",
       "role": "Singer",
-      "photo": "/assets/uploads/tayrn.jpg"
+      "photo": "/assets/uploads/tayrn.jpg",
+      "bio": "Taryn is a lifelong vocalist with over four decades of experience bringing music to life. She has performed at venues large and small across the Bay Area, earning a reputation for her soulful tone, dynamic range, and heartfelt connection with audiences. Whether on stage or in intimate gatherings, her voice leaves a lasting impression."
     },
     {
       "name": "Adam Rogers",
       "role": "Keyboard",
-      "photo": "/assets/uploads/member-2-adam2.jpg"
+      "photo": "/assets/uploads/member-2-adam2.jpg",
+      "bio": "Adam Rogers has been playing piano since age 7. He trained in jazz and blues piano during high school and attended the Berklee College of Music for 1 year after college. He loves music and plays daily, performing as often as he can. Playing in bands is a serious hobby for him and connecting with people through music is his favorite pastime."
     },
     {
       "name": "Mark Carlson",
       "role": "Bass",
-      "photo": "/assets/uploads/mark-caroson.jpg"
+      "photo": "/assets/uploads/mark-caroson.jpg",
+      "bio": "At ten years old, Mark Carlson bought his first bass guitar from a classified ad. It was a 1973 Fender Jazz he played in school pep, vocal, and jazz bands. His musical journey, dormant for decades, was reignited during the COVID lockdowns, inspiring him to post various bass cover videos online. Today, his bass collection has grown somewhat, but is strictly limited by the number his wife will tolerate."
     }
   ]
 }
