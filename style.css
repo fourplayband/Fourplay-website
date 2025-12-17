@@ -859,6 +859,86 @@ body.members-page{
   opacity: 0.92;
 }
 
+/* ================= Members page fixes (footer full width + sticky bottom) ================= */
+
+/* 让 Members 页整体撑满一屏，footer 才能贴底 */
+body.members-page{
+  min-height: 100vh;
+  display: flex;
+  flex-direction: column;
+}
+
+/* 主内容占满剩余高度 */
+.members-main{
+  flex: 1;
+}
+
+/* footer 全宽贴合左右 + 贴底 */
+.site-footer--sticky{
+  width: 100%;
+  margin: 0;
+}
+
+/* 有弹窗时禁止页面滚动 */
+.no-scroll{
+  overflow: hidden;
+}
+
+/* ================= Members hero align & no crop ================= */
+.members-hero{
+  max-width: 1200px;
+  margin: 0 auto 34px;
+  display: flex;
+  gap: 28px;
+  align-items: stretch;
+}
+
+.members-hero-photoWrap{
+  flex: 0 0 52%;
+  display: flex;
+  background: rgba(10,10,30,.42);
+  border: 1px solid rgba(255,255,255,.12);
+  border-radius: 18px;
+  padding: 14px;
+  backdrop-filter: blur(10px);
+}
+
+/* 重点：不要裁剪合照（不做 cover），完整显示在框里 */
+.members-hero-photo{
+  width: 100%;
+  height: auto;
+  display: block;
+  border-radius: 14px;
+  object-fit: contain;     /* ✅ 不裁剪 */
+  background: rgba(0,0,0,.25);
+}
+
+.panel-soft{
+  background: rgba(10,10,30,.42);
+  border: 1px solid rgba(255,255,255,.12);
+  border-radius: 18px;
+  padding: 18px 20px;
+  backdrop-filter: blur(10px);
+}
+
+.members-hero-text{
+  flex: 1;
+}
+
+/* Band intro 左对齐 */
+.members-hero-title{
+  margin: 0 0 10px;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+}
+.members-hero-bio{
+  margin: 0;
+  text-align: left;       /* ✅ 左对齐 */
+  font-size: 0.95rem;
+  line-height: 1.65;
+  opacity: 0.92;
+}
+
 /* ================= Members row: 5 across, Taryn center on desktop, first on mobile ================= */
 .members-grid{
   max-width: 1200px;
@@ -1031,5 +1111,3 @@ body.members-page{
   opacity: 0.92;
   white-space: pre-wrap;
 }
-
-
