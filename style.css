@@ -779,4 +779,257 @@ a {
     grid-template-columns: 1fr; /* 手机一人一行 */
   }
 }
+/* ================= Members page fixes (footer full width + sticky bottom) ================= */
+
+/* 让 Members 页整体撑满一屏，footer 才能贴底 */
+body.members-page{
+  min-height: 100vh;
+  display: flex;
+  flex-direction: column;
+}
+
+/* 主内容占满剩余高度 */
+.members-main{
+  flex: 1;
+}
+
+/* footer 全宽贴合左右 + 贴底 */
+.site-footer--sticky{
+  width: 100%;
+  margin: 0;
+}
+
+/* 有弹窗时禁止页面滚动 */
+.no-scroll{
+  overflow: hidden;
+}
+
+/* ================= Members hero align & no crop ================= */
+.members-hero{
+  max-width: 1200px;
+  margin: 0 auto 34px;
+  display: flex;
+  gap: 28px;
+  align-items: stretch;
+}
+
+.members-hero-photoWrap{
+  flex: 0 0 52%;
+  display: flex;
+  background: rgba(10,10,30,.42);
+  border: 1px solid rgba(255,255,255,.12);
+  border-radius: 18px;
+  padding: 14px;
+  backdrop-filter: blur(10px);
+}
+
+/* 重点：不要裁剪合照（不做 cover），完整显示在框里 */
+.members-hero-photo{
+  width: 100%;
+  height: auto;
+  display: block;
+  border-radius: 14px;
+  object-fit: contain;     /* ✅ 不裁剪 */
+  background: rgba(0,0,0,.25);
+}
+
+.panel-soft{
+  background: rgba(10,10,30,.42);
+  border: 1px solid rgba(255,255,255,.12);
+  border-radius: 18px;
+  padding: 18px 20px;
+  backdrop-filter: blur(10px);
+}
+
+.members-hero-text{
+  flex: 1;
+}
+
+/* Band intro 左对齐 */
+.members-hero-title{
+  margin: 0 0 10px;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+}
+.members-hero-bio{
+  margin: 0;
+  text-align: left;       /* ✅ 左对齐 */
+  font-size: 0.95rem;
+  line-height: 1.65;
+  opacity: 0.92;
+}
+
+/* ================= Members row: 5 across, Taryn center on desktop, first on mobile ================= */
+.members-grid{
+  max-width: 1200px;
+  margin: 0 auto 48px;
+  display: flex;            /* ✅ 用 flex 才能用 order */
+  gap: 22px;
+  align-items: stretch;
+}
+
+/* 5 人一排：每张卡平均分配宽度 */
+.member-card{
+  flex: 1 1 0;
+  min-width: 0;
+  position: relative;
+  border: 1px solid rgba(255,255,255,0.14);
+  border-radius: 16px;
+  padding: 62px 16px 18px;  /* 给头像“上浮”预留空间 */
+  text-align: center;
+  backdrop-filter: blur(8px);
+  -webkit-backdrop-filter: blur(8px);
+  background: rgba(255,255,255,0.10);
+  box-shadow: 0 12px 30px rgba(0,0,0,0.28);
+  cursor: pointer;
+
+  /* 关键：默认用桌面 order */
+  order: var(--order-desktop, 99);
+}
+
+.member-card:hover{
+  transform: translateY(-2px);
+}
+
+/* 头像圆框上浮（offset 向上一点） */
+.member-avatarWrap{
+  position: absolute;
+  top: -34px;
+  left: 50%;
+  transform: translateX(-50%);
+  width: 92px;
+  height: 92px;
+  border-radius: 999px;
+  padding: 4px;
+  background: rgba(0,0,0,0.35);
+  border: 1px solid rgba(255,255,255,0.22);
+}
+
+.member-avatar{
+  width: 100%;
+  height: 100%;
+  border-radius: 999px;
+  object-fit: cover;
+  display: block;
+}
+
+.member-name{
+  margin: 6px 0 6px;
+  font-size: 0.95rem;
+  letter-spacing: 0.02em;
+  font-weight: 700;
+}
+
+.member-role{
+  font-size: 0.82rem;
+  opacity: 0.75;
+  margin-bottom: 8px;
+  text-transform: uppercase;
+  letter-spacing: 0.12em;
+}
+
+.member-clickHint{
+  font-size: 0.78rem;
+  opacity: 0.55;
+}
+
+/* ========= Taryn bigger (one circle larger) ========= */
+.member-card.featured{
+  transform: translateY(-6px);
+  border-color: rgba(255,255,255,0.28);
+  box-shadow:
+    0 0 0 1px rgba(255,255,255,0.22),
+    0 18px 40px rgba(127,255,255,0.20);
+  z-index: 2;
+}
+
+.member-card.featured .member-avatarWrap{
+  width: 118px;   /* ✅ 比别人“大一圈” */
+  height: 118px;
+  top: -48px;     /* 往上再提一点 */
+}
+
+.member-card.featured{
+  padding-top: 78px; /* 给更大的头像留位置 */
+}
+
+/* ================= Mobile: Taryn first + one per row ================= */
+@media (max-width: 980px){
+  .members-hero{
+    flex-direction: column;
+  }
+
+  .members-grid{
+    flex-direction: column;
+  }
+
+  /* 关键：手机端改用 mobile order => Taryn 第一 */
+  .member-card{
+    order: var(--order-mobile, 99);
+  }
+}
+
+/* ================= Bio modal ================= */
+.bio-modal{
+  position: fixed;
+  inset: 0;
+  display: none;
+  z-index: 9999;
+}
+
+.bio-modal.is-open{
+  display: block;
+}
+
+.bio-modal__backdrop{
+  position: absolute;
+  inset: 0;
+  background: rgba(0,0,0,0.55);
+  backdrop-filter: blur(4px);
+}
+
+.bio-modal__panel{
+  position: relative;
+  max-width: 720px;
+  margin: 10vh auto 0;
+  background: rgba(10,10,30,0.92);
+  border: 1px solid rgba(255,255,255,0.14);
+  border-radius: 18px;
+  padding: 18px 18px 20px;
+  box-shadow: 0 20px 60px rgba(0,0,0,0.6);
+}
+
+.bio-modal__close{
+  position: absolute;
+  top: 10px;
+  right: 10px;
+  border: 0;
+  background: rgba(255,255,255,0.10);
+  color: #fff;
+  width: 34px;
+  height: 34px;
+  border-radius: 10px;
+  cursor: pointer;
+}
+
+.bio-modal__title{
+  margin: 8px 0 6px;
+  font-size: 1.25rem;
+  letter-spacing: 0.04em;
+}
+
+.bio-modal__role{
+  opacity: 0.75;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  font-size: 0.82rem;
+  margin-bottom: 12px;
+}
+
+.bio-modal__text{
+  line-height: 1.7;
+  opacity: 0.92;
+  white-space: pre-wrap;
+}
+
 
