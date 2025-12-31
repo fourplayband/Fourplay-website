@@ -2,9 +2,10 @@
 <html lang="en">
 <head>
   <meta charset="UTF-8" />
-  <title>Band Members | Fourplay Dance Band</title>
+  <title>Members | Fourplay Dance Band</title>
   <meta name="viewport" content="width=device-width, initial-scale=1" />
   <link rel="stylesheet" href="style.css" />
+  <script defer src="nav.js"></script>
 </head>
 
 <body>
@@ -19,9 +20,11 @@
         </a>
         <div class="site-title-small">FOURPLAY DANCE BAND</div>
       </div>
-      <button class="nav-toggle" aria-label="Toggle navigation">
+
+      <button class="nav-toggle" aria-label="Toggle navigation" aria-expanded="false">
         <span></span><span></span><span></span>
       </button>
+
       <nav class="nav">
         <a href="index.html">Home</a>
         <a href="members.html" class="active">Members</a>
@@ -34,69 +37,135 @@
     </div>
   </header>
 
-  <main class="main-content members-page">
+  <main class="main-content">
+    <section class="section-narrow">
+      <div class="page-header">
+        <h1>Members</h1>
+        <p>Meet the band.</p>
+      </div>
 
-    <!-- Band Photo -->
-    <section class="band-photo-wrap">
-      <img id="band-photo" class="band-photo" src="" alt="Band Photo" />
+      <div class="panel" style="padding:16px;">
+        <img id="band-photo" class="band-photo" src="" alt="Band Photo" style="width:100%;height:auto;border-radius:14px;border:1px solid rgba(255,255,255,0.10);"/>
+        <p id="band-bio" class="band-bio" style="margin-top:14px;text-align:left;opacity:.9;line-height:1.6;"></p>
+      </div>
+
+      <div style="height:18px;"></div>
+
+      <div class="members-grid" id="membersGrid" style="
+        display:grid;
+        grid-template-columns: repeat(5, 1fr);
+        gap: 16px;
+      "></div>
     </section>
-
-    <!-- Band Bio -->
-    <section class="band-bio-section">
-      <p id="band-bio" class="band-bio"></p>
-    </section>
-
-    <!-- 4 Musicians -->
-    <section class="musicians-grid" id="musicians-grid"></section>
-
-    <!-- Singer Featured -->
-    <section class="featured-singer-section">
-      <h2 id="singer-name"></h2>
-      <img id="singer-photo" class="singer-photo" src="" alt="Lead Singer" />
-      <p id="singer-role"></p>
-      <p id="singer-bio"></p>
-    </section>
-
   </main>
 
   <footer class="site-footer">
-    © 2025 Fourplay Dance Band
+    © 2025 Fourplay Dance Band. All rights reserved.
   </footer>
 </div>
 
 <script>
-fetch('/content/members.json')
-  .then(r => r.json())
-  .then(data => {
-    if (!data) return;
+(async function () {
+  try {
+    const res = await fetch("/content/members.json", { cache: "no-store" });
+    const data = await res.json();
 
-    // Band photo
-    document.getElementById('band-photo').src = data.bandPhoto;
+    document.getElementById("band-photo").src = data.bandPhoto || "";
+    document.getElementById("band-bio").textContent = data.bandBio || "";
 
-    // Band bio
-    document.getElementById('band-bio').textContent = data.bandBio;
+    const grid = document.getElementById("membersGrid");
+    grid.innerHTML = "";
 
-    // 4 musicians
-    const grid = document.getElementById('musicians-grid');
-    data.musicians.forEach(m => {
-      const card = document.createElement('div');
-      card.className = 'musician-card';
+    // ✅ NEW STRUCTURE: data.members (your CMS now)
+    if (Array.isArray(data.members)) {
+      data.members.forEach(m => {
+        const card = document.createElement("div");
+        card.className = "member-card";
+        card.style.position = "relative";
+        card.style.paddingTop = "56px";
+        card.style.borderRadius = "16px";
+        card.style.background = "rgba(255,255,255,0.10)";
+        card.style.border = "1px solid rgba(255,255,255,0.14)";
+        card.style.backdropFilter = "blur(8px)";
+        card.style.boxShadow = "0 12px 30px rgba(0,0,0,0.28)";
+        card.style.textAlign = "center";
+
+        card.innerHTML = `
+          <div class="member-avatarWrap" style="
+            position:absolute; top:-34px; left:50%; transform:translateX(-50%);
+            width:86px; height:86px; border-radius:999px; padding:4px;
+            background:rgba(0,0,0,0.35); border:1px solid rgba(255,255,255,0.22);
+          ">
+            <img class="member-avatar" src="${m.photo || ""}" alt="${m.name || ""}" style="
+              width:100%;height:100%;border-radius:999px;object-fit:cover;display:block;
+            "/>
+          </div>
+          <div class="member-name" style="margin:8px 0 6px;font-weight:800;letter-spacing:.02em;text-transform:uppercase;color:rgba(255,255,255,0.90);">
+            ${m.name || ""}
+          </div>
+          <div class="member-role" style="font-size:.85rem;opacity:.78;margin-bottom:8px;">
+            ${m.role || ""}
+          </div>
+          <div class="member-bio" style="font-size:.86rem;line-height:1.45;opacity:.86;text-align:left;">
+            ${m.bio ? m.bio : ""}
+          </div>
+        `;
+        grid.appendChild(card);
+      });
+      return;
+    }
+
+    // ✅ OLD STRUCTURE fallback: data.musicians + data.singer
+    const all = [];
+    if (Array.isArray(data.musicians)) all.push(...data.musicians);
+    if (data.singer) all.splice(2, 0, data.singer); // singer in middle
+
+    all.forEach(m => {
+      const card = document.createElement("div");
+      card.className = "member-card";
+      card.style.position = "relative";
+      card.style.paddingTop = "56px";
+      card.style.borderRadius = "16px";
+      card.style.background = "rgba(255,255,255,0.10)";
+      card.style.border = "1px solid rgba(255,255,255,0.14)";
+      card.style.backdropFilter = "blur(8px)";
+      card.style.boxShadow = "0 12px 30px rgba(0,0,0,0.28)";
+      card.style.textAlign = "center";
+
       card.innerHTML = `
-        <img src="${m.photo}" alt="${m.name}" class="musician-photo" />
-        <h3>${m.name}</h3>
-        <p class="role">${m.role}</p>
-        <p class="bio">${m.bio || ""}</p>
+        <div class="member-avatarWrap" style="
+          position:absolute; top:-34px; left:50%; transform:translateX(-50%);
+          width:86px; height:86px; border-radius:999px; padding:4px;
+          background:rgba(0,0,0,0.35); border:1px solid rgba(255,255,255,0.22);
+        ">
+          <img class="member-avatar" src="${m.photo || ""}" alt="${m.name || ""}" style="
+            width:100%;height:100%;border-radius:999px;object-fit:cover;display:block;
+          "/>
+        </div>
+        <div class="member-name" style="margin:8px 0 6px;font-weight:800;letter-spacing:.02em;text-transform:uppercase;color:rgba(255,255,255,0.90);">
+          ${m.name || ""}
+        </div>
+        <div class="member-role" style="font-size:.85rem;opacity:.78;margin-bottom:8px;">
+          ${m.role || ""}
+        </div>
+        <div class="member-bio" style="font-size:.86rem;line-height:1.45;opacity:.86;text-align:left;">
+          ${m.bio ? m.bio : ""}
+        </div>
       `;
       grid.appendChild(card);
     });
 
-    // Singer featured in center
-    document.getElementById('singer-name').textContent = data.singer.name;
-    document.getElementById('singer-photo').src = data.singer.photo;
-    document.getElementById('singer-role').textContent = data.singer.role;
-    document.getElementById('singer-bio').textContent = data.singer.bio;
-  });
+  } catch (e) {
+    console.error(e);
+  }
+})();
 </script>
+
+<style>
+@media (max-width: 900px){
+  #membersGrid { grid-template-columns: 1fr !important; }
+}
+</style>
 
 </body>
 </html>
