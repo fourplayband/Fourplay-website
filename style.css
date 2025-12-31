@@ -7,6 +7,7 @@ body {
   color: #ffffff;
   background: #05081a url("assets/logo-bg.jpg") center top fixed;
   background-size: cover;
+
   min-height: 100vh;
   display: flex;
   flex-direction: column;
@@ -23,28 +24,36 @@ a { color: inherit; text-decoration: none; }
 main, .main-content { flex: 1 0 auto; }
 footer, .site-footer { margin-top: auto; }
 
+/* 去掉 header 中间“白点”（任何伪元素全关） */
+.site-header::before,
+.site-header::after,
+.header-inner::before,
+.header-inner::after {
+  content: none !important;
+  display: none !important;
+}
+
 /* ========== Header & Nav ========== */
 .site-header {
   position: sticky;
   top: 0;
   z-index: 1000;
-  background: rgba(0,0,0,0.20); /* ✅ 20% */
+  background: rgba(0,0,0,0.20);  /* 你要的 20% */
   backdrop-filter: blur(12px);
   -webkit-backdrop-filter: blur(12px);
   border-bottom: 1px solid rgba(255,255,255,0.08);
+  overflow: hidden; /* 防止任何东西溢出造成“白点/白线” */
 }
 
 .header-inner {
   max-width: 1200px;
   margin: 0 auto;
-  padding: 10px 16px;   /* ✅ 从 20px 改成 16px */
+  padding: 10px 20px;
   display: flex;
   align-items: center;
   justify-content: space-between;
-  gap: 14px;
-
-  width: 100%;          /* ✅ 关键 */
-  box-sizing: border-box;
+  gap: 18px;
+  position: relative;
 }
 
 .header-left {
@@ -67,6 +76,7 @@ footer, .site-footer { margin-top: auto; }
   white-space: nowrap;
 }
 
+/* Desktop nav */
 .nav {
   display: flex;
   align-items: center;
@@ -88,6 +98,7 @@ footer, .site-footer { margin-top: auto; }
   text-shadow: 0 0 10px rgba(68,227,255,0.7);
 }
 
+/* underline highlight */
 .nav a::after {
   content: "";
   position: absolute;
@@ -101,6 +112,34 @@ footer, .site-footer { margin-top: auto; }
 }
 .nav a:hover::after,
 .nav a.active::after { width: 100%; }
+
+/* Hamburger button */
+.nav-toggle {
+  display: none; /* desktop hidden */
+  align-items: center;
+  justify-content: center;
+  width: 44px;
+  height: 38px;
+  border: 1px solid rgba(255,255,255,0.18);
+  background: rgba(0,0,0,0.22);
+  border-radius: 12px;
+  cursor: pointer;
+  z-index: 1100;
+}
+
+.nav-toggle span {
+  display: block;
+  width: 22px;
+  height: 2px;
+  border-radius: 999px;
+  background: #ffffff;
+  margin: 3px 0;
+  transition: transform .2s ease, opacity .2s ease;
+}
+
+.nav-toggle.open span:nth-child(1) { transform: translateY(5px) rotate(45deg); }
+.nav-toggle.open span:nth-child(2) { opacity: 0; }
+.nav-toggle.open span:nth-child(3) { transform: translateY(-5px) rotate(-45deg); }
 
 /* ========== Layout (non-home) ========== */
 .main-content {
@@ -138,7 +177,6 @@ footer, .site-footer { margin-top: auto; }
 /* ========== Home (Video Fullscreen) ========== */
 body.home { background: #05081a; }
 
-/* ✅ 关键：hero 真正 100vh，全屏占满 */
 .hero-video-full {
   position: relative;
   height: 100vh;
@@ -150,7 +188,6 @@ body.home { background: #05081a; }
   overflow: hidden;
 }
 
-/* ✅ 视频铺满 */
 .hero-video {
   position: absolute;
   inset: 0;
@@ -160,13 +197,12 @@ body.home { background: #05081a; }
   z-index: 0;
 }
 
-/* 内容层 */
 .hero-inner {
   position: relative;
   z-index: 1;
   max-width: 1050px;
   margin: 0 auto;
-  padding: 110px 20px 80px; /* 给 sticky header 留空间 */
+  padding: 110px 20px 80px;
 }
 
 .hero-logo {
@@ -196,7 +232,7 @@ body.home { background: #05081a; }
 .btn {
   display: inline-flex;
   align-items: center;
-  justify-content: center; /* ✅ 字体居中 */
+  justify-content: center;
   text-align: center;
   min-width: 160px;
   padding: 10px 22px;
@@ -245,32 +281,193 @@ body.home { background: #05081a; }
 .music-toggle:not(.playing) .icon-play { display: block; }
 .music-toggle:not(.playing) .icon-pause { display: none; }
 
-/* mobile hero buttons reflow */
-@media (max-width: 768px){
-  .hero-inner { padding-top: 92px; padding-bottom: 70px; }
-  .hero-buttons { flex-direction: column; gap: 12px; }
-  .btn { width: min(320px, 86vw); }
-}
-
 /* ========== Non-home pages static background ========== */
 body:not(.home){
   background: #05081a url("assets/logo-bg.jpg") center top fixed;
   background-size: cover;
 }
 
-/* ========== Footer ========== */
-.site-footer {
-  padding: 14px 20px 18px;
-  text-align: center;
-  font-size: 0.82rem;
-  color: rgba(255,255,255,0.75);
-  background: linear-gradient(to top, rgba(5,0,25,0.92), rgba(5,0,25,0.7));
-  border-top: 1px solid rgba(255,255,255,0.08);
+/* ========== Videos (Modern Neon Cards) ========== */
+.video-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(320px, 1fr));
+  gap: 22px;
 }
-/* =====================================================
-   Schedule Calendar (2026) + Modal
-   ===================================================== */
 
+.video-card {
+  border-radius: 18px;
+  overflow: hidden;
+  border: 1px solid rgba(255,255,255,0.10);
+  background:
+    radial-gradient(circle at top, rgba(255,79,211,0.14), transparent 55%),
+    radial-gradient(circle at bottom, rgba(68,227,255,0.12), transparent 55%),
+    rgba(5,0,30,0.80);
+  box-shadow: 0 18px 45px rgba(0,0,0,0.65);
+  transition: transform .18s ease, box-shadow .18s ease, border-color .18s ease;
+}
+
+.video-card:hover {
+  transform: translateY(-2px);
+  border-color: rgba(255,255,255,0.20);
+  box-shadow: 0 26px 65px rgba(0,0,0,0.72);
+}
+
+.video-frame-wrap {
+  position: relative;
+  padding-bottom: 56.25%;
+  height: 0;
+  background: rgba(0,0,0,0.35);
+}
+
+.video-frame-wrap iframe {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  border: 0;
+}
+
+.video-meta {
+  padding: 14px 16px 16px;
+}
+
+.video-title {
+  font-weight: 750;
+  letter-spacing: 0.04em;
+  margin-bottom: 8px;
+}
+
+.video-desc {
+  color: rgba(255,255,255,0.78);
+  line-height: 1.55;
+  font-size: 0.95rem;
+}
+
+/* ========== Members (Name 90% white) ========== */
+.member-name,
+.musician-card h3 {
+  color: rgba(255,255,255,0.90);
+}
+
+/* ========== Photos (your existing design uses these) ========== */
+.photos-toolbar {
+  margin-bottom: 18px;
+}
+.photos-toolbar__top {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+}
+.photos-year-label {
+  font-weight: 700;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  opacity: .9;
+}
+.photos-years {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  justify-content: flex-end;
+}
+.photos-year {
+  border: 1px solid rgba(255,255,255,0.18);
+  background: rgba(0,0,0,0.25);
+  color: rgba(255,255,255,0.9);
+  padding: 8px 12px;
+  border-radius: 999px;
+  cursor: pointer;
+  font-weight: 650;
+}
+.photos-year.is-active {
+  background: linear-gradient(90deg, rgba(255,0,255,0.30), rgba(0,255,255,0.20));
+  border-color: rgba(255,255,255,0.28);
+}
+
+.photos-section { margin-top: 22px; }
+.photos-section__header {
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: 12px;
+  margin-bottom: 10px;
+}
+.photos-section__title {
+  letter-spacing: 0.10em;
+  text-transform: uppercase;
+}
+.photos-section__sub { opacity: .75; }
+
+.photos-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+  gap: 16px;
+}
+
+.photo-card {
+  border: 0;
+  padding: 0;
+  cursor: pointer;
+  background: transparent;
+  text-align: left;
+}
+.photo-card img {
+  width: 100%;
+  height: 240px;
+  border-radius: 18px;
+  object-fit: cover;
+  box-shadow: 0 14px 32px rgba(0,0,0,0.7);
+  border: 1px solid rgba(255,255,255,0.10);
+}
+.photo-cap {
+  margin-top: 8px;
+  font-size: 0.92rem;
+  opacity: .80;
+}
+.photos-empty { opacity: .7; padding: 18px 4px; }
+
+.photos-lightbox {
+  position: fixed; inset: 0;
+  display: none;
+  z-index: 9999;
+}
+.photos-lightbox.is-open { display: block; }
+.photos-lightbox__backdrop {
+  position: absolute; inset: 0;
+  background: rgba(0,0,0,0.75);
+  backdrop-filter: blur(6px);
+}
+.photos-lightbox__panel {
+  position: relative;
+  width: min(980px, calc(100vw - 32px));
+  margin: 8vh auto 0;
+  border-radius: 18px;
+  border: 1px solid rgba(255,255,255,0.14);
+  background: rgba(10, 10, 22, 0.75);
+  backdrop-filter: blur(14px);
+  box-shadow: 0 20px 70px rgba(0,0,0,0.55);
+  padding: 14px;
+}
+.photos-lightbox__close {
+  position: absolute; top: 10px; right: 10px;
+  width: 38px; height: 38px;
+  border-radius: 999px;
+  border: 1px solid rgba(255,255,255,0.18);
+  background: rgba(0,0,0,0.25);
+  color: rgba(255,255,255,0.9);
+  cursor: pointer;
+}
+.photos-lightbox__img {
+  width: 100%;
+  max-height: 70vh;
+  object-fit: contain;
+  border-radius: 14px;
+  background: rgba(0,0,0,0.35);
+}
+.photos-lightbox__caption { margin-top: 10px; opacity: .85; }
+
+/* ========== Schedule Calendar (2026) + Modal ========== */
 .calendar-section {
   width: 100%;
   max-width: 1180px;
@@ -302,7 +499,6 @@ body:not(.home){
   border-radius: 999px;
   cursor: pointer;
   font-weight: 600;
-  letter-spacing: 0.3px;
   transition: transform 120ms ease, box-shadow 120ms ease, background 120ms ease;
 }
 
@@ -314,7 +510,6 @@ body:not(.home){
 .month-tab.is-active {
   background: linear-gradient(90deg, rgba(255, 0, 255, 0.35), rgba(0, 255, 255, 0.25));
   border-color: rgba(255, 255, 255, 0.26);
-  box-shadow: 0 0 0 3px rgba(255, 0, 255, 255, 0.12);
 }
 
 .calendar-panel-header {
@@ -391,7 +586,7 @@ body:not(.home){
   padding: 6px 10px;
   border-radius: 999px;
   font-size: 12px;
-  font-weight: 700;
+  font-weight: 800;
   border: 1px solid rgba(255, 255, 255, 0.16);
   background: rgba(0, 0, 0, 0.28);
   color: rgba(255, 255, 255, 0.92);
@@ -419,24 +614,9 @@ body:not(.home){
 }
 
 /* Modal */
-.event-modal {
-  position: fixed;
-  inset: 0;
-  display: none;
-  z-index: 9999;
-}
-
-.event-modal.is-open {
-  display: block;
-}
-
-.event-modal__backdrop {
-  position: absolute;
-  inset: 0;
-  background: rgba(0, 0, 0, 0.72);
-  backdrop-filter: blur(6px);
-}
-
+.event-modal { position: fixed; inset: 0; display: none; z-index: 9999; }
+.event-modal.is-open { display: block; }
+.event-modal__backdrop { position: absolute; inset: 0; background: rgba(0, 0, 0, 0.72); backdrop-filter: blur(6px); }
 .event-modal__panel {
   position: relative;
   width: min(720px, calc(100vw - 32px));
@@ -445,380 +625,86 @@ body:not(.home){
   border: 1px solid rgba(255, 255, 255, 0.14);
   background: rgba(10, 10, 22, 0.75);
   backdrop-filter: blur(14px);
-  -webkit-backdrop-filter: blur(14px);
   box-shadow: 0 20px 70px rgba(0, 0, 0, 0.55);
   padding: 18px;
 }
-
 .event-modal__close {
   position: absolute;
-  top: 12px;
-  right: 12px;
-  width: 38px;
-  height: 38px;
+  top: 12px; right: 12px;
+  width: 38px; height: 38px;
   border-radius: 999px;
   border: 1px solid rgba(255, 255, 255, 0.18);
   background: rgba(0, 0, 0, 0.25);
   color: rgba(255, 255, 255, 0.9);
   cursor: pointer;
 }
+.event-modal__title { margin: 0 0 6px; font-size: 22px; }
+.event-modal__meta { margin: 0 0 14px; opacity: 0.9; }
+.event-modal__note { margin: 0; line-height: 1.55; opacity: 0.9; }
 
-.event-modal__title {
-  margin: 0 0 6px;
-  font-size: 22px;
-  letter-spacing: 0.4px;
+/* ========== Footer ========== */
+.site-footer {
+  padding: 14px 20px 18px;
+  text-align: center;
+  font-size: 0.82rem;
+  color: rgba(255,255,255,0.75);
+  background: linear-gradient(to top, rgba(5,0,25,0.92), rgba(5,0,25,0.7));
+  border-top: 1px solid rgba(255,255,255,0.08);
 }
 
-.event-modal__meta {
-  margin: 0 0 14px;
-  opacity: 0.9;
-}
-
-.event-modal__note {
-  margin: 0;
-  line-height: 1.55;
-  opacity: 0.9;
-}
-
-@media (max-width: 640px) {
-  .calendar-title { font-size: 20px; }
-  .day-card { min-height: 72px; }
-}
-
-header::before,
-/* ===== remove the mystery white dot in header (all pages) ===== */
-.site-header::before,
-.site-header::after,
-.header-inner::before,
-.header-inner::after,
-.header-left::before,
-.header-left::after,
-.site-title-small::before,
-.site-title-small::after,
-.nav::before,
-.nav::after {
-  content: none !important;
-  display: none !important;
-}
-
-/* also make sure hamburger button is not showing as a tiny dot on desktop */
-.nav-toggle {
-  display: none;
-  background: none;
-  border: 0;
-  padding: 0;
-  margin: 0;
-}
-
-/* keep hamburger only on mobile (if你后面需要) */
+/* ========== Responsive (Mobile Nav + Schedule dots) ========== */
 @media (max-width: 768px) {
-  .nav-toggle { display: flex; }
-}
+  .nav-toggle { display: inline-flex; }
 
-/* =====================================================
-   Photos (CMS by Year) — Posters + Gig Photos
-   ===================================================== */
-.photos-toolbar{
-  margin-bottom: 22px;
-}
-.photos-toolbar__top{
-  display:flex;
-  align-items:center;
-  gap:14px;
-  flex-wrap:wrap;
-}
-.photos-year-label{
-  font-weight:700;
-  letter-spacing:0.12em;
-  text-transform:uppercase;
-  opacity:0.9;
-}
-.photos-years{
-  display:flex;
-  gap:10px;
-  flex-wrap:wrap;
-}
-.photos-year{
-  appearance:none;
-  border:1px solid rgba(255,255,255,0.18);
-  background: rgba(0,0,0,0.22);
-  color: rgba(255,255,255,0.92);
-  padding: 8px 12px;
-  border-radius: 999px;
-  cursor:pointer;
-  font-weight:700;
-  transition: transform 120ms ease, box-shadow 120ms ease, background 120ms ease, border-color 120ms ease;
-}
-.photos-year:hover{
-  transform: translateY(-1px);
-  box-shadow: 0 0 0 3px rgba(0,255,255,0.08), 0 10px 26px rgba(0,0,0,0.35);
-}
-.photos-year.is-active{
-  background: linear-gradient(90deg, rgba(255,79,211,0.22), rgba(68,227,255,0.18));
-  border-color: rgba(255,255,255,0.28);
-  box-shadow: 0 0 0 3px rgba(255,79,211,0.10);
-}
-.photos-toolbar__hint{
-  margin-top: 10px;
-  font-size: 0.9rem;
-  opacity: 0.75;
-}
-
-.photos-section{
-  margin-top: 22px;
-}
-.photos-section__header{
-  display:flex;
-  align-items:flex-end;
-  justify-content:space-between;
-  gap:16px;
-  margin: 0 2px 12px;
-}
-.photos-section__title{
-  margin:0;
-  font-size: 1.25rem;
-  letter-spacing: 0.10em;
-  text-transform: uppercase;
-}
-.photos-section__sub{
-  margin:0;
-  font-size: 0.9rem;
-  opacity: 0.75;
-}
-
-/* shared grid base */
-.photos-grid{
-  display:grid;
-  gap: 14px;
-}
-
-/* posters: bigger, more “card” */
-.posters-grid{
-  grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
-}
-
-/* gig: denser */
-.gig-grid{
-  grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
-}
-
-.photo-card{
-  border: 1px solid rgba(255,255,255,0.10);
-  background: rgba(0,0,0,0.18);
-  border-radius: 18px;
-  overflow: hidden;
-  padding: 0;
-  cursor: pointer;
-  text-align: left;
-  box-shadow: 0 14px 32px rgba(0,0,0,0.55);
-  transition: transform 140ms ease, box-shadow 140ms ease, border-color 140ms ease;
-}
-.photo-card:hover{
-  transform: translateY(-2px);
-  border-color: rgba(255,255,255,0.22);
-  box-shadow: 0 18px 42px rgba(0,0,0,0.68);
-}
-.photo-card img{
-  width: 100%;
-  display: block;
-  object-fit: cover;
-}
-
-/* poster aspect a bit taller */
-.photo-card.is-poster img{
-  height: 320px;
-}
-.photo-card.is-gig img{
-  height: 220px;
-}
-
-/* caption */
-.photo-cap{
-  padding: 10px 12px 12px;
-  font-size: 0.9rem;
-  line-height: 1.35;
-  opacity: 0.9;
-}
-
-/* empty state */
-.photos-empty{
-  padding: 16px 14px;
-  border: 1px dashed rgba(255,255,255,0.16);
-  border-radius: 16px;
-  background: rgba(0,0,0,0.12);
-  opacity: 0.8;
-}
-
-/* Lightbox */
-.photos-lightbox{
-  position: fixed;
-  inset: 0;
-  display: none;
-  z-index: 9999;
-}
-.photos-lightbox.is-open{ display:block; }
-.photos-lightbox__backdrop{
-  position:absolute;
-  inset:0;
-  background: rgba(0,0,0,0.78);
-  backdrop-filter: blur(6px);
-}
-.photos-lightbox__panel{
-  position: relative;
-  width: min(980px, calc(100vw - 26px));
-  margin: 8vh auto 0;
-  border-radius: 18px;
-  border: 1px solid rgba(255,255,255,0.14);
-  background: rgba(10,10,22,0.75);
-  backdrop-filter: blur(14px);
-  box-shadow: 0 20px 70px rgba(0,0,0,0.55);
-  padding: 14px;
-}
-.photos-lightbox__close{
-  position:absolute;
-  top: 10px;
-  right: 10px;
-  width: 38px;
-  height: 38px;
-  border-radius: 999px;
-  border: 1px solid rgba(255,255,255,0.18);
-  background: rgba(0,0,0,0.25);
-  color: rgba(255,255,255,0.9);
-  cursor:pointer;
-}
-.photos-lightbox__img{
-  width: 100%;
-  max-height: 72vh;
-  object-fit: contain;
-  display: block;
-  border-radius: 14px;
-}
-.photos-lightbox__caption{
-  margin-top: 10px;
-  font-size: 0.95rem;
-  opacity: 0.85;
-  line-height: 1.45;
-}
-
-/* mobile tweak */
-@media (max-width: 640px){
-  .photo-card.is-poster img{ height: 280px; }
-  .photo-card.is-gig img{ height: 200px; }
-}
-/* =========================
-   Artists list (no search)
-   ========================= */
-
-.artists-intro{
-  margin-bottom: 14px;
-  line-height: 1.6;
-  color: rgba(255,255,255,0.85);
-}
-
-/* Desktop: 5 cols (auto to 4 on smaller screens) */
-.artists-list{
-  display: grid;
-  grid-auto-flow: row;           /* ✅ keep row order */
-  grid-template-columns: repeat(5, minmax(0, 1fr));
-  gap: 12px 14px;
-  padding-top: 6px;
-}
-
-/* When screen narrower: 4 columns */
-@media (max-width: 1100px){
-  .artists-list{ grid-template-columns: repeat(4, minmax(0, 1fr)); }
-}
-
-/* Mobile: 2 columns, still row order */
-@media (max-width: 768px){
-  .artists-list{ grid-template-columns: repeat(2, minmax(0, 1fr)); }
-}
-
-/* pill look */
-.artist-pill{
-  border: 1px solid rgba(255,255,255,0.14);
-  background: rgba(0,0,0,0.22);
-  border-radius: 14px;
-  padding: 12px 12px;
-  font-weight: 700;
-  letter-spacing: 0.4px;
-  color: rgba(255,255,255,0.92);
-  backdrop-filter: blur(12px);
-  -webkit-backdrop-filter: blur(12px);
-  box-shadow: inset 0 0 0 1px rgba(255,255,255,0.04);
-  position: relative;
-  overflow: hidden;
-}
-
-.artist-pill::before{
-  content:"";
-  position:absolute;
-  inset:-50px;
-  background:
-    radial-gradient(circle at 20% 0%, rgba(255,79,211,0.20), transparent 55%),
-    radial-gradient(circle at 80% 120%, rgba(68,227,255,0.16), transparent 55%);
-  filter: blur(18px);
-  opacity: 0.9;
-  pointer-events:none;
-}
-
-.artist-pill:hover{
-  border-color: rgba(255,255,255,0.26);
-  box-shadow: 0 14px 36px rgba(0,0,0,0.38);
-}
-
-/* Mobile nav */
-@media (max-width: 768px) {
-  .nav-toggle {
-    display: flex;
-    flex-direction: column;
-    gap: 4px;
-    background: none;
-    border: none;
-    cursor: pointer;
-    padding: 6px;
-    z-index: 1001;
-  }
-
-  .nav-toggle span {
-    width: 22px;
-    height: 2px;
-    border-radius: 999px;
-    background: #fff;
-    transition: transform 0.2s ease, opacity 0.2s ease;
-  }
-
-  .nav-toggle.open span:nth-child(1) {
-    transform: translateY(6px) rotate(45deg);
-  }
-  .nav-toggle.open span:nth-child(2) {
-    opacity: 0;
-  }
-  .nav-toggle.open span:nth-child(3) {
-    transform: translateY(-6px) rotate(-45deg);
-  }
-
+  /* mobile nav dropdown */
   .nav {
     display: none;
-    position: absolute;
-    top: 60px;
+    position: fixed;
+    top: 64px;
     right: 14px;
-    width: 190px;
+    width: min(240px, calc(100vw - 28px));
     flex-direction: column;
     gap: 12px;
     padding: 18px 18px;
-    background: rgba(5, 0, 30, 0.92);
-    border-radius: 14px;
-    border: 1px solid rgba(255, 255, 255, 0.15);
-    box-shadow: 0 10px 25px rgba(0, 0, 0, 0.65);
-    z-index: 1000;
+    background: rgba(0,0,0,0.80); /* ✅ 80% */
+    border-radius: 16px;
+    border: 1px solid rgba(255,255,255,0.16);
+    box-shadow: 0 14px 40px rgba(0,0,0,0.65);
+    z-index: 1200;
   }
 
   .nav.nav-open { display: flex; }
-}
 
-.nav-toggle {
-  margin-left: auto;   /* ✅ 把它推回 header 内 */
-  flex-shrink: 0;      /* ✅ 不允许被压缩 */
-}
+  .nav a {
+    width: 100%;
+    padding: 8px 4px;
+  }
 
+  /* hero buttons reflow */
+  .hero-inner { padding-top: 92px; padding-bottom: 70px; }
+  .hero-buttons { flex-direction: column; gap: 12px; }
+  .btn { width: min(320px, 86vw); }
+
+  /* ✅ schedule 手机端：Booked/Available pill 变圆点 */
+  .day-card__pill {
+    font-size: 0;        /* 把文字压没 */
+    padding: 0;
+    width: 14px;
+    height: 14px;
+    border-radius: 999px;
+    left: 10px;
+    bottom: 10px;
+  }
+
+  .day-card.is-booked .day-card__pill {
+    background: rgba(255, 79, 211, 0.95);      /* 粉紫 */
+    border-color: rgba(255, 79, 211, 0.65);
+    box-shadow: 0 0 14px rgba(255, 79, 211, 0.45);
+  }
+
+  .day-card.is-available .day-card__pill {
+    background: rgba(68, 227, 255, 0.95);      /* 蓝绿 */
+    border-color: rgba(68, 227, 255, 0.55);
+    box-shadow: 0 0 14px rgba(68, 227, 255, 0.38);
+  }
+}
