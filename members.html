@@ -2,27 +2,26 @@
 <html lang="en">
 <head>
   <meta charset="UTF-8" />
-  <title>Fourplay Dance Band | Members</title>
+  <title>Band Members | Fourplay Dance Band</title>
   <meta name="viewport" content="width=device-width, initial-scale=1" />
   <link rel="stylesheet" href="style.css" />
 </head>
 
-<body class="members-page">
+<body>
+<div class="page">
 
-  <!-- ================= HEADER ================= -->
-  <header class="site-header site-header--fixed">
+  <!-- Header -->
+  <header class="site-header">
     <div class="header-inner">
       <div class="header-left">
         <a href="index.html">
-          <img src="assets/logo.png" class="header-logo" alt="Fourplay Dance Band" />
+          <img src="assets/logo.png" alt="Logo" class="header-logo" />
         </a>
-        <span class="site-title-small">FOURPLAY DANCE BAND</span>
+        <div class="site-title-small">FOURPLAY DANCE BAND</div>
       </div>
-
       <button class="nav-toggle" aria-label="Toggle navigation">
         <span></span><span></span><span></span>
       </button>
-
       <nav class="nav">
         <a href="index.html">Home</a>
         <a href="members.html" class="active">Members</a>
@@ -35,138 +34,69 @@
     </div>
   </header>
 
-  <!-- ================= MAIN ================= -->
-  <main class="main-content members-main">
-    <!-- ===== Top Band Section ===== -->
-    <section class="members-hero">
-      <div class="members-hero-photoWrap">
-        <img id="bandPhoto" class="members-hero-photo" alt="Fourplay Dance Band" />
-      </div>
+  <main class="main-content members-page">
 
-      <div class="members-hero-text panel-soft">
-        <h2 class="members-hero-title">Band Members</h2>
-        <p id="bandBio" class="members-hero-bio"></p>
-      </div>
+    <!-- Band Photo -->
+    <section class="band-photo-wrap">
+      <img id="band-photo" class="band-photo" src="" alt="Band Photo" />
     </section>
 
-    <!-- ===== Members Row ===== -->
-    <section class="members-grid" id="membersGrid"></section>
+    <!-- Band Bio -->
+    <section class="band-bio-section">
+      <p id="band-bio" class="band-bio"></p>
+    </section>
+
+    <!-- 4 Musicians -->
+    <section class="musicians-grid" id="musicians-grid"></section>
+
+    <!-- Singer Featured -->
+    <section class="featured-singer-section">
+      <h2 id="singer-name"></h2>
+      <img id="singer-photo" class="singer-photo" src="" alt="Lead Singer" />
+      <p id="singer-role"></p>
+      <p id="singer-bio"></p>
+    </section>
+
   </main>
 
-  <!-- ================= FOOTER ================= -->
- <footer class="site-footer site-footer--sticky site-footer--fullbleed">
-  <div class="footer-inner">
-    © 2025 Fourplay Dance Band. All rights reserved.
-  </div>
-</footer>
+  <footer class="site-footer">
+    © 2025 Fourplay Dance Band
+  </footer>
+</div>
 
-  <!-- ================= MODAL (Bio Popup) ================= -->
-  <div class="bio-modal" id="bioModal" aria-hidden="true">
-    <div class="bio-modal__backdrop" data-close="1"></div>
-    <div class="bio-modal__panel" role="dialog" aria-modal="true" aria-labelledby="bioTitle">
-      <button class="bio-modal__close" aria-label="Close" data-close="1">✕</button>
-      <h3 class="bio-modal__title" id="bioTitle"></h3>
-      <div class="bio-modal__role" id="bioRole"></div>
-      <div class="bio-modal__text" id="bioText"></div>
-    </div>
-  </div>
+<script>
+fetch('/content/members.json')
+  .then(r => r.json())
+  .then(data => {
+    if (!data) return;
 
-  <!-- ================= SCRIPT ================= -->
-  <script src="nav.js"></script>
+    // Band photo
+    document.getElementById('band-photo').src = data.bandPhoto;
 
-  <script>
-    const FEATURED_NAME = "Taryn McCallum";
+    // Band bio
+    document.getElementById('band-bio').textContent = data.bandBio;
 
-    function normalizeMembersForLayout(members) {
-      // 桌面：Taryn 必须在中间（第3个）
-      // 手机：Taryn 必须排第一
-      const featured = members.find(x => x.name === FEATURED_NAME);
-      const others = members.filter(x => x.name !== FEATURED_NAME);
-
-      // 桌面顺序：前2个 + Taryn + 后2个（保持其它人原顺序）
-      const desktopOrder = [];
-      desktopOrder.push(...others.slice(0, 2));
-      if (featured) desktopOrder.push(featured);
-      desktopOrder.push(...others.slice(2));
-
-      // 手机顺序：Taryn + 其他人
-      const mobileOrder = [];
-      if (featured) mobileOrder.push(featured);
-      mobileOrder.push(...others);
-
-      // 给每个人打上两个 order（用于 CSS flex order）
-      const desktopMap = new Map(desktopOrder.map((m, i) => [m.name, i + 1]));
-      const mobileMap  = new Map(mobileOrder.map((m, i) => [m.name, i + 1]));
-
-      return members.map(m => ({
-        ...m,
-        orderDesktop: desktopMap.get(m.name) || 99,
-        orderMobile: mobileMap.get(m.name) || 99,
-        isFeatured: m.name === FEATURED_NAME
-      }));
-    }
-
-    function openBioModal(member) {
-      const modal = document.getElementById("bioModal");
-      document.getElementById("bioTitle").textContent = member.name || "";
-      document.getElementById("bioRole").textContent = member.role || "";
-      document.getElementById("bioText").textContent = member.bio || "Bio coming soon.";
-      modal.classList.add("is-open");
-      modal.setAttribute("aria-hidden", "false");
-      document.body.classList.add("no-scroll");
-    }
-
-    function closeBioModal() {
-      const modal = document.getElementById("bioModal");
-      modal.classList.remove("is-open");
-      modal.setAttribute("aria-hidden", "true");
-      document.body.classList.remove("no-scroll");
-    }
-
-    // Close modal handlers
-    document.addEventListener("click", (e) => {
-      if (e.target && e.target.dataset && e.target.dataset.close) closeBioModal();
-    });
-    document.addEventListener("keydown", (e) => {
-      if (e.key === "Escape") closeBioModal();
+    // 4 musicians
+    const grid = document.getElementById('musicians-grid');
+    data.musicians.forEach(m => {
+      const card = document.createElement('div');
+      card.className = 'musician-card';
+      card.innerHTML = `
+        <img src="${m.photo}" alt="${m.name}" class="musician-photo" />
+        <h3>${m.name}</h3>
+        <p class="role">${m.role}</p>
+        <p class="bio">${m.bio || ""}</p>
+      `;
+      grid.appendChild(card);
     });
 
-    fetch("/content/members.json")
-      .then(res => res.json())
-      .then(data => {
-        document.getElementById("bandPhoto").src = data.bandPhoto;
-        document.getElementById("bandBio").textContent = data.bandBio;
-
-        const grid = document.getElementById("membersGrid");
-        grid.innerHTML = "";
-
-        const normalized = normalizeMembersForLayout(data.members || []);
-
-        normalized.forEach(m => {
-          const card = document.createElement("button");
-          card.type = "button";
-          card.className = "member-card" + (m.isFeatured ? " featured" : "");
-          card.style.setProperty("--order-desktop", m.orderDesktop);
-          card.style.setProperty("--order-mobile", m.orderMobile);
-
-          card.innerHTML = `
-            <div class="member-avatarWrap">
-              <img class="member-avatar" src="${m.photo || ""}" alt="${m.name || ""}">
-            </div>
-            <div class="member-name">${m.name || ""}</div>
-            <div class="member-role">${m.role || ""}</div>
-            <div class="member-clickHint">Click for bio</div>
-          `;
-
-          card.addEventListener("click", () => openBioModal(m));
-          grid.appendChild(card);
-        });
-      })
-      .catch(err => {
-        console.error("Failed to load members.json", err);
-      });
-  </script>
+    // Singer featured in center
+    document.getElementById('singer-name').textContent = data.singer.name;
+    document.getElementById('singer-photo').src = data.singer.photo;
+    document.getElementById('singer-role').textContent = data.singer.role;
+    document.getElementById('singer-bio').textContent = data.singer.bio;
+  });
+</script>
 
 </body>
 </html>
-
