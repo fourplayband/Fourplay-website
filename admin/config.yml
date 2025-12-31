@@ -1,11 +1,65 @@
 backend:
   name: git-gateway
-  branch: main
+  branch: main   # 如果你的默认分支是 master，就改成 master
+
+local_backend: true
 
 media_folder: "assets/uploads"
 public_folder: "/assets/uploads"
 
+publish_mode: simple
+
 collections:
+
+  # ======================
+  # Site Settings (全站设置)
+  # ======================
+  - name: "settings"
+    label: "Site Settings"
+    editor:
+      preview: false
+    files:
+      - file: "content/settings/global.json"
+        label: "Global"
+        name: "global"
+        fields:
+          - { label: "Site Name", name: "site_name", widget: "string", default: "FOURPLAY Dance Band" }
+          - { label: "Header Logo (optional)", name: "logo", widget: "image", required: false }
+          - { label: "Footer Text (optional)", name: "footer", widget: "string", required: false }
+          - { label: "Contact Email", name: "contact_email", widget: "string", required: false }
+          - { label: "Instagram", name: "instagram", widget: "string", required: false }
+          - { label: "Facebook", name: "facebook", widget: "string", required: false }
+          - { label: "YouTube", name: "youtube", widget: "string", required: false }
+
+
+  # ======================
+  # Pages (单页文案，可选)
+  # 如果你现在页面文字都写死在HTML里，也没关系：先留着以后再接
+  # ======================
+  - name: "pages"
+    label: "Pages (Optional Text)"
+    editor:
+      preview: false
+    files:
+      - file: "content/pages/home.json"
+        label: "Home"
+        name: "home"
+        fields:
+          - { label: "Browser Title", name: "title", widget: "string", default: "FOURPLAY Dance Band" }
+          - { label: "Hero Title", name: "hero_title", widget: "string", required: false }
+          - { label: "Hero Subtitle", name: "hero_subtitle", widget: "string", required: false }
+
+      - file: "content/pages/contact.json"
+        label: "Contact"
+        name: "contact"
+        fields:
+          - { label: "Title", name: "title", widget: "string", default: "Contact" }
+          - { label: "Intro", name: "intro", widget: "text", required: false }
+
+
+  # ======================
+  # Members (保持你现在不变：单文件 JSON)
+  # ======================
   - name: "members"
     label: "Band Members"
     format: "json"
@@ -15,17 +69,143 @@ collections:
         name: "members_page"
         file: "content/members.json"
         fields:
-          - { label: "Band Photo", name: "bandPhoto", widget: "image", required: true }
+          - { label: "Band Photo", name: "bandPhoto", widget: "image", required: false }
           - { label: "Band Bio", name: "bandBio", widget: "text", required: false }
 
-          - label: "Members (5)"
+          - label: "Members"
             name: "members"
             widget: "list"
             min: 1
-            max: 5
-            summary: "{{fields.name}} — {{fields.role}}"
+            summary: "{{fields.name}} – {{fields.role}}"
             fields:
               - { label: "Name", name: "name", widget: "string" }
               - { label: "Role / Instrument", name: "role", widget: "string" }
               - { label: "Photo", name: "photo", widget: "image" }
               - { label: "Bio", name: "bio", widget: "text", required: false }
+
+
+  # ======================
+  # Artists (可无限加 artist，前端按“每行顺序”显示)
+  # ======================
+  - name: "artists"
+    label: "Artists"
+    folder: "content/artists"
+    create: true
+    format: "json"
+    extension: "json"
+    slug: "{{fields.order}}-{{slug}}"
+    sortable_fields: ["order", "name"]
+    fields:
+      - { label: "Name", name: "name", widget: "string" }
+      - { label: "Order (small first)", name: "order", widget: "number", value_type: "int", default: 1 }
+
+
+  # ======================
+  # Videos (按 post time 排列；有简介)
+  # ======================
+  - name: "videos"
+    label: "Videos"
+    folder: "content/videos"
+    create: true
+    format: "json"
+    extension: "json"
+    slug: "{{fields.posted}}-{{slug}}"
+    sortable_fields: ["posted", "title"]
+    fields:
+      - { label: "Title", name: "title", widget: "string" }
+
+      # 你可以放 YouTube / Vimeo / 或直接 mp4 url
+      - { label: "Video URL (YouTube or MP4)", name: "url", widget: "string" }
+
+      # 用于封面（可选）
+      - { label: "Thumbnail (optional)", name: "thumbnail", widget: "image", required: false }
+
+      # 简介
+      - { label: "Description", name: "description", widget: "text", required: false }
+
+      # 排序关键：posted
+      - label: "Posted Time"
+        name: "posted"
+        widget: "datetime"
+        format: "YYYY-MM-DD HH:mm"
+        time_format: "HH:mm"
+
+
+  # ======================
+  # Photos (一张照片一个条目；不做裁剪；小图同一张图即可)
+  # ======================
+  - name: "photos"
+    label: "Photos"
+    folder: "content/photos"
+    create: true
+    format: "json"
+    extension: "json"
+    slug: "{{fields.date}}-{{slug}}"
+    sortable_fields: ["date", "title"]
+    fields:
+      - { label: "Title / Caption (optional)", name: "title", widget: "string", required: false }
+      - { label: "Image", name: "image", widget: "image" }
+
+      # 分类：Poster / Gig Photo（你之前提过要分区）
+      - label: "Category"
+        name: "category"
+        widget: "select"
+        options: ["posters", "gig_photos"]
+        default: "gig_photos"
+
+      - label: "Date (optional)"
+        name: "date"
+        widget: "datetime"
+        required: false
+        format: "YYYY-MM-DD"
+        time_format: false
+
+
+  # ======================
+  # Schedule (Booked / Available)
+  # Booked：可填写详情+海报；点开显示
+  # Available：点开去 book（给一个 booking link）
+  # ======================
+  - name: "schedule"
+    label: "Schedule"
+    folder: "content/schedule"
+    create: true
+    format: "json"
+    extension: "json"
+    slug: "{{fields.date}}-{{slug}}"
+    sortable_fields: ["date", "status", "venue"]
+    fields:
+      - label: "Date"
+        name: "date"
+        widget: "datetime"
+        format: "YYYY-MM-DD"
+        time_format: false
+
+      - label: "Status"
+        name: "status"
+        widget: "select"
+        options: ["available", "booked"]
+        default: "available"
+
+      # Booked details
+      - { label: "Event Title (Booked)", name: "title", widget: "string", required: false }
+      - label: "Start Time (optional)"
+        name: "start_time"
+        widget: "string"
+        required: false
+        hint: "Example: 8:00 PM"
+
+      - { label: "Venue (Booked)", name: "venue", widget: "string", required: false }
+      - { label: "Address (optional)", name: "address", widget: "string", required: false }
+      - { label: "Note / Details (optional)", name: "note", widget: "text", required: false }
+
+      - label: "Performers (optional)"
+        name: "performers"
+        widget: "list"
+        required: false
+        field: { label: "Name", name: "name", widget: "string" }
+
+      - { label: "Poster Image (optional)", name: "poster", widget: "image", required: false }
+
+      # Available click -> booking link
+      - { label: "Booking Link (for Available)", name: "booking_link", widget: "string", required: false }
