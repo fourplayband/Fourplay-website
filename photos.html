@@ -5,6 +5,7 @@
   <title>Photos | Fourplay Dance Band</title>
   <meta name="viewport" content="width=device-width, initial-scale=1" />
   <link rel="stylesheet" href="style.css" />
+  <script defer src="nav.js"></script>
 </head>
 
 <body class="photos-page">
@@ -20,12 +21,10 @@
           <div class="site-title-small">FOURPLAY DANCE BAND</div>
         </div>
 
-        <!-- Hamburger -->
-        <button class="nav-toggle" aria-label="Toggle navigation">
+        <button class="nav-toggle" aria-label="Toggle navigation" aria-expanded="false">
           <span></span><span></span><span></span>
         </button>
 
-        <!-- Nav -->
         <nav class="nav">
           <a href="index.html">Home</a>
           <a href="members.html">Members</a>
@@ -46,7 +45,6 @@
           <p>Posters & gig photos by year.</p>
         </div>
 
-        <!-- Year Tabs -->
         <div class="photos-toolbar panel">
           <div class="photos-toolbar__top">
             <div class="photos-year-label">Year</div>
@@ -55,7 +53,6 @@
           <div class="photos-toolbar__hint" id="photosHint">Loading…</div>
         </div>
 
-        <!-- Posters -->
         <div class="photos-section">
           <div class="photos-section__header">
             <h2 class="photos-section__title">Posters</h2>
@@ -64,7 +61,6 @@
           <div class="photos-grid posters-grid" id="postersGrid"></div>
         </div>
 
-        <!-- Gig Photos -->
         <div class="photos-section">
           <div class="photos-section__header">
             <h2 class="photos-section__title">Gig Photos</h2>
@@ -75,7 +71,6 @@
       </section>
     </main>
 
-    <!-- Footer -->
     <footer class="site-footer">
       © 2025 Fourplay Dance Band. All rights reserved.
     </footer>
@@ -91,20 +86,6 @@
     </div>
   </div>
 
-  <!-- Nav JS (same behavior as your inline version) -->
-  <script>
-    document.addEventListener('DOMContentLoaded', () => {
-      const navToggle = document.querySelector('.nav-toggle');
-      const nav = document.querySelector('.nav');
-      if (!navToggle || !nav) return;
-      navToggle.addEventListener('click', () => {
-        navToggle.classList.toggle('open');
-        nav.classList.toggle('nav-open');
-      });
-    });
-  </script>
-
-  <!-- Photos CMS Loader -->
   <script>
     (function () {
       const YEARS = [];
@@ -120,7 +101,7 @@
       const lbCap = document.getElementById('photosLightboxCaption');
       const lbClose = document.getElementById('photosLightboxClose');
 
-      let DATA_BY_YEAR = {};   // year -> {year, galleries[]}
+      let DATA_BY_YEAR = {};
       let AVAILABLE_YEARS = [];
 
       function escapeHTML(str) {
@@ -141,13 +122,9 @@
         lbImg.src = '';
         lbCap.textContent = '';
       }
-      lb.addEventListener('click', (e) => {
-        if (e.target?.dataset?.close) closeLightbox();
-      });
+      lb.addEventListener('click', (e) => { if (e.target?.dataset?.close) closeLightbox(); });
       lbClose.addEventListener('click', closeLightbox);
-      document.addEventListener('keydown', (e) => {
-        if (e.key === 'Escape') closeLightbox();
-      });
+      document.addEventListener('keydown', (e) => { if (e.key === 'Escape') closeLightbox(); });
 
       async function fetchYear(y) {
         const url = `/content/photos/${y}.json`;
@@ -160,6 +137,13 @@
         } catch (err) {
           return null;
         }
+      }
+
+      function normalizeSection(s){
+        const v = String(s || '').toLowerCase().trim();
+        if (v === 'poster' || v === 'posters') return 'posters';
+        if (v === 'gig' || v === 'gigs' || v === 'gig-photos' || v === 'gigphotos') return 'gig-photos';
+        return v;
       }
 
       function buildTabs() {
@@ -182,14 +166,14 @@
       }
 
       function flattenImagesForSection(yearData, sectionName) {
-        // galleries[] each has section + images[]
         const out = [];
         (yearData.galleries || []).forEach(g => {
-          if (g.section !== sectionName) return;
+          if (normalizeSection(g.section) !== sectionName) return;
           (g.images || []).forEach(imgObj => {
-            if (!imgObj || !imgObj.image) return;
+            const src = imgObj?.image || imgObj?.src || imgObj?.url;
+            if (!src) return;
             out.push({
-              src: imgObj.image,
+              src,
               caption: imgObj.caption || g.title || ''
             });
           });
@@ -209,7 +193,7 @@
         items.forEach((it) => {
           const card = document.createElement('button');
           card.type = 'button';
-          card.className = `photo-card ${variant === 'posters' ? 'is-poster' : 'is-gig'}`;
+          card.className = `photo-card`;
           card.innerHTML = `
             <img src="${escapeHTML(it.src)}" alt="" loading="lazy" />
             ${it.caption ? `<div class="photo-cap">${escapeHTML(it.caption)}</div>` : ``}
@@ -232,8 +216,7 @@
         renderGrid(postersGrid, posters, 'posters');
         renderGrid(gigGrid, gigs, 'gigs');
 
-        const count = posters.length + gigs.length;
-        hintEl.textContent = `${y} loaded · ${count} images`;
+        hintEl.textContent = `${y} loaded · ${posters.length + gigs.length} images`;
       }
 
       async function init() {
@@ -244,11 +227,7 @@
           const y = YEARS[idx];
           if (!r) return;
           DATA_BY_YEAR[y] = r;
-
-          // consider year "available" if it has any galleries/images OR exists
-          const any = (r.galleries || []).some(g => (g.images || []).length > 0);
-          // show year tab if file exists; if you prefer only years with photos, change to: if(any)
-          AVAILABLE_YEARS.push(y);
+          AVAILABLE_YEARS.push(y); // 文件存在就显示年份 tab
         });
 
         if (!AVAILABLE_YEARS.length) {
@@ -258,7 +237,6 @@
 
         buildTabs();
 
-        // default to latest year that has any images; fallback to last
         let defaultYear = AVAILABLE_YEARS[AVAILABLE_YEARS.length - 1];
         for (let i = AVAILABLE_YEARS.length - 1; i >= 0; i--) {
           const y = AVAILABLE_YEARS[i];
