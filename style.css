@@ -817,3 +817,8 @@ header::before,
   .nav.nav-open { display: flex; }
 }
 
+.nav-toggle {
+  margin-left: auto;   /* ✅ 把它推回 header 内 */
+  flex-shrink: 0;      /* ✅ 不允许被压缩 */
+}
+
