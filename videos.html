@@ -5,6 +5,7 @@
   <title>Videos | Fourplay Dance Band</title>
   <meta name="viewport" content="width=device-width, initial-scale=1" />
   <link rel="stylesheet" href="style.css" />
+  <script defer src="nav.js"></script>
 </head>
 <body>
 <div class="page">
@@ -18,26 +19,21 @@
       <div class="site-title-small">FOURPLAY DANCE BAND</div>
     </div>
 
-    <!-- 汉堡菜单按钮 -->
-    <button class="nav-toggle" aria-label="Toggle navigation">
-      <span></span>
-      <span></span>
-      <span></span>
+    <button class="nav-toggle" aria-label="Toggle navigation" aria-expanded="false">
+      <span></span><span></span><span></span>
     </button>
 
-    <!-- 导航菜单 -->
     <nav class="nav">
-      <a href="index.html" class="active">Home</a>
+      <a href="index.html">Home</a>
       <a href="members.html">Members</a>
       <a href="artists.html">Artists We Cover</a>
-      <a href="videos.html">Videos</a>
+      <a href="videos.html" class="active">Videos</a>
       <a href="photos.html">Photos</a>
       <a href="schedule.html">Schedule</a>
       <a href="contact.html">Contact</a>
     </nav>
   </div>
 </header>
-
 
   <main class="main-content">
     <section class="section-narrow">
@@ -47,7 +43,7 @@
       </div>
 
       <div class="video-grid">
-        <div class="video-item">
+        <article class="video-card">
           <div class="video-frame-wrap">
             <iframe
               src="https://www.youtube.com/embed/G-CXvZpNiJk"
@@ -56,10 +52,13 @@
               allowfullscreen
             ></iframe>
           </div>
-          <div class="video-title">Fourplay Dance Band – Live highlight</div>
-        </div>
+          <div class="video-meta">
+            <div class="video-title">Live Highlight</div>
+            <div class="video-desc">High energy dance hits, crowd moments, and a taste of the FOURPLAY vibe.</div>
+          </div>
+        </article>
 
-        <div class="video-item">
+        <article class="video-card">
           <div class="video-frame-wrap">
             <iframe
               src="https://www.youtube.com/embed/hDLEuFKPEq8"
@@ -68,8 +67,11 @@
               allowfullscreen
             ></iframe>
           </div>
-          <div class="video-title">Fourplay Dance Band – Current hits medley</div>
-        </div>
+          <div class="video-meta">
+            <div class="video-title">Current Hits Medley</div>
+            <div class="video-desc">Modern dance-floor favorites + classic singalongs — polished and punchy.</div>
+          </div>
+        </article>
       </div>
     </section>
   </main>
@@ -78,9 +80,5 @@
     © 2025 Fourplay Dance Band. All rights reserved.
   </footer>
 </div>
-
-<script src="nav.js"></script>
-</body>
-</html>
 </body>
 </html>
