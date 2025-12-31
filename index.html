@@ -1,126 +1,141 @@
-<!DOCTYPE html>
+<!doctype html>
 <html lang="en">
-<head>
-  <meta charset="UTF-8" />
-  <title>Fourplay Dance Band | Current Dance Hits</title>
-  <meta name="viewport" content="width=device-width, initial-scale=1" />
-  <link rel="stylesheet" href="style.css" />
-</head>
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width,initial-scale=1" />
+    <title>FOURPLAY Dance Band</title>
+    <link rel="stylesheet" href="style.css" />
+    <script defer src="nav.js"></script>
+  </head>
 
-<body class="home">
-<div class="page">
+  <body class="home">
+    <div class="page">
+      <!-- Header -->
+      <header class="site-header">
+        <div class="header-inner">
+          <div class="header-left">
+            <a href="index.html" aria-label="Fourplay Home">
+              <img class="header-logo" src="assets/logo.png" alt="FOURPLAY" />
+            </a>
+            <div class="site-title-small">FOURPLAY DANCE BAND</div>
+          </div>
 
-  <!-- Header -->
-  <header class="site-header">
-    <div class="header-inner">
-      <div class="header-left">
-        <a href="index.html">
-          <img src="assets/logo.png" alt="Fourplay Dance Band" class="header-logo" />
-        </a>
-        <div class="site-title-small">FOURPLAY DANCE BAND</div>
-      </div>
+          <nav class="nav" aria-label="Primary Navigation">
+            <a href="index.html" class="active">Home</a>
+            <a href="members.html">Members</a>
+            <a href="artists.html">Artists</a>
+            <a href="videos.html">Videos</a>
+            <a href="photos.html">Photos</a>
+            <a href="schedule.html">Schedule</a>
+            <a href="contact.html">Contact</a>
+          </nav>
+        </div>
+      </header>
 
-      <!-- Hamburger Menu -->
-      <button class="nav-toggle" aria-label="Toggle navigation">
-        <span></span>
-        <span></span>
-        <span></span>
-      </button>
+      <!-- Main -->
+      <main class="home-main">
+        <section class="hero-video-full" aria-label="Hero">
+          <!-- Fullscreen Loop Video -->
+          <video
+            class="hero-video"
+            src="assets/logo-bg.mp4"
+            autoplay
+            muted
+            loop
+            playsinline
+          ></video>
 
-      <!-- Navigation -->
-      <nav class="nav">
-        <a href="index.html" class="active">Home</a>
-        <a href="members.html">Members</a>
-        <a href="artists.html">Artists We Cover</a>
-        <a href="videos.html">Videos</a>
-        <a href="photos.html">Photos</a>
-        <a href="schedule.html">Schedule</a>
-        <a href="contact.html">Contact</a>
-      </nav>
+          <div class="hero-inner">
+            <!-- Big logo on background -->
+            <img class="hero-logo" src="assets/logo.png" alt="FOURPLAY DANCE BAND" />
+
+            <div class="hero-tagline">PLAY CURRENT DANCE HITS</div>
+
+            <div class="hero-buttons">
+              <a class="btn btn-primary" href="videos.html">Watch Videos</a>
+
+              <!-- Music Toggle -->
+              <button class="music-toggle playing" id="musicToggle" aria-label="Toggle music">
+                <!-- Play -->
+                <svg class="icon-play" viewBox="0 0 24 24" aria-hidden="true">
+                  <path d="M8 5v14l11-7z"></path>
+                </svg>
+                <!-- Pause -->
+                <svg class="icon-pause" viewBox="0 0 24 24" aria-hidden="true">
+                  <path d="M6 5h5v14H6zM13 5h5v14h-5z"></path>
+                </svg>
+              </button>
+
+              <a class="btn btn-secondary" href="contact.html">Contact Us</a>
+            </div>
+          </div>
+
+          <!-- Background Music -->
+          <!-- 把文件名改成你自己的，比如 assets/bgm.mp3 -->
+          <audio id="bgm" src="assets/bgm.mp3" preload="auto" loop></audio>
+
+          <script>
+            (function () {
+              const audio = document.getElementById("bgm");
+              const btn = document.getElementById("musicToggle");
+
+              // UI 状态
+              function setPlaying(isPlaying) {
+                btn.classList.toggle("playing", isPlaying);
+                btn.setAttribute("aria-pressed", String(isPlaying));
+              }
+
+              // 尝试自动播放（可能被浏览器拦截）
+              async function tryAutoPlay() {
+                try {
+                  await audio.play();
+                  setPlaying(true);
+                } catch (e) {
+                  // 自动播放被拦截：先显示为“未播放”，等待第一次用户交互
+                  setPlaying(false);
+
+                  const unlock = async () => {
+                    try {
+                      await audio.play();
+                      setPlaying(true);
+                    } catch (_) {}
+                    document.removeEventListener("click", unlock, true);
+                    document.removeEventListener("touchstart", unlock, true);
+                  };
+
+                  document.addEventListener("click", unlock, true);
+                  document.addEventListener("touchstart", unlock, true);
+                }
+              }
+
+              // 按钮切换播放/暂停
+              btn.addEventListener("click", async (e) => {
+                e.preventDefault();
+                e.stopPropagation();
+                if (audio.paused) {
+                  try {
+                    await audio.play();
+                    setPlaying(true);
+                  } catch (_) {
+                    setPlaying(false);
+                  }
+                } else {
+                  audio.pause();
+                  setPlaying(false);
+                }
+              });
+
+              // 启动
+              tryAutoPlay();
+            })();
+          </script>
+        </section>
+      </main>
+
+      <!-- Footer -->
+      <footer class="site-footer">
+        © 2025 Fourplay Dance Band. All rights reserved.
+      </footer>
     </div>
-  </header>
-
-  <!-- Main -->
-  <main class="main-content">
-    <section class="hero">
-      <div class="hero-inner">
-
-        <!-- Logo -->
-        <div class="hero-logo-wrap">
-          <img src="assets/logo.png" alt="Fourplay Dance Band logo" class="hero-logo" />
-        </div>
-
-        <p class="hero-tagline">Play Current Dance Hits</p>
-
-        <div class="hero-buttons">
-          <a href="videos.html" class="btn btn-primary">Watch Videos</a>
-          <a href="schedule.html" class="btn btn-secondary">View Schedule</a>
-        </div>
-      </div>
-    </section>
-  </main>
-
-  <!-- Footer -->
-  <footer class="site-footer">
-    © 2025 Fourplay Dance Band. All rights reserved.
-  </footer>
-
-</div> <!-- end .page -->
-
-
-<!-- ========================= -->
-<!--  Navigation toggle script -->
-<!-- ========================= -->
-<script>
-document.addEventListener('DOMContentLoaded', () => {
-  const navToggle = document.querySelector('.nav-toggle');
-  const nav = document.querySelector('.nav');
-
-  if (!navToggle || !nav) return;
-
-  navToggle.addEventListener('click', () => {
-    navToggle.classList.toggle('open');
-    nav.classList.toggle('nav-open');
-  });
-});
-</script>
-
-
-<!-- ================================================= -->
-<!--  Netlify Identity Library (needed for CMS login)  -->
-<!-- ================================================= -->
-<script src="https://identity.netlify.com/v1/netlify-identity-widget.js"></script>
-
-
-<!-- =============================================================== -->
-<!--  Email Confirmation Handler (THIS FIXES THE “jump to homepage”) -->
-<!-- =============================================================== -->
-<script>
-  // If URL contains #confirmation_token from email click
-  if (window.location.hash.includes("confirmation_token")) {
-
-    // Wait for Identity system to initialize
-    netlifyIdentity.on("init", function () {
-
-      // Attempt to confirm email
-      netlifyIdentity
-        .confirm()
-        .then(function () {
-          console.log("Email confirmed!");
-
-          // Redirect to CMS login
-          window.location.href = "/admin/";
-        })
-        .catch(function (err) {
-          console.error("Confirmation error:", err);
-        });
-    });
-
-    // Manually initialize Identity system
-    netlifyIdentity.init();
-  }
-</script>
-
-
-</body>
+  </body>
 </html>
