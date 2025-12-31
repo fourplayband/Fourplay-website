@@ -6,81 +6,273 @@
   <meta name="viewport" content="width=device-width, initial-scale=1" />
   <link rel="stylesheet" href="style.css" />
 </head>
-<body>
-<div class="page">
 
- <!-- Header -->
-<header class="site-header">
-  <div class="header-inner">
-    <div class="header-left">
-      <a href="index.html">
-        <img src="assets/logo.png" alt="Fourplay Dance Band" class="header-logo" />
-      </a>
-      <div class="site-title-small">FOURPLAY DANCE BAND</div>
-    </div>
+<body class="photos-page">
+  <div class="page">
 
-    <!-- 汉堡菜单按钮 -->
-    <button class="nav-toggle" aria-label="Toggle navigation">
-      <span></span>
-      <span></span>
-      <span></span>
-    </button>
-
-    <!-- 导航菜单 -->
-    <nav class="nav">
-      <a href="index.html" class="active">Home</a>
-      <a href="members.html">Members</a>
-      <a href="artists.html">Artists We Cover</a>
-      <a href="videos.html">Videos</a>
-      <a href="photos.html">Photos</a>
-      <a href="schedule.html">Schedule</a>
-      <a href="contact.html">Contact</a>
-    </nav>
-  </div>
-</header>
-
-
-  <main class="main-content">
-    <section class="section-narrow">
-      <div class="page-header">
-        <h1>Photos</h1>
-        <p>Promo shots, live shows, and crowd moments.</p>
-      </div>
-
-      <div class="panel">
-        <div class="photo-grid">
-          <!-- 这些占位图路径你之后可以换成真实图片 -->
-          <img src="assets/photo-1.jpg" alt="Fourplay live" />
-          <img src="assets/photo-2.jpg" alt="Fourplay live" />
-          <img src="assets/photo-3.jpg" alt="Fourplay live" />
-          <img src="assets/photo-4.jpg" alt="Fourplay live" />
-          <img src="assets/photo-5.jpg" alt="Fourplay live" />
-          <img src="assets/photo-6.jpg" alt="Fourplay live" />
+    <!-- Header -->
+    <header class="site-header">
+      <div class="header-inner">
+        <div class="header-left">
+          <a href="index.html">
+            <img src="assets/logo.png" alt="Fourplay Dance Band" class="header-logo" />
+          </a>
+          <div class="site-title-small">FOURPLAY DANCE BAND</div>
         </div>
+
+        <!-- Hamburger -->
+        <button class="nav-toggle" aria-label="Toggle navigation">
+          <span></span><span></span><span></span>
+        </button>
+
+        <!-- Nav -->
+        <nav class="nav">
+          <a href="index.html">Home</a>
+          <a href="members.html">Members</a>
+          <a href="artists.html">Artists We Cover</a>
+          <a href="videos.html">Videos</a>
+          <a href="photos.html" class="active">Photos</a>
+          <a href="schedule.html">Schedule</a>
+          <a href="contact.html">Contact</a>
+        </nav>
       </div>
-    </section>
-  </main>
+    </header>
 
-  <footer class="site-footer">
-    © 2025 Fourplay Dance Band. All rights reserved.
-  </footer>
-</div>
+    <!-- Main -->
+    <main class="main-content">
+      <section class="section-narrow">
+        <div class="page-header">
+          <h1>Photos</h1>
+          <p>Posters & gig photos by year.</p>
+        </div>
 
-<script>
-document.addEventListener('DOMContentLoaded', () => {
-  const navToggle = document.querySelector('.nav-toggle');
-  const nav = document.querySelector('.nav');
+        <!-- Year Tabs -->
+        <div class="photos-toolbar panel">
+          <div class="photos-toolbar__top">
+            <div class="photos-year-label">Year</div>
+            <div class="photos-years" id="photosYears"></div>
+          </div>
+          <div class="photos-toolbar__hint" id="photosHint">Loading…</div>
+        </div>
 
-  if (!navToggle || !nav) return;
+        <!-- Posters -->
+        <div class="photos-section">
+          <div class="photos-section__header">
+            <h2 class="photos-section__title">Posters</h2>
+            <div class="photos-section__sub">Flyers, promo art, show posters</div>
+          </div>
+          <div class="photos-grid posters-grid" id="postersGrid"></div>
+        </div>
 
-  navToggle.addEventListener('click', () => {
-    navToggle.classList.toggle('open');   // 控制汉堡变 X
-    nav.classList.toggle('nav-open');     // 控制菜单显示/隐藏
-  });
-});
-</script>
-</body>
-</html>
+        <!-- Gig Photos -->
+        <div class="photos-section">
+          <div class="photos-section__header">
+            <h2 class="photos-section__title">Gig Photos</h2>
+            <div class="photos-section__sub">Live shots & behind the scenes</div>
+          </div>
+          <div class="photos-grid gig-grid" id="gigGrid"></div>
+        </div>
+      </section>
+    </main>
 
+    <!-- Footer -->
+    <footer class="site-footer">
+      © 2025 Fourplay Dance Band. All rights reserved.
+    </footer>
+  </div>
+
+  <!-- Lightbox -->
+  <div class="photos-lightbox" id="photosLightbox" aria-hidden="true">
+    <div class="photos-lightbox__backdrop" data-close="true"></div>
+    <div class="photos-lightbox__panel" role="dialog" aria-modal="true">
+      <button class="photos-lightbox__close" id="photosLightboxClose" aria-label="Close">✕</button>
+      <img class="photos-lightbox__img" id="photosLightboxImg" alt="" />
+      <div class="photos-lightbox__caption" id="photosLightboxCaption"></div>
+    </div>
+  </div>
+
+  <!-- Nav JS (same behavior as your inline version) -->
+  <script>
+    document.addEventListener('DOMContentLoaded', () => {
+      const navToggle = document.querySelector('.nav-toggle');
+      const nav = document.querySelector('.nav');
+      if (!navToggle || !nav) return;
+      navToggle.addEventListener('click', () => {
+        navToggle.classList.toggle('open');
+        nav.classList.toggle('nav-open');
+      });
+    });
+  </script>
+
+  <!-- Photos CMS Loader -->
+  <script>
+    (function () {
+      const YEARS = [];
+      for (let y = 2016; y <= 2026; y++) YEARS.push(y);
+
+      const yearsEl = document.getElementById('photosYears');
+      const hintEl = document.getElementById('photosHint');
+      const postersGrid = document.getElementById('postersGrid');
+      const gigGrid = document.getElementById('gigGrid');
+
+      const lb = document.getElementById('photosLightbox');
+      const lbImg = document.getElementById('photosLightboxImg');
+      const lbCap = document.getElementById('photosLightboxCaption');
+      const lbClose = document.getElementById('photosLightboxClose');
+
+      let DATA_BY_YEAR = {};   // year -> {year, galleries[]}
+      let AVAILABLE_YEARS = [];
+
+      function escapeHTML(str) {
+        return (str || '').replace(/[&<>"']/g, (m) => ({
+          '&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'
+        }[m]));
+      }
+
+      function openLightbox(src, caption) {
+        lbImg.src = src;
+        lbCap.textContent = caption || '';
+        lb.classList.add('is-open');
+        lb.setAttribute('aria-hidden', 'false');
+      }
+      function closeLightbox() {
+        lb.classList.remove('is-open');
+        lb.setAttribute('aria-hidden', 'true');
+        lbImg.src = '';
+        lbCap.textContent = '';
+      }
+      lb.addEventListener('click', (e) => {
+        if (e.target?.dataset?.close) closeLightbox();
+      });
+      lbClose.addEventListener('click', closeLightbox);
+      document.addEventListener('keydown', (e) => {
+        if (e.key === 'Escape') closeLightbox();
+      });
+
+      async function fetchYear(y) {
+        const url = `/content/photos/${y}.json`;
+        try {
+          const res = await fetch(url, { cache: 'no-store' });
+          if (!res.ok) return null;
+          const json = await res.json();
+          if (!json || !Array.isArray(json.galleries)) return { year: y, galleries: [] };
+          return json;
+        } catch (err) {
+          return null;
+        }
+      }
+
+      function buildTabs() {
+        yearsEl.innerHTML = '';
+        AVAILABLE_YEARS.forEach((y) => {
+          const btn = document.createElement('button');
+          btn.className = 'photos-year';
+          btn.type = 'button';
+          btn.textContent = y;
+          btn.dataset.year = String(y);
+          btn.addEventListener('click', () => renderYear(y));
+          yearsEl.appendChild(btn);
+        });
+      }
+
+      function setActiveTab(y) {
+        yearsEl.querySelectorAll('.photos-year').forEach((b) => {
+          b.classList.toggle('is-active', b.dataset.year === String(y));
+        });
+      }
+
+      function flattenImagesForSection(yearData, sectionName) {
+        // galleries[] each has section + images[]
+        const out = [];
+        (yearData.galleries || []).forEach(g => {
+          if (g.section !== sectionName) return;
+          (g.images || []).forEach(imgObj => {
+            if (!imgObj || !imgObj.image) return;
+            out.push({
+              src: imgObj.image,
+              caption: imgObj.caption || g.title || ''
+            });
+          });
+        });
+        return out;
+      }
+
+      function renderGrid(container, items, variant) {
+        container.innerHTML = '';
+
+        if (!items.length) {
+          container.innerHTML = `<div class="photos-empty">No ${variant} for this year yet.</div>`;
+          return;
+        }
+
+        const frag = document.createDocumentFragment();
+        items.forEach((it) => {
+          const card = document.createElement('button');
+          card.type = 'button';
+          card.className = `photo-card ${variant === 'posters' ? 'is-poster' : 'is-gig'}`;
+          card.innerHTML = `
+            <img src="${escapeHTML(it.src)}" alt="" loading="lazy" />
+            ${it.caption ? `<div class="photo-cap">${escapeHTML(it.caption)}</div>` : ``}
+          `;
+          card.addEventListener('click', () => openLightbox(it.src, it.caption));
+          frag.appendChild(card);
+        });
+        container.appendChild(frag);
+      }
+
+      function renderYear(y) {
+        const yearData = DATA_BY_YEAR[y];
+        if (!yearData) return;
+
+        setActiveTab(y);
+
+        const posters = flattenImagesForSection(yearData, 'posters');
+        const gigs = flattenImagesForSection(yearData, 'gig-photos');
+
+        renderGrid(postersGrid, posters, 'posters');
+        renderGrid(gigGrid, gigs, 'gigs');
+
+        const count = posters.length + gigs.length;
+        hintEl.textContent = `${y} loaded · ${count} images`;
+      }
+
+      async function init() {
+        hintEl.textContent = 'Loading years…';
+
+        const results = await Promise.all(YEARS.map(fetchYear));
+        results.forEach((r, idx) => {
+          const y = YEARS[idx];
+          if (!r) return;
+          DATA_BY_YEAR[y] = r;
+
+          // consider year "available" if it has any galleries/images OR exists
+          const any = (r.galleries || []).some(g => (g.images || []).length > 0);
+          // show year tab if file exists; if you prefer only years with photos, change to: if(any)
+          AVAILABLE_YEARS.push(y);
+        });
+
+        if (!AVAILABLE_YEARS.length) {
+          hintEl.textContent = 'No year files found. Make sure content/photos/2016.json etc exist.';
+          return;
+        }
+
+        buildTabs();
+
+        // default to latest year that has any images; fallback to last
+        let defaultYear = AVAILABLE_YEARS[AVAILABLE_YEARS.length - 1];
+        for (let i = AVAILABLE_YEARS.length - 1; i >= 0; i--) {
+          const y = AVAILABLE_YEARS[i];
+          const d = DATA_BY_YEAR[y];
+          const posters = flattenImagesForSection(d, 'posters');
+          const gigs = flattenImagesForSection(d, 'gig-photos');
+          if (posters.length + gigs.length > 0) { defaultYear = y; break; }
+        }
+
+        renderYear(defaultYear);
+      }
+
+      init();
+    })();
+  </script>
 </body>
 </html>
