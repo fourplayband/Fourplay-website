@@ -37,11 +37,14 @@ footer, .site-footer { margin-top: auto; }
 .header-inner {
   max-width: 1200px;
   margin: 0 auto;
-  padding: 10px 20px;
+  padding: 10px 16px;   /* ✅ 从 20px 改成 16px */
   display: flex;
   align-items: center;
   justify-content: space-between;
-  gap: 18px;
+  gap: 14px;
+
+  width: 100%;          /* ✅ 关键 */
+  box-sizing: border-box;
 }
 
 .header-left {
@@ -813,3 +816,4 @@ header::before,
 
   .nav.nav-open { display: flex; }
 }
+
