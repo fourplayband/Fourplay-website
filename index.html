@@ -11,32 +11,31 @@
   <body class="home">
     <div class="page">
       <!-- Header -->
-    <header class="site-header">
-  <div class="header-inner">
-    <div class="header-left">
-      <a href="index.html" aria-label="Fourplay Home">
-        <img src="assets/logo.png" alt="Fourplay Dance Band" class="header-logo" />
-      </a>
-      <div class="site-title-small">FOURPLAY DANCE BAND</div>
-    </div>
+      <header class="site-header">
+        <div class="header-inner">
+          <div class="header-left">
+            <a href="index.html" aria-label="Fourplay Home">
+              <img class="header-logo" src="assets/logo.png" alt="FOURPLAY" />
+            </a>
+            <div class="site-title-small">FOURPLAY DANCE BAND</div>
+          </div>
 
-    <!-- 汉堡菜单按钮（移动端显示） -->
-    <button class="nav-toggle" aria-label="Toggle navigation" aria-expanded="false">
-      <span></span><span></span><span></span>
-    </button>
+          <!-- ✅ Hamburger -->
+          <button class="nav-toggle" aria-label="Toggle navigation" aria-expanded="false">
+            <span></span><span></span><span></span>
+          </button>
 
-    <nav class="nav" aria-label="Primary Navigation">
-      <a href="index.html">Home</a>
-      <a href="members.html">Members</a>
-      <a href="artists.html">Artists</a>
-      <a href="videos.html">Videos</a>
-      <a href="photos.html">Photos</a>
-      <a href="schedule.html">Schedule</a>
-      <a href="contact.html">Contact</a>
-    </nav>
-  </div>
-</header>
-
+          <nav class="nav" aria-label="Primary Navigation">
+            <a href="index.html" class="active">Home</a>
+            <a href="members.html">Members</a>
+            <a href="artists.html">Artists</a>
+            <a href="videos.html">Videos</a>
+            <a href="photos.html">Photos</a>
+            <a href="schedule.html">Schedule</a>
+            <a href="contact.html">Contact</a>
+          </nav>
+        </div>
+      </header>
 
       <!-- Main -->
       <main class="home-main">
@@ -52,21 +51,16 @@
           ></video>
 
           <div class="hero-inner">
-            <!-- Big logo on background -->
             <img class="hero-logo" src="assets/logo.png" alt="FOURPLAY DANCE BAND" />
-
             <div class="hero-tagline">PLAY CURRENT DANCE HITS</div>
 
             <div class="hero-buttons">
               <a class="btn btn-primary" href="videos.html">Watch Videos</a>
 
-              <!-- Music Toggle -->
               <button class="music-toggle playing" id="musicToggle" aria-label="Toggle music">
-                <!-- Play -->
                 <svg class="icon-play" viewBox="0 0 24 24" aria-hidden="true">
                   <path d="M8 5v14l11-7z"></path>
                 </svg>
-                <!-- Pause -->
                 <svg class="icon-pause" viewBox="0 0 24 24" aria-hidden="true">
                   <path d="M6 5h5v14H6zM13 5h5v14h-5z"></path>
                 </svg>
@@ -76,8 +70,6 @@
             </div>
           </div>
 
-          <!-- Background Music -->
-          <!-- 把文件名改成你自己的，比如 assets/bgm.mp3 -->
           <audio id="bgm" src="assets/bgm.mp3" preload="auto" loop></audio>
 
           <script>
@@ -85,19 +77,16 @@
               const audio = document.getElementById("bgm");
               const btn = document.getElementById("musicToggle");
 
-              // UI 状态
               function setPlaying(isPlaying) {
                 btn.classList.toggle("playing", isPlaying);
                 btn.setAttribute("aria-pressed", String(isPlaying));
               }
 
-              // 尝试自动播放（可能被浏览器拦截）
               async function tryAutoPlay() {
                 try {
                   await audio.play();
                   setPlaying(true);
                 } catch (e) {
-                  // 自动播放被拦截：先显示为“未播放”，等待第一次用户交互
                   setPlaying(false);
 
                   const unlock = async () => {
@@ -114,7 +103,6 @@
                 }
               }
 
-              // 按钮切换播放/暂停
               btn.addEventListener("click", async (e) => {
                 e.preventDefault();
                 e.stopPropagation();
@@ -131,7 +119,6 @@
                 }
               });
 
-              // 启动
               tryAutoPlay();
             })();
           </script>
@@ -145,5 +132,3 @@
     </div>
   </body>
 </html>
-
-
