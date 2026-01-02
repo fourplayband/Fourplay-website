@@ -127,16 +127,25 @@
       document.addEventListener('keydown', (e) => { if (e.key === 'Escape') closeLightbox(); });
 
       async function fetchYear(y) {
-        const url = `/content/photos/${y}.json`;
-        try {
-          const res = await fetch(url, { cache: 'no-store' });
-          if (!res.ok) return null;
-          const json = await res.json();
-          if (!json || !Array.isArray(json.galleries)) return { year: y, galleries: [] };
-          return json;
-        } catch (err) {
-          return null;
+        // Try relative path first (works when site lives in a subfolder),
+        // then absolute path (works when served from domain root).
+        const candidates = [
+          `content/photos/${y}.json`,
+          `/content/photos/${y}.json`
+        ];
+
+        for (const url of candidates) {
+          try {
+            const res = await fetch(url, { cache: 'no-store' });
+            if (!res || !res.ok) continue;
+            const json = await res.json();
+            if (!json || !Array.isArray(json.galleries)) return { year: y, galleries: [] };
+            return json;
+          } catch (err) {
+            // try next candidate
+          }
         }
+        return null;
       }
 
       function normalizeSection(s){
