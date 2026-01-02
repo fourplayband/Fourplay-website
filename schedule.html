@@ -36,155 +36,125 @@
       </nav>
     </div>
   </header>
-
+  
   <main class="main-content">
-    <section class="section-narrow calendar-section">
+    <section class="section-narrow">
       <div class="page-header">
         <h1>Schedule</h1>
-        <p>Availability & upcoming gigs.</p>
+        <p>Upcoming shows for 2026.</p>
       </div>
 
       <div class="calendar-wrapper">
-        <div class="month-tabs" id="month-tabs"></div>
-
         <div class="calendar-panel">
           <div class="calendar-panel-header">
-            <h2 class="calendar-title" id="calendar-title">JANUARY 2026</h2>
-            <p class="calendar-hint">Click a booked date to see details</p>
+            <h2 class="calendar-title" id="calendar-title">2026</h2>
+            <p class="calendar-hint">Click a show to see details</p>
           </div>
 
-          <div class="calendar-dow">
-            <div>Sun</div><div>Mon</div><div>Tue</div><div>Wed</div><div>Thu</div><div>Fri</div><div>Sat</div>
+          <!-- legend removed per request: dots now appear on each event -->
+
+          <div class="upcoming-wrapper">
+            <div class="featured-show" id="featured-show" aria-live="polite"></div>
+            <ul class="upcoming-shows" id="shows-list" aria-live="polite"></ul>
           </div>
-
-          <div class="calendar-grid" id="calendar-grid"></div>
         </div>
       </div>
-
-      <!-- Event details modal -->
-      <div class="event-modal" id="event-modal" aria-hidden="true">
-        <div class="event-modal__backdrop" data-close="true"></div>
-
-        <div class="event-modal__panel" role="dialog" aria-modal="true" aria-label="Event details">
-          <button class="event-modal__close" type="button" id="event-modal-close" aria-label="Close">✕</button>
-          <h3 class="event-modal__title" id="event-title">Event</h3>
-          <p class="event-modal__meta" id="event-meta"></p>
-          <p class="event-modal__note" id="event-note"></p>
-        </div>
-      </div>
-
     </section>
   </main>
 
-  <footer class="site-footer">
-    © 2025 Fourplay Dance Band. All rights reserved.
-  </footer>
-</div>
+  <!-- Event details modal -->
+  <div class="event-modal" id="event-modal" aria-hidden="true">
+    <div class="event-modal__backdrop" data-close="true"></div>
+    <div class="event-modal__panel" role="dialog" aria-modal="true" aria-label="Event details">
+      <button class="event-modal__close" type="button" id="event-modal-close" aria-label="Close">✕</button>
+      <h3 class="event-modal__title" id="event-title">Event</h3>
+      <p class="event-modal__meta" id="event-meta"></p>
+      <p class="event-modal__note" id="event-note"></p>
+    </div>
+  </div>
 
-<script>
-document.addEventListener("DOMContentLoaded", () => {
-  const MONTHS = ["January","February","March","April","May","June","July","August","September","October","November","December"];
-
-  // 先写死一个 booked：2026-01-24 @ R PLACE（你说的）
-  // 后续接 CMS/Google Calendar 时，这块会替换成 fetch 的数据
-  const bookedEvents = {
-    "2026-01-24": { venue: "R PLACE", note: "Gig night at R PLACE." }
-  };
-
-  const monthTabsEl = document.getElementById("month-tabs");
-  const titleEl = document.getElementById("calendar-title");
-  const gridEl = document.getElementById("calendar-grid");
-
-  const modalEl = document.getElementById("event-modal");
-  const modalCloseBtn = document.getElementById("event-modal-close");
-  const eventTitleEl = document.getElementById("event-title");
-  const eventMetaEl = document.getElementById("event-meta");
-  const eventNoteEl = document.getElementById("event-note");
-
-  let activeMonthIndex = 0;
-
-  function pad2(n){ return String(n).padStart(2, "0"); }
-  function ymd(year, monthIndex, day){ return `${year}-${pad2(monthIndex+1)}-${pad2(day)}`; }
-
-  function openModal(dateStr, eventObj){
-    eventTitleEl.textContent = eventObj.venue || "Booked";
-    eventMetaEl.textContent = `${dateStr}  •  BOOKED`;
-    eventNoteEl.textContent = eventObj.note || "";
-    modalEl.classList.add("is-open");
-    modalEl.setAttribute("aria-hidden", "false");
-  }
-
-  function closeModal(){
-    modalEl.classList.remove("is-open");
-    modalEl.setAttribute("aria-hidden", "true");
-  }
-
-  modalCloseBtn.addEventListener("click", closeModal);
-  modalEl.addEventListener("click", (e) => {
-    if (e.target && e.target.getAttribute("data-close") === "true") closeModal();
-  });
-  document.addEventListener("keydown", (e) => { if (e.key === "Escape") closeModal(); });
-
-  function renderTabs(){
-    monthTabsEl.innerHTML = "";
-    MONTHS.forEach((m, idx) => {
-      const btn = document.createElement("button");
-      btn.type = "button";
-      btn.className = "month-tab" + (idx === activeMonthIndex ? " is-active" : "");
-      btn.textContent = m.slice(0,3);
-      btn.addEventListener("click", () => {
-        activeMonthIndex = idx;
-        renderTabs();
-        renderCalendar();
-      });
-      monthTabsEl.appendChild(btn);
-    });
-  }
-
-  function renderCalendar(){
+  <script>
+  document.addEventListener("DOMContentLoaded", () => {
     const YEAR = 2026;
-    titleEl.textContent = `${MONTHS[activeMonthIndex].toUpperCase()} ${YEAR}`;
-    gridEl.innerHTML = "";
 
-    const firstDay = new Date(YEAR, activeMonthIndex, 1);
-    const startDow = firstDay.getDay();
-    const daysInMonth = new Date(YEAR, activeMonthIndex + 1, 0).getDate();
+    const showsList = document.getElementById('shows-list');
 
-    for (let i = 0; i < startDow; i++){
-      const blank = document.createElement("div");
-      blank.className = "day-card is-empty";
-      gridEl.appendChild(blank);
+    // Try to load CMS schedule data for the year from common locations
+    async function loadSchedule(year){
+      const candidates = [
+        `content/schedule/${year}.json`,
+        `/content/schedule/${year}.json`,
+        `content/schedule.json`,
+        `/content/schedule.json`
+      ];
+
+      for (const url of candidates){
+        try{
+          const res = await fetch(url, { cache: 'no-store' });
+          if (!res || !res.ok) continue;
+          const json = await res.json();
+          // expected shape: { year: 2026, events: [ { date, location, members: [] }, ... ] }
+          if (json && Array.isArray(json.events)) return json.events;
+          // allow top-level array as fallback
+          if (Array.isArray(json)) return json;
+        }catch(e){ /* try next */ }
+      }
+      return null;
     }
 
-    for (let d = 1; d <= daysInMonth; d++){
-      const dateStr = ymd(YEAR, activeMonthIndex, d);
-      const isBooked = Boolean(bookedEvents[dateStr]);
-
-      const card = document.createElement("div");
-      card.className = "day-card " + (isBooked ? "is-booked" : "is-available");
-
-      const dateEl = document.createElement("div");
-      dateEl.className = "day-card__date";
-      dateEl.textContent = d;
-
-      const pill = document.createElement("div");
-      pill.className = "day-card__pill";
-      pill.textContent = isBooked ? "Booked" : "Available";
-
-      card.appendChild(dateEl);
-      card.appendChild(pill);
-
-      if (isBooked){
-        card.addEventListener("click", () => openModal(dateStr, bookedEvents[dateStr]));
+    function renderShows(events){
+      showsList.innerHTML = '';
+      const featuredEl = document.getElementById('featured-show');
+      if (featuredEl) featuredEl.innerHTML = '';
+      if (!events || !events.length){
+        showsList.innerHTML = '<li class="no-shows">No upcoming shows listed for 2026.</li>';
+        return;
       }
 
-      gridEl.appendChild(card);
-    }
-  }
+      events.sort((a,b)=> (a.date||'').localeCompare(b.date||''));
 
-  renderTabs();
-  renderCalendar();
-});
-</script>
+      events.forEach((ev, idx) => {
+        const li = document.createElement('li');
+        li.className = 'show-item';
+        const members = Array.isArray(ev.members) ? ev.members.join(', ') : '';
+        li.innerHTML = `
+          <div class="show-row">
+            <span class="show-dot booked" aria-hidden="true"></span>
+            <div class="show-date">${ev.date || ''}</div>
+            <div class="show-location">${ev.location || ''}</div>
+            <div class="show-members">${members}</div>
+          </div>
+        `;
+        showsList.appendChild(li);
+        // render the first event as featured
+        if (idx === 0 && featuredEl){
+          featuredEl.innerHTML = `
+            <div class="featured-panel">
+              <span class="show-dot booked" aria-hidden="true"></span>
+              <div class="featured-date">${ev.date || ''}</div>
+              <div class="featured-venue">${ev.location || ''}</div>
+              <div class="featured-members">${members}</div>
+            </div>
+          `;
+        }
+      });
+    }
+
+    (async function(){
+      const events = await loadSchedule(YEAR);
+      if (!events) {
+        // fallback to inline examples if no CMS file found
+        renderShows([
+          { date: '2026-01-24', location: 'R PLACE', members: ['Taryn McCallum','Robby Rottin','Jeff Pavon'] },
+          { date: '2026-05-08', location: 'The Forum', members: ['Taryn McCallum','Adam Rogers','Mark Carlson'] }
+        ]);
+        return;
+      }
+      renderShows(events);
+    })();
+  });
+  </script>
+
+  
 </body>
 </html>
