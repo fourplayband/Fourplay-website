@@ -41,7 +41,7 @@ collections:
     editor:
       preview: false
     files:
-      - file: "content/pages/home.json"
+      - file: "content/pages/home.md"
         label: "Home"
         name: "home"
         fields:
@@ -49,7 +49,7 @@ collections:
           - { label: "Hero Title", name: "hero_title", widget: "string", required: false }
           - { label: "Hero Subtitle", name: "hero_subtitle", widget: "string", required: false }
 
-      - file: "content/pages/contact.json"
+      - file: "content/pages/contact.md"
         label: "Contact"
         name: "contact"
         fields:
@@ -134,9 +134,10 @@ collections:
   # ======================
   # Photos (一张照片一个条目；不做裁剪；小图同一张图即可)
   # ======================
-  - name: "photos"
-    label: "Photos"
-    folder: "content/photos"
+  # Photos split into year sections so CMS uploads are organized
+  - name: "photos_2026"
+    label: "Photos — 2026 (Primary)"
+    folder: "content/photos/2026"
     create: true
     format: "json"
     extension: "json"
@@ -145,14 +146,121 @@ collections:
     fields:
       - { label: "Title / Caption (optional)", name: "title", widget: "string", required: false }
       - { label: "Image", name: "image", widget: "image" }
-
-      # 分类：Poster / Gig Photo（你之前提过要分区）
       - label: "Category"
         name: "category"
         widget: "select"
         options: ["posters", "gig_photos"]
         default: "gig_photos"
+      - label: "Date (optional)"
+        name: "date"
+        widget: "datetime"
+        required: false
+        format: "YYYY-MM-DD"
+        time_format: false
 
+  - name: "photos_2025"
+    label: "Photos — 2025"
+    folder: "content/photos/2025"
+    create: true
+    format: "json"
+    extension: "json"
+    slug: "{{fields.date}}-{{slug}}"
+    fields:
+      - { label: "Title / Caption (optional)", name: "title", widget: "string", required: false }
+      - { label: "Image", name: "image", widget: "image" }
+      - label: "Category"
+        name: "category"
+        widget: "select"
+        options: ["posters", "gig_photos"]
+        default: "gig_photos"
+      - label: "Date (optional)"
+        name: "date"
+        widget: "datetime"
+        required: false
+        format: "YYYY-MM-DD"
+        time_format: false
+
+  - name: "photos_2024"
+    label: "Photos — 2024"
+    folder: "content/photos/2024"
+    create: true
+    format: "json"
+    extension: "json"
+    slug: "{{fields.date}}-{{slug}}"
+    fields:
+      - { label: "Title / Caption (optional)", name: "title", widget: "string", required: false }
+      - { label: "Image", name: "image", widget: "image" }
+      - label: "Category"
+        name: "category"
+        widget: "select"
+        options: ["posters", "gig_photos"]
+        default: "gig_photos"
+      - label: "Date (optional)"
+        name: "date"
+        widget: "datetime"
+        required: false
+        format: "YYYY-MM-DD"
+        time_format: false
+
+  - name: "photos_2023"
+    label: "Photos — 2023"
+    folder: "content/photos/2023"
+    create: true
+    format: "json"
+    extension: "json"
+    slug: "{{fields.date}}-{{slug}}"
+    fields:
+      - { label: "Title / Caption (optional)", name: "title", widget: "string", required: false }
+      - { label: "Image", name: "image", widget: "image" }
+      - label: "Category"
+        name: "category"
+        widget: "select"
+        options: ["posters", "gig_photos"]
+        default: "gig_photos"
+      - label: "Date (optional)"
+        name: "date"
+        widget: "datetime"
+        required: false
+        format: "YYYY-MM-DD"
+        time_format: false
+
+  - name: "photos_2020_2022"
+    label: "Photos — 2020-2022"
+    folder: "content/photos/2020-2022"
+    create: true
+    format: "json"
+    extension: "json"
+    slug: "{{fields.date}}-{{slug}}"
+    fields:
+      - { label: "Title / Caption (optional)", name: "title", widget: "string", required: false }
+      - { label: "Image", name: "image", widget: "image" }
+      - label: "Category"
+        name: "category"
+        widget: "select"
+        options: ["posters", "gig_photos"]
+        default: "gig_photos"
+      - label: "Date (optional)"
+        name: "date"
+        widget: "datetime"
+        required: false
+        format: "YYYY-MM-DD"
+        time_format: false
+
+  - name: "photos_2016_2019"
+    label: "Photos — 2016-2019"
+    folder: "content/photos/2016-2019"
+    create: true
+    format: "json"
+    extension: "json"
+    slug: "{{fields.date}}-{{slug}}"
+    fields:
+      - { label: "Title / Caption (optional)", name: "title", widget: "string", required: false }
+      - { label: "Image", name: "image", widget: "image" }
+      - label: "Category"
+        name: "category"
+        widget: "select"
+        options: ["posters", "gig_photos"]
+        default: "gig_photos"
       - label: "Date (optional)"
         name: "date"
         widget: "datetime"
