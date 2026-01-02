@@ -82,7 +82,7 @@
         const card = document.createElement("div");
         card.className = "member-card";
         card.style.position = "relative";
-        card.style.paddingTop = "56px";
+        card.style.paddingTop = "80px";
         card.style.borderRadius = "16px";
         card.style.background = "rgba(255,255,255,0.10)";
         card.style.border = "1px solid rgba(255,255,255,0.14)";
@@ -110,6 +110,11 @@
             ${m.bio ? m.bio : ""}
           </div>
         `;
+        // mark Taryn for special styling and ordering
+        if ((m.name || '').toLowerCase().includes('taryn')) {
+          card.classList.add('member--taryn');
+        }
+
         grid.appendChild(card);
       });
       return;
@@ -124,7 +129,7 @@
       const card = document.createElement("div");
       card.className = "member-card";
       card.style.position = "relative";
-      card.style.paddingTop = "56px";
+      card.style.paddingTop = "80px";
       card.style.borderRadius = "16px";
       card.style.background = "rgba(255,255,255,0.10)";
       card.style.border = "1px solid rgba(255,255,255,0.14)";
@@ -152,6 +157,9 @@
           ${m.bio ? m.bio : ""}
         </div>
       `;
+      if ((m.name || '').toLowerCase().includes('taryn')) {
+        card.classList.add('member--taryn');
+      }
       grid.appendChild(card);
     });
 
