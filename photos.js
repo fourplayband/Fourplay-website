@@ -84,7 +84,17 @@
       a.href = `photos-year.html?year=${encodeURIComponent(y.id)}`;
       a.setAttribute('role','listitem');
 
-      const img = document.createElement('img'); img.className='cover'; img.alt = y.label + ' cover'; img.loading='lazy'; img.src = y.cover || '';
+      const img = document.createElement('img'); img.className='cover'; img.alt = y.label + ' cover'; img.loading='lazy';
+      const coverUrl = (y.cover || y.thumbnail || '');
+      img.src = coverUrl;
+      if(coverUrl){
+        img.addEventListener('error', ()=>{
+          img.style.display = 'none';
+          console.warn('Cover failed to load', coverUrl);
+        });
+      } else {
+        img.style.display = 'none';
+      }
       const meta = document.createElement('div'); meta.className='year-meta';
       const label = document.createElement('div'); label.className='year-label'; label.textContent = y.label || y.id;
       const sub = document.createElement('div'); sub.className='year-sub'; sub.textContent = '';
@@ -109,10 +119,52 @@
     title.textContent = year;
     sub.textContent = `Photos for ${year}`;
 
-    const path = `content/photos/${year}.json`;
-    const json = await fetchJson(path);
+    const jsonUrl = `content/photos/${year}.json?v=${Date.now()}`;
+    console.log('Photos year:', year, 'JSON:', jsonUrl);
+    const json = await fetchJson(jsonUrl);
+    if(!json){ grid.style.display='none'; noPhotos.style.display='block'; noPhotos.textContent = 'Unable to load photos.'; return; }
+
+    // If the JSON uses galleries (preferred), render each gallery with its own section
+    if(Array.isArray(json.galleries) && json.galleries.length){
+      grid.innerHTML = '';
+      grid.style.display = 'block';
+      noPhotos.style.display = 'none';
+
+      json.galleries.forEach(g => {
+        const section = document.createElement('section'); section.className = 'gallery-section';
+        const h = document.createElement('h2'); h.className = 'gallery-title'; h.textContent = g.title || g.section || '';
+        section.appendChild(h);
+
+        if(!Array.isArray(g.images) || g.images.length === 0){
+          const p = document.createElement('div'); p.className='panel'; p.textContent = 'No photos yet.'; section.appendChild(p);
+        } else {
+          const innerGrid = document.createElement('div'); innerGrid.className = 'photo-grid';
+          // prepare mapped photos for lightbox
+          const mapped = g.images.map(img => ({ src: img.image || img.src || img.url || '', caption: img.caption || '', subtitle: img.subtitle || '' }));
+          mapped.forEach((p, idx) => {
+            const fig = document.createElement('figure'); fig.className='photo-thumb'; fig.tabIndex=0; fig.setAttribute('role','button');
+            const imgEl = document.createElement('img'); imgEl.src = p.src; imgEl.alt = p.caption || p.subtitle || '';
+            const cap = document.createElement('div'); cap.className='cap';
+            const capTitle = document.createElement('div'); capTitle.className='cap-title'; capTitle.textContent = p.caption || '';
+            const capSub = document.createElement('div'); capSub.className='cap-sub'; capSub.textContent = p.subtitle || '';
+            cap.appendChild(capTitle); if(p.subtitle) cap.appendChild(capSub);
+            fig.appendChild(imgEl); if(p.caption || p.subtitle) fig.appendChild(cap);
+            fig.addEventListener('click', ()=> openLightbox(mapped, idx));
+            fig.addEventListener('keydown', (e)=>{ if(e.key==='Enter' || e.key===' ') { e.preventDefault(); openLightbox(mapped, idx); } });
+            innerGrid.appendChild(fig);
+          });
+          section.appendChild(innerGrid);
+        }
+
+        grid.appendChild(section);
+      });
+
+      return;
+    }
+
+    // Fallback: older JSON shapes (array or photos list) — flatten and render
     const photos = normalizePhotos(json);
-    if(!photos || photos.length === 0){ grid.style.display='none'; noPhotos.style.display='block'; return; }
+    if(!photos || photos.length === 0){ grid.style.display='none'; noPhotos.style.display='block'; noPhotos.textContent = 'No photos yet.'; return; }
 
     grid.style.display='grid'; noPhotos.style.display='none';
     grid.innerHTML='';
@@ -139,7 +191,7 @@
             <button class="lb-btn" data-action="prev">◀ Prev</button>
             <button class="lb-btn" data-action="next">Next ▶</button>
           </div>
-          <div class="lb-meta"><span class="lb-caption"></span> &nbsp; <span class="lb-index"></span></div>
+          <div class="lb-meta"><div class="lb-caption"></div><div class="lb-subtitle"></div><div class="lb-index"></div></div>
         </div>
       </div>
     `;
@@ -154,6 +206,11 @@
       else if(e.key === 'ArrowLeft') lbNavigate(-1);
       else if(e.key === 'ArrowRight') lbNavigate(1);
     });
+
+    // touch swipe support
+    let touchStartX = null;
+    lb.addEventListener('touchstart', (e)=>{ if(e.touches && e.touches.length) touchStartX = e.touches[0].clientX; });
+    lb.addEventListener('touchend', (e)=>{ if(touchStartX === null) return; const endX = (e.changedTouches && e.changedTouches[0] && e.changedTouches[0].clientX) || 0; const dx = endX - touchStartX; const thresh = 50; if(dx > thresh) lbNavigate(-1); else if(dx < -thresh) lbNavigate(1); touchStartX = null; });
     return lb;
   }
 
@@ -169,7 +226,7 @@
   }
   function closeLightbox(){ if(!lb) return; lb.classList.remove('open'); lb.setAttribute('aria-hidden','true'); document.body.style.overflow=''; }
   function lbNavigate(delta){ if(!currentPhotos.length) return; currentIndex = (currentIndex + delta + currentPhotos.length) % currentPhotos.length; updateLightbox(); }
-  function updateLightbox(){ if(!lb) return; const img = lb.querySelector('img'); const caption = lb.querySelector('.lb-caption'); const indexEl = lb.querySelector('.lb-index'); const p = currentPhotos[currentIndex] || {}; img.src = p.src || p.image || ''; img.alt = p.alt || p.caption || ''; caption.textContent = p.caption || p.alt || ''; indexEl.textContent = `${currentIndex+1} / ${currentPhotos.length}`; }
+  function updateLightbox(){ if(!lb) return; const img = lb.querySelector('img'); const caption = lb.querySelector('.lb-caption'); const subtitle = lb.querySelector('.lb-subtitle'); const indexEl = lb.querySelector('.lb-index'); const p = currentPhotos[currentIndex] || {}; img.src = p.src || p.image || ''; img.alt = p.alt || p.caption || ''; caption.textContent = p.caption || p.alt || ''; subtitle.textContent = p.subtitle || ''; indexEl.textContent = `${currentIndex+1} / ${currentPhotos.length}`; }
 
   // Init on DOM
   document.addEventListener('DOMContentLoaded', ()=>{
