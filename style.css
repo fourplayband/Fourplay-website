@@ -518,6 +518,14 @@ body:not(.home){
   opacity: 0.9;
 }
 
+/* Make each member's bio have a solid dark background for readability */
+.member-bio{
+  background: rgba(0,0,0,0.80); /* black at 80% opacity */
+  padding: 12px;
+  border-radius: 10px;
+  color: rgba(255,255,255,0.95);
+}
+
 .member-card.singer{
   transform: translateY(-4px);
   border-color: rgba(255,255,255,0.28);
@@ -530,6 +538,22 @@ body:not(.home){
   }
   .members-grid{
     grid-template-columns: 1fr;
+  }
+}
+
+/* Mobile: avoid avatar overlapping neighboring cards by keeping avatar in flow */
+@media (max-width: 900px){
+  .member-card{
+    padding-top: 28px; /* less top padding when avatar is in flow */
+  }
+  .member-avatarWrap{
+    position: relative !important; /* remove absolute positioning on small screens */
+    top: 0 !important;
+    left: 50% !important;
+    transform: translateX(-50%) !important;
+    margin: 0 auto 8px auto !important;
+    width: 86px !important;
+    height: 86px !important;
   }
 }
 
@@ -641,6 +665,73 @@ body:not(.home){
   color:#fff;
   cursor:pointer;
 }
+
+/* =====================================================
+   Photos page: modern panel + grid styles (match artists look)
+   ===================================================== */
+.photos-page .section-narrow{ padding: 26px 20px; }
+.photos-section{
+  margin-top: 18px;
+  background: rgba(5,0,30,0.72);
+  border-radius: 18px;
+  padding: 18px;
+  box-shadow: 0 18px 45px rgba(0,0,0,0.6);
+  border: 1px solid rgba(255,255,255,0.06);
+}
+.photos-section__header{ display:flex; align-items:center; justify-content:space-between; gap:12px; margin-bottom:12px; }
+.photos-section__title{ margin:0; font-size:1.05rem; text-transform:uppercase; letter-spacing:0.08em; }
+.photos-section__sub{ opacity:0.9; font-size:0.92rem; }
+
+.photos-grid{
+  display:grid;
+  grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+  gap: 14px;
+}
+.photo-card{
+  position: relative;
+  border-radius: 14px;
+  overflow: hidden;
+  border: 1px solid rgba(255,255,255,0.06);
+  background: linear-gradient(180deg, rgba(255,255,255,0.02), rgba(0,0,0,0.30));
+  box-shadow: 0 14px 36px rgba(0,0,0,0.55);
+  cursor: pointer;
+  display: block;
+}
+.photo-card img{ width:100%; height:200px; object-fit:cover; display:block; }
+.photo-cap{
+  position: absolute;
+  left: 0; right: 0; bottom: 0;
+  padding: 10px 12px;
+  background: linear-gradient(180deg, rgba(0,0,0,0.0), rgba(0,0,0,0.62));
+  color: rgba(255,255,255,0.95);
+  font-size: 0.95rem;
+}
+
+@media (max-width: 760px){
+  .photos-section__header{ flex-direction:column; align-items:flex-start; }
+  .photo-card img{ height:160px; }
+}
+
+/* year tabs (thumbnail + label) */
+.photos-years{ display:flex; gap:8px; flex-wrap:wrap; }
+.photos-year{
+  appearance:none;
+  border:1px solid rgba(255,255,255,0.06);
+  background: rgba(0,0,0,0.28);
+  color: rgba(255,255,255,0.92);
+  padding:6px 10px;
+  border-radius:12px;
+  display:inline-flex;
+  align-items:center;
+  gap:8px;
+  cursor:pointer;
+}
+.photos-year-thumb{ width:36px; height:36px; border-radius:8px; object-fit:cover; display:block; }
+.photos-year-label{ font-weight:700; margin-left:4px; }
+.photos-year.is-active, .photos-year:hover{ box-shadow: 0 10px 26px rgba(0,0,0,0.5); transform: translateY(-2px); }
+
+.photo-cap-title{ font-weight:700; }
+.photo-subtitle{ font-size:0.9rem; opacity:0.92; margin-top:4px; }
 
 /* =====================================================
    Schedule Calendar (2026) + Modal
@@ -876,6 +967,96 @@ body:not(.home){
   .calendar-title { font-size: 20px; }
   .day-card { min-height: 72px; }
 }
+
+/* =====================================================
+   Artists list (pills)
+   ===================================================== */
+.artists-list{
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(160px, 1fr));
+  gap: 14px;
+  padding: 12px 6px;
+}
+.artist-pill{
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 12px 18px;
+  border-radius: 14px;
+  background: linear-gradient(180deg, rgba(255,255,255,0.02), rgba(0,0,0,0.30));
+  background-color: rgba(0,0,0,0.45);
+  color: rgba(255,255,255,0.95);
+  font-weight: 800;
+  box-shadow: inset 0 0 0 1px rgba(255,255,255,0.02), 0 10px 26px rgba(0,0,0,0.45);
+  border: 1px solid rgba(255,255,255,0.06);
+  text-align: center;
+}
+/* Ensure all artist boxes are a compact single-line pill (one name) */
+.artist-pill{
+  height: clamp(40px, 6vw, 56px);
+  min-height: clamp(40px, 6vw, 56px);
+  padding: 8px 12px;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+@media (max-width:420px){
+  .artist-pill{ height:48px; padding:8px 10px; font-size:0.95rem }
+}
+@media (max-width: 600px){
+  .artists-list{ grid-template-columns: repeat(2, 1fr); }
+}
+
+/* =====================================================
+   Videos grid & cards
+   ===================================================== */
+.video-grid{
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 28px;
+  align-items: start;
+}
+.video-card{
+  position: relative;
+  border-radius: 14px;
+  overflow: hidden;
+  background: rgba(10,10,12,0.9);
+  box-shadow: 0 18px 45px rgba(0,0,0,0.6);
+  border: 1px solid rgba(255,255,255,0.06);
+}
+.video-frame-wrap{
+  position: relative;
+  width: 100%;
+  padding-top: 56.25%; /* 16:9 */
+  background: #111;
+}
+.video-frame-wrap iframe{
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  border: 0;
+  display: block;
+}
+.video-meta{
+  position: absolute;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  padding: 12px 16px;
+  background: linear-gradient(180deg, rgba(0,0,0,0.68), rgba(0,0,0,0.25));
+  color: rgba(255,255,255,0.95);
+}
+.video-title{ font-weight:700; margin-bottom:6px; }
+.video-desc{ font-size:0.92rem; opacity:0.9; }
+
+@media (max-width: 900px){
+  .video-grid{ grid-template-columns: 1fr; }
+}
+
 
 /* remove stray dots */
 header::before,
