@@ -3,21 +3,28 @@
 <head>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width,initial-scale=1" />
-  <title>Photos — Year Gallery</title>
+  <title>Photos — Fourplay Dance Band</title>
   <link rel="stylesheet" href="style.css" />
   <link rel="stylesheet" href="photos.css" />
   <script defer src="nav.js"></script>
   <script defer src="photos.js"></script>
 </head>
-<body class="photos-page">
+<body>
   <div class="page">
+    <!-- Header (same structure as other pages) -->
     <header class="site-header">
       <div class="header-inner">
         <div class="header-left">
-          <a href="index.html" aria-label="Fourplay Home"><img src="assets/logo.png" alt="Fourplay Dance Band" class="header-logo"/></a>
+          <a href="index.html">
+            <img src="assets/logo.png" alt="Fourplay Dance Band" class="header-logo" />
+          </a>
           <div class="site-title-small">FOURPLAY DANCE BAND</div>
         </div>
-        <button class="nav-toggle" aria-label="Toggle navigation" aria-expanded="false"><span></span><span></span><span></span></button>
+
+        <button class="nav-toggle" aria-label="Toggle navigation" aria-expanded="false">
+          <span></span><span></span><span></span>
+        </button>
+
         <nav class="nav" aria-label="Primary Navigation">
           <a href="index.html">Home</a>
           <a href="members.html">Members</a>
@@ -30,25 +37,183 @@
       </div>
     </header>
 
-    <main class="main-content">
+    <main class="main-content photos-page">
       <section class="section-narrow">
         <div class="page-header">
-          <h1 id="galleryTitle">Gallery</h1>
-          <p id="gallerySub" class="lead">Browse photos</p>
-          <p><a href="photos.html" class="btn btn-secondary">Back to Years</a></p>
+          <h1>Photos</h1>
+          <p class="lead">A cinematic year hub — select a year to view the full gallery.</p>
         </div>
 
-        <div id="photoGrid" class="photo-grid" role="list">
-          <!-- thumbnails injected by photos.js -->
+        <div id="yearHub" class="year-hub" role="list">
+          <!-- year cards injected by photos.js -->
         </div>
-
-        <div id="noPhotos" class="panel" style="display:none;margin-top:18px;">Photos coming soon.</div>
       </section>
     </main>
-
-    <footer class="site-footer">© 2025 Fourplay Dance Band. All rights reserved.</footer>
+    <footer class="site-footer">
+      © 2025 Fourplay Dance Band. All rights reserved.
+    </footer>
   </div>
 
-  <!-- lightbox injected by photos.js or present here as fallback -->
+  <!-- Fullscreen player -->
+  <div id="player" class="player" aria-hidden="true">
+    <div class="player-backdrop" data-close="true"></div>
+    <div class="player-panel" role="dialog" aria-modal="true" aria-label="Photo player">
+      <div class="player-stage" id="playerStage"></div>
+      <div class="player-controls">
+        <button id="prevBtn" class="btn" aria-label="Previous">◀</button>
+        <button id="playPauseBtn" class="btn control" aria-label="Play/Pause">Pause</button>
+        <button id="nextBtn" class="btn" aria-label="Next">▶</button>
+        <div class="progress" aria-hidden="true"><div class="progress-bar" id="progressBar"></div></div>
+        <div class="caption"><span id="playerMeta">&nbsp;</span> • <span id="playerIndex">0 / 0</span></div>
+        <button id="closeBtn" class="btn" aria-label="Close">✕</button>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    // Timeline photos page — data-driven from CMS JSON
+    // Loads: /content/photos/photos.json
+    (function(){
+      const DATA_URL = '/content/photos/photos.json';
+      const timelineEl = document.getElementById('timeline');
+      const playerEl = document.getElementById('player');
+      const playerStage = document.getElementById('playerStage');
+      const playPauseBtn = document.getElementById('playPauseBtn');
+      const prevBtn = document.getElementById('prevBtn');
+      const nextBtn = document.getElementById('nextBtn');
+      const closeBtn = document.getElementById('closeBtn');
+      const progressBar = document.getElementById('progressBar');
+      const playerMeta = document.getElementById('playerMeta');
+      const playerIndex = document.getElementById('playerIndex');
+
+      let YEARS = [];
+      let currentYear = null;
+      let currentPhotos = [];
+      let currentIndex = 0;
+      let isPlaying = true;
+      const autoPlayInterval = 3000;
+      let intervalId = null;
+      let rafId = null;
+
+      // explicit ordering required by spec
+      const PRIORITY_ORDER = ["2026","2025","2024","2023","2020-2022","2016-2019"];
+
+      function el(tag, cls){ const e = document.createElement(tag); if(cls) e.className = cls; return e }
+
+      function setPlayerOpen(open){ if(open){ document.body.style.overflow='hidden'; playerEl.classList.add('is-open'); playerEl.setAttribute('aria-hidden','false'); } else { document.body.style.overflow=''; playerEl.classList.remove('is-open'); playerEl.setAttribute('aria-hidden','true'); } }
+
+      // load JSON
+      async function init(){
+        try{
+          const res = await fetch(DATA_URL, {cache:'no-store'});
+          if(!res.ok) throw new Error('Photos JSON not found');
+          const json = await res.json();
+          YEARS = Array.isArray(json.years) ? json.years.map(normalizeYear) : [];
+
+          // sort by PRIORITY_ORDER then numeric desc fallback
+          YEARS.sort((a,b)=>{
+            const ia = PRIORITY_ORDER.indexOf(a.id);
+            const ib = PRIORITY_ORDER.indexOf(b.id);
+            if(ia !== -1 || ib !== -1) return (ia===-1?Infinity:ia) - (ib===-1?Infinity:ib);
+            const na = parseInt(a.label)||0, nb = parseInt(b.label)||0; return nb - na;
+          });
+
+          renderTimeline();
+        }catch(err){
+          console.error(err);
+          timelineEl.innerHTML = `<div style="color:var(--muted)">Unable to load photos data. Ensure ${DATA_URL} exists.</div>`;
+        }
+      }
+
+      function normalizeYear(y){
+        return {
+          id: String(y.id || y.label || ''),
+          label: String(y.label || y.id || ''),
+          priority: y.priority || '',
+          cover: y.cover || y.thumbnail || '',
+          photos: Array.isArray(y.photos) ? y.photos : [],
+          city: y.city || '',
+          tagline: y.tagline || ''
+        };
+      }
+
+      function renderTimeline(){
+        timelineEl.innerHTML = '';
+        YEARS.forEach(y=>{
+          if(y.priority === 'hero' || y.id === '2026') timelineEl.appendChild(renderHero(y));
+          else timelineEl.appendChild(renderYearCard(y));
+        });
+      }
+
+      function renderHero(y){
+        const wrap = el('section','hero-year');
+        const left = el('div','hero-left');
+        const right = el('div','hero-right');
+        const label = el('div','year-label'); label.textContent = y.label || '';
+        const tag = el('div','hero-tag'); tag.textContent = y.tagline || y.city || '';
+        const cta = el('div','hero-cta'); cta.textContent = 'Tap to play — full gallery';
+        left.appendChild(label); left.appendChild(tag); left.appendChild(cta);
+
+        const cover = el('div','hero-cover pulse');
+        const img = el('img'); img.src = y.cover || (y.photos[0]||''); img.alt = y.label + ' cover'; img.loading='lazy';
+        cover.appendChild(img);
+        right.appendChild(cover);
+
+        wrap.addEventListener('click',()=>openPlayerForYear(y));
+        return wrap;
+      }
+
+      function renderYearCard(y){
+        const card = el('article','year-card');
+        if(y.id && (y.id.includes('-')||y.id.includes('–'))) card.classList.add('archive');
+        const thumb = el('div','year-thumb'+(card.classList.contains('archive')? ' archive':''));
+        const img = el('img'); img.src = y.cover || (y.photos[0]||''); img.alt = y.label + ' thumbnail'; img.loading='lazy'; thumb.appendChild(img);
+        const info = el('div','year-info'); const title = el('div','year-title'); title.textContent = y.label||''; const sub = el('div','year-sub'); sub.textContent = [y.city||'', y.tagline||''].filter(Boolean).join(' • ');
+        const tap = el('button','tap-play'); tap.type='button'; tap.textContent='Tap to play'; tap.addEventListener('click',(ev)=>{ ev.stopPropagation(); openPlayerForYear(y); });
+        info.appendChild(title); info.appendChild(sub); info.appendChild(tap);
+        card.appendChild(thumb); card.appendChild(info);
+        card.tabIndex = 0; card.addEventListener('keydown',(e)=>{ if(e.key==='Enter'||e.key===' '){ e.preventDefault(); openPlayerForYear(y); } });
+        return card;
+      }
+
+      // Player
+      function openPlayerForYear(y){
+        currentYear = y; currentPhotos = Array.isArray(y.photos)? y.photos.slice() : [];
+        if(currentPhotos.length===0){ alert('No photos for ' + (y.label||y.id)); return; }
+        currentIndex = 0; isPlaying = true; renderPlayer(); setPlayerOpen(true); startAutoPlay();
+      }
+
+      function renderPlayer(){
+        playerStage.innerHTML = ''; const img = document.createElement('img'); img.src = currentPhotos[currentIndex]; img.alt = `${currentYear.label} ${currentIndex+1}`; img.loading='eager'; playerStage.appendChild(img);
+        playerMeta.textContent = currentYear.city || currentYear.label || '';
+        playerIndex.textContent = (currentIndex+1) + ' / ' + currentPhotos.length;
+        progressBar.style.width = '0%';
+      }
+
+      function prev(){ if(!currentPhotos.length) return; currentIndex = (currentIndex -1 + currentPhotos.length)%currentPhotos.length; renderPlayer(); resetAutoPlay(); }
+      function next(){ if(!currentPhotos.length) return; currentIndex = (currentIndex +1) % currentPhotos.length; renderPlayer(); resetAutoPlay(); }
+
+      function startAutoPlay(){ stopAutoPlay(); intervalId = setInterval(()=>{ next(); }, autoPlayInterval); playPauseBtn.textContent='Pause'; isPlaying=true; animateProgress(); }
+      function stopAutoPlay(){ if(intervalId) { clearInterval(intervalId); intervalId=null; } if(rafId){ cancelAnimationFrame(rafId); rafId=null; } playPauseBtn.textContent='Play'; isPlaying=false; }
+      function togglePlay(){ if(isPlaying) stopAutoPlay(); else startAutoPlay(); }
+      function resetAutoPlay(){ if(isPlaying){ stopAutoPlay(); startAutoPlay(); } }
+
+      // progress animation
+      let progressStart = null;
+      function animateProgress(){ if(!isPlaying || !intervalId) return; progressStart = performance.now(); const duration = autoPlayInterval; function step(now){ const elapsed = (now - progressStart) % duration; const pct = (elapsed / duration) * 100; progressBar.style.width = pct + '%'; rafId = requestAnimationFrame(step); } rafId = requestAnimationFrame(step); }
+
+      function closePlayer(){ stopAutoPlay(); setPlayerOpen(false); }
+
+      // events
+      playPauseBtn.addEventListener('click', togglePlay);
+      prevBtn.addEventListener('click', prev);
+      nextBtn.addEventListener('click', next);
+      closeBtn.addEventListener('click', closePlayer);
+      playerEl.addEventListener('click',(e)=>{ if(e.target && e.target.dataset && e.target.dataset.close) closePlayer(); });
+      document.addEventListener('keydown',(e)=>{ if(playerEl.classList.contains('is-open')){ if(e.key==='Escape') closePlayer(); else if(e.key==='ArrowLeft') prev(); else if(e.key==='ArrowRight') next(); else if(e.key===' ') { e.preventDefault(); togglePlay(); } } });
+
+      init();
+    })();
+  </script>
 </body>
 </html>
