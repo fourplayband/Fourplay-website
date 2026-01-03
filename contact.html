@@ -48,7 +48,7 @@
         <p>Book the band or send a message.</p>
       </div>
 
-      <div class="panel" style="display:grid;grid-template-columns: 1fr 360px;gap:18px;align-items:start;">
+      <div class="panel contact-panel" style="display:grid;grid-template-columns: 1fr;gap:18px;align-items:start;">
         <div>
           <p><strong>Email:</strong> <a href="mailto:info@fourplaydanceband.com">info@fourplaydanceband.com</a></p>
           <p><strong>Tel:</strong> (925) 588-5911</p>
@@ -56,16 +56,28 @@
           <p style="margin-top:12px;opacity:.95;">Let us know your date, location, and event type, and we'll follow up with availability, pricing, and options tailored for your party or venue.</p>
         </div>
 
-        <div>
+        <div style="max-width:720px;margin:12px auto 0 auto;">
           <form id="inquireForm" style="display:flex;flex-direction:column;gap:8px;">
             <input id="inquireName" type="text" name="name" placeholder="Your name" required aria-required="true" style="padding:10px;border-radius:8px;border:1px solid rgba(255,255,255,0.06);background:transparent;color:inherit;" />
             <input id="inquireEmail" type="email" name="email" placeholder="Email" required aria-required="true" style="padding:10px;border-radius:8px;border:1px solid rgba(255,255,255,0.06);background:transparent;color:inherit;" />
             <input id="inquirePhone" type="tel" name="phone" placeholder="Phone number" required aria-required="true" style="padding:10px;border-radius:8px;border:1px solid rgba(255,255,255,0.06);background:transparent;color:inherit;" />
             <textarea id="inquireMessage" name="message" placeholder="Message" rows="6" required aria-required="true" style="padding:10px;border-radius:8px;border:1px solid rgba(255,255,255,0.06);background:transparent;color:inherit;"></textarea>
+            <div id="inquireStatus" role="status" aria-live="polite" style="min-height:1.2em;color:var(--muted);"></div>
             <button id="inquireSubmit" class="btn btn-primary" type="submit" style="width:160px;">Send Inquiry</button>
           </form>
         </div>
       </div>
+      <style>
+        /* Contact: make inquiry inputs wider on desktop and responsive on mobile */
+        #inquireForm input,
+        #inquireForm textarea { width:100% !important; max-width:1080px; box-sizing: border-box; }
+        /* Make the Send button ~3x wider on desktop (was 160px) */
+        #inquireSubmit{ width:480px !important; }
+        @media (max-width: 480px){
+          #inquireSubmit{ width:100% !important; }
+          .contact-panel{ padding:12px; }
+        }
+      </style>
       <script>
         (function(){
           const form = document.getElementById('inquireForm');
@@ -87,9 +99,19 @@
               message
             ];
             const body = encodeURIComponent(bodyParts.join('\n'));
+            // Open user's mail client via mailto (fallback) and then optimistically mark as sent
             window.location.href = `mailto:${to}?subject=${subject}&body=${body}`;
+            markInquirySent();
           });
         })();
+        function markInquirySent(){
+          const fields = ['inquireName','inquireEmail','inquirePhone','inquireMessage'];
+          fields.forEach(id=>{ const el=document.getElementById(id); if(el){ el.disabled=true; el.style.opacity='0.6'; el.style.background='rgba(255,255,255,0.03)'; }});
+          const btn = document.getElementById('inquireSubmit');
+          if(btn){ btn.disabled=true; btn.textContent='Message Sent'; btn.style.opacity='0.7'; }
+          const status = document.getElementById('inquireStatus');
+          if(status){ status.textContent = 'Message prepared — please send from your email client. Fields disabled.'; status.style.color='var(--muted)'; }
+        }
       </script>
     </section>
   </main>
