@@ -1,0 +1,53 @@
+{
+  "years": [
+    {
+      "id": "2026",
+      "label": "2026",
+      "cover": "/assets/uploads/fourplay-flyer-front.jpg",
+      "photos": [
+        "/assets/uploads/fourplay-flyer-front.jpg"
+      ]
+    },
+    {
+      "id": "2025",
+      "label": "2025",
+      "cover": "/assets/uploads/img_1421.jpg",
+      "photos": [
+        "/assets/uploads/img_1421.jpg",
+        "/assets/uploads/img_1422.jpg"
+      ]
+    },
+    {
+      "id": "2024",
+      "label": "2024",
+      "cover": "/assets/uploads/img_1422.jpg",
+      "photos": [
+        "/assets/uploads/img_1422.jpg"
+      ]
+    },
+    {
+      "id": "2023",
+      "label": "2023",
+      "cover": "/assets/uploads/img_8132.jpg",
+      "photos": [
+        "/assets/uploads/img_8132.jpg"
+      ]
+    },
+    {
+      "id": "2021",
+      "label": "2021",
+      "cover": "/assets/uploads/october-30-2016-founding-gig-tracy.jpg",
+      "photos": [
+        "/assets/uploads/october-30-2016-founding-gig-tracy.jpg"
+      ]
+    },
+    {
+      "id": "2016",
+      "label": "2016",
+      "cover": "/assets/uploads/october-30-2016-founding-gig-tracy.jpg",
+      "photos": [
+        "/assets/uploads/october-30-2016-founding-gig-tracy.jpg"
+      ]
+    }
+  ]
+}
