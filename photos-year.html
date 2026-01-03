@@ -4,28 +4,35 @@
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width,initial-scale=1" />
   <title>Photos — Year Gallery</title>
-  <link rel="stylesheet" href="style.css" />
-  <link rel="stylesheet" href="photos.css" />
-  <script defer src="nav.js"></script>
-  <script defer src="photos.js"></script>
+  <link rel="stylesheet" href="/style.css" />
+  <link rel="stylesheet" href="/photos.css" />
+  <script defer src="/nav.js"></script>
+  <script defer src="/photos.js"></script>
 </head>
 <body class="photos-page">
   <div class="page">
+    <!-- Header (copied from photos.html to ensure consistency) -->
     <header class="site-header">
       <div class="header-inner">
         <div class="header-left">
-          <a href="index.html" aria-label="Fourplay Home"><img src="assets/logo.png" alt="Fourplay Dance Band" class="header-logo"/></a>
+          <a href="/index.html">
+            <img src="/assets/logo.png" alt="Fourplay Dance Band" class="header-logo" />
+          </a>
           <div class="site-title-small">FOURPLAY DANCE BAND</div>
         </div>
-        <button class="nav-toggle" aria-label="Toggle navigation" aria-expanded="false"><span></span><span></span><span></span></button>
+
+        <button class="nav-toggle" aria-label="Toggle navigation" aria-expanded="false">
+          <span></span><span></span><span></span>
+        </button>
+
         <nav class="nav" aria-label="Primary Navigation">
-          <a href="index.html">Home</a>
-          <a href="members.html">Members</a>
-          <a href="artists.html">Artists We Cover</a>
-          <a href="videos.html">Videos</a>
-          <a href="photos.html" class="active">Photos</a>
-          <a href="schedule.html">Schedule</a>
-          <a href="contact.html">Contact</a>
+          <a href="/index.html">Home</a>
+          <a href="/members.html">Members</a>
+          <a href="/artists.html">Artists We Cover</a>
+          <a href="/videos.html">Videos</a>
+          <a href="/photos.html" class="active">Photos</a>
+          <a href="/schedule.html">Schedule</a>
+          <a href="/contact.html">Contact</a>
         </nav>
       </div>
     </header>
@@ -35,8 +42,10 @@
         <div class="page-header">
           <h1 id="galleryTitle">Gallery</h1>
           <p id="gallerySub" class="lead">Browse photos</p>
-          <p><a href="photos.html" class="btn btn-secondary">Back to Years</a></p>
+          <p><a href="/photos.html" class="btn btn-secondary">Back to Years</a></p>
         </div>
+
+        <div id="photoDebug" style="margin-bottom:10px;color:rgba(255,255,255,0.75);font-size:0.95rem;">Loading:</div>
 
         <div id="photoGrid" class="photo-grid" role="list">
           <!-- thumbnails injected by photos.js -->
@@ -46,7 +55,9 @@
       </section>
     </main>
 
-    <footer class="site-footer">© 2025 Fourplay Dance Band. All rights reserved.</footer>
+    <footer class="site-footer">
+      © 2025 Fourplay Dance Band. All rights reserved.
+    </footer>
   </div>
 
   <!-- lightbox injected by photos.js or present here as fallback -->
