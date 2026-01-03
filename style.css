@@ -233,13 +233,14 @@ body.home .site-header { background: rgba(0,0,0,0.40); }
 
   /* center the avatar wrapper and remove any float/margin tricks */
   .member-avatarWrap {
-    position: absolute !important;
-    left: 50% !important;
+    position: static !important;
+    left: auto !important;
     right: auto !important;
-    transform: translateX(-50%) !important;
+    transform: none !important;
     display: flex !important;
     justify-content: center !important;
-    margin: 0 !important;
+    width: 100% !important;
+    margin: 0 auto !important;
     float: none !important;
   }
 
