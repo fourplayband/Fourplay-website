@@ -1,17 +1,16 @@
-<!DOCTYPE html>
+<!doctype html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8" />
-  <title>Photos | Fourplay Dance Band</title>
-  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>Photos — Fourplay Dance Band</title>
   <link rel="stylesheet" href="style.css" />
   <script defer src="nav.js"></script>
+  <link rel="stylesheet" href="photos.css" />
 </head>
-
-<body class="photos-page">
+<body>
   <div class="page">
-
-    <!-- Header -->
+    <!-- Header (same structure as other pages) -->
     <header class="site-header">
       <div class="header-inner">
         <div class="header-left">
@@ -25,7 +24,7 @@
           <span></span><span></span><span></span>
         </button>
 
-        <nav class="nav">
+        <nav class="nav" aria-label="Primary Navigation">
           <a href="index.html">Home</a>
           <a href="members.html">Members</a>
           <a href="artists.html">Artists We Cover</a>
@@ -37,226 +36,176 @@
       </div>
     </header>
 
-    <!-- Main -->
     <main class="main-content">
-      <section class="section-narrow">
-        <div class="page-header">
-          <h1>Photos</h1>
-          <p>Posters & gig photos by year.</p>
-        </div>
+      <h1>Photos</h1>
+      <p class="lead">A timeline gallery by year — cinematic, neon-lit, data-driven.</p>
 
-        <div class="photos-toolbar panel">
-          <div class="photos-toolbar__top">
-            <div class="photos-year-label">Year</div>
-            <div class="photos-years" id="photosYears"></div>
-          </div>
-          <div class="photos-toolbar__hint" id="photosHint">Loading…</div>
-        </div>
-
-        <div class="photos-section">
-          <div class="photos-section__header">
-            <h2 class="photos-section__title">Posters</h2>
-            <div class="photos-section__sub">Flyers, promo art, show posters</div>
-          </div>
-          <div class="photos-grid posters-grid" id="postersGrid"></div>
-        </div>
-
-        <div class="photos-section">
-          <div class="photos-section__header">
-            <h2 class="photos-section__title">Gig Photos</h2>
-            <div class="photos-section__sub">Live shots & behind the scenes</div>
-          </div>
-          <div class="photos-grid gig-grid" id="gigGrid"></div>
-        </div>
-      </section>
+      <div id="timeline" class="timeline" role="list">
+        <!-- years injected here -->
+      </div>
     </main>
-
     <footer class="site-footer">
       © 2025 Fourplay Dance Band. All rights reserved.
     </footer>
   </div>
 
-  <!-- Lightbox -->
-  <div class="photos-lightbox" id="photosLightbox" aria-hidden="true">
-    <div class="photos-lightbox__backdrop" data-close="true"></div>
-    <div class="photos-lightbox__panel" role="dialog" aria-modal="true">
-      <button class="photos-lightbox__close" id="photosLightboxClose" aria-label="Close">✕</button>
-      <img class="photos-lightbox__img" id="photosLightboxImg" alt="" />
-      <div class="photos-lightbox__caption" id="photosLightboxCaption"></div>
+  <!-- Fullscreen player -->
+  <div id="player" class="player" aria-hidden="true">
+    <div class="player-backdrop" data-close="true"></div>
+    <div class="player-panel" role="dialog" aria-modal="true" aria-label="Photo player">
+      <div class="player-stage" id="playerStage"></div>
+      <div class="player-controls">
+        <button id="prevBtn" class="btn" aria-label="Previous">◀</button>
+        <button id="playPauseBtn" class="btn control" aria-label="Play/Pause">Pause</button>
+        <button id="nextBtn" class="btn" aria-label="Next">▶</button>
+        <div class="progress" aria-hidden="true"><div class="progress-bar" id="progressBar"></div></div>
+        <div class="caption"><span id="playerMeta">&nbsp;</span> • <span id="playerIndex">0 / 0</span></div>
+        <button id="closeBtn" class="btn" aria-label="Close">✕</button>
+      </div>
     </div>
   </div>
 
   <script>
-    (function () {
-      const YEARS = [];
-      for (let y = 2016; y <= 2026; y++) YEARS.push(y);
+    // Timeline photos page — data-driven from CMS JSON
+    // Loads: /content/photos/photos.json
+    (function(){
+      const DATA_URL = '/content/photos/photos.json';
+      const timelineEl = document.getElementById('timeline');
+      const playerEl = document.getElementById('player');
+      const playerStage = document.getElementById('playerStage');
+      const playPauseBtn = document.getElementById('playPauseBtn');
+      const prevBtn = document.getElementById('prevBtn');
+      const nextBtn = document.getElementById('nextBtn');
+      const closeBtn = document.getElementById('closeBtn');
+      const progressBar = document.getElementById('progressBar');
+      const playerMeta = document.getElementById('playerMeta');
+      const playerIndex = document.getElementById('playerIndex');
 
-      const yearsEl = document.getElementById('photosYears');
-      const hintEl = document.getElementById('photosHint');
-      const postersGrid = document.getElementById('postersGrid');
-      const gigGrid = document.getElementById('gigGrid');
+      let YEARS = [];
+      let currentYear = null;
+      let currentPhotos = [];
+      let currentIndex = 0;
+      let isPlaying = true;
+      const autoPlayInterval = 3000;
+      let intervalId = null;
+      let rafId = null;
 
-      const lb = document.getElementById('photosLightbox');
-      const lbImg = document.getElementById('photosLightboxImg');
-      const lbCap = document.getElementById('photosLightboxCaption');
-      const lbClose = document.getElementById('photosLightboxClose');
+      // explicit ordering required by spec
+      const PRIORITY_ORDER = ["2026","2025","2024","2023","2020-2022","2016-2019"];
 
-      let DATA_BY_YEAR = {};
-      let AVAILABLE_YEARS = [];
+      function el(tag, cls){ const e = document.createElement(tag); if(cls) e.className = cls; return e }
 
-      function escapeHTML(str) {
-        return (str || '').replace(/[&<>"']/g, (m) => ({
-          '&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'
-        }[m]));
-      }
+      function setPlayerOpen(open){ if(open){ document.body.style.overflow='hidden'; playerEl.classList.add('is-open'); playerEl.setAttribute('aria-hidden','false'); } else { document.body.style.overflow=''; playerEl.classList.remove('is-open'); playerEl.setAttribute('aria-hidden','true'); } }
 
-      function openLightbox(src, caption) {
-        lbImg.src = src;
-        lbCap.textContent = caption || '';
-        lb.classList.add('is-open');
-        lb.setAttribute('aria-hidden', 'false');
-      }
-      function closeLightbox() {
-        lb.classList.remove('is-open');
-        lb.setAttribute('aria-hidden', 'true');
-        lbImg.src = '';
-        lbCap.textContent = '';
-      }
-      lb.addEventListener('click', (e) => { if (e.target?.dataset?.close) closeLightbox(); });
-      lbClose.addEventListener('click', closeLightbox);
-      document.addEventListener('keydown', (e) => { if (e.key === 'Escape') closeLightbox(); });
+      // load JSON
+      async function init(){
+        try{
+          const res = await fetch(DATA_URL, {cache:'no-store'});
+          if(!res.ok) throw new Error('Photos JSON not found');
+          const json = await res.json();
+          YEARS = Array.isArray(json.years) ? json.years.map(normalizeYear) : [];
 
-      async function fetchYear(y) {
-        // Try relative path first (works when site lives in a subfolder),
-        // then absolute path (works when served from domain root).
-        const candidates = [
-          `content/photos/${y}.json`,
-          `/content/photos/${y}.json`
-        ];
-
-        for (const url of candidates) {
-          try {
-            const res = await fetch(url, { cache: 'no-store' });
-            if (!res || !res.ok) continue;
-            const json = await res.json();
-            if (!json || !Array.isArray(json.galleries)) return { year: y, galleries: [] };
-            return json;
-          } catch (err) {
-            // try next candidate
-          }
-        }
-        return null;
-      }
-
-      function normalizeSection(s){
-        const v = String(s || '').toLowerCase().trim();
-        if (v === 'poster' || v === 'posters') return 'posters';
-        if (v === 'gig' || v === 'gigs' || v === 'gig-photos' || v === 'gigphotos') return 'gig-photos';
-        return v;
-      }
-
-      function buildTabs() {
-        yearsEl.innerHTML = '';
-        AVAILABLE_YEARS.forEach((y) => {
-          const btn = document.createElement('button');
-          btn.className = 'photos-year';
-          btn.type = 'button';
-          btn.textContent = y;
-          btn.dataset.year = String(y);
-          btn.addEventListener('click', () => renderYear(y));
-          yearsEl.appendChild(btn);
-        });
-      }
-
-      function setActiveTab(y) {
-        yearsEl.querySelectorAll('.photos-year').forEach((b) => {
-          b.classList.toggle('is-active', b.dataset.year === String(y));
-        });
-      }
-
-      function flattenImagesForSection(yearData, sectionName) {
-        const out = [];
-        (yearData.galleries || []).forEach(g => {
-          if (normalizeSection(g.section) !== sectionName) return;
-          (g.images || []).forEach(imgObj => {
-            const src = imgObj?.image || imgObj?.src || imgObj?.url;
-            if (!src) return;
-            out.push({
-              src,
-              caption: imgObj.caption || g.title || ''
-            });
+          // sort by PRIORITY_ORDER then numeric desc fallback
+          YEARS.sort((a,b)=>{
+            const ia = PRIORITY_ORDER.indexOf(a.id);
+            const ib = PRIORITY_ORDER.indexOf(b.id);
+            if(ia !== -1 || ib !== -1) return (ia===-1?Infinity:ia) - (ib===-1?Infinity:ib);
+            const na = parseInt(a.label)||0, nb = parseInt(b.label)||0; return nb - na;
           });
-        });
-        return out;
-      }
 
-      function renderGrid(container, items, variant) {
-        container.innerHTML = '';
-
-        if (!items.length) {
-          container.innerHTML = `<div class="photos-empty">No ${variant} for this year yet.</div>`;
-          return;
+          renderTimeline();
+        }catch(err){
+          console.error(err);
+          timelineEl.innerHTML = `<div style="color:var(--muted)">Unable to load photos data. Ensure ${DATA_URL} exists.</div>`;
         }
+      }
 
-        const frag = document.createDocumentFragment();
-        items.forEach((it) => {
-          const card = document.createElement('button');
-          card.type = 'button';
-          card.className = `photo-card`;
-          card.innerHTML = `
-            <img src="${escapeHTML(it.src)}" alt="" loading="lazy" />
-            ${it.caption ? `<div class="photo-cap">${escapeHTML(it.caption)}</div>` : ``}
-          `;
-          card.addEventListener('click', () => openLightbox(it.src, it.caption));
-          frag.appendChild(card);
+      function normalizeYear(y){
+        return {
+          id: String(y.id || y.label || ''),
+          label: String(y.label || y.id || ''),
+          priority: y.priority || '',
+          cover: y.cover || y.thumbnail || '',
+          photos: Array.isArray(y.photos) ? y.photos : [],
+          city: y.city || '',
+          tagline: y.tagline || ''
+        };
+      }
+
+      function renderTimeline(){
+        timelineEl.innerHTML = '';
+        YEARS.forEach(y=>{
+          if(y.priority === 'hero' || y.id === '2026') timelineEl.appendChild(renderHero(y));
+          else timelineEl.appendChild(renderYearCard(y));
         });
-        container.appendChild(frag);
       }
 
-      function renderYear(y) {
-        const yearData = DATA_BY_YEAR[y];
-        if (!yearData) return;
+      function renderHero(y){
+        const wrap = el('section','hero-year');
+        const left = el('div','hero-left');
+        const right = el('div','hero-right');
+        const label = el('div','year-label'); label.textContent = y.label || '';
+        const tag = el('div','hero-tag'); tag.textContent = y.tagline || y.city || '';
+        const cta = el('div','hero-cta'); cta.textContent = 'Tap to play — full gallery';
+        left.appendChild(label); left.appendChild(tag); left.appendChild(cta);
 
-        setActiveTab(y);
+        const cover = el('div','hero-cover pulse');
+        const img = el('img'); img.src = y.cover || (y.photos[0]||''); img.alt = y.label + ' cover'; img.loading='lazy';
+        cover.appendChild(img);
+        right.appendChild(cover);
 
-        const posters = flattenImagesForSection(yearData, 'posters');
-        const gigs = flattenImagesForSection(yearData, 'gig-photos');
-
-        renderGrid(postersGrid, posters, 'posters');
-        renderGrid(gigGrid, gigs, 'gigs');
-
-        hintEl.textContent = `${y} loaded · ${posters.length + gigs.length} images`;
+        wrap.addEventListener('click',()=>openPlayerForYear(y));
+        return wrap;
       }
 
-      async function init() {
-        hintEl.textContent = 'Loading years…';
-
-        const results = await Promise.all(YEARS.map(fetchYear));
-        results.forEach((r, idx) => {
-          const y = YEARS[idx];
-          if (!r) return;
-          DATA_BY_YEAR[y] = r;
-          AVAILABLE_YEARS.push(y); // 文件存在就显示年份 tab
-        });
-
-        if (!AVAILABLE_YEARS.length) {
-          hintEl.textContent = 'No year files found. Make sure content/photos/2016.json etc exist.';
-          return;
-        }
-
-        buildTabs();
-
-        let defaultYear = AVAILABLE_YEARS[AVAILABLE_YEARS.length - 1];
-        for (let i = AVAILABLE_YEARS.length - 1; i >= 0; i--) {
-          const y = AVAILABLE_YEARS[i];
-          const d = DATA_BY_YEAR[y];
-          const posters = flattenImagesForSection(d, 'posters');
-          const gigs = flattenImagesForSection(d, 'gig-photos');
-          if (posters.length + gigs.length > 0) { defaultYear = y; break; }
-        }
-
-        renderYear(defaultYear);
+      function renderYearCard(y){
+        const card = el('article','year-card');
+        if(y.id && (y.id.includes('-')||y.id.includes('–'))) card.classList.add('archive');
+        const thumb = el('div','year-thumb'+(card.classList.contains('archive')? ' archive':''));
+        const img = el('img'); img.src = y.cover || (y.photos[0]||''); img.alt = y.label + ' thumbnail'; img.loading='lazy'; thumb.appendChild(img);
+        const info = el('div','year-info'); const title = el('div','year-title'); title.textContent = y.label||''; const sub = el('div','year-sub'); sub.textContent = [y.city||'', y.tagline||''].filter(Boolean).join(' • ');
+        const tap = el('button','tap-play'); tap.type='button'; tap.textContent='Tap to play'; tap.addEventListener('click',(ev)=>{ ev.stopPropagation(); openPlayerForYear(y); });
+        info.appendChild(title); info.appendChild(sub); info.appendChild(tap);
+        card.appendChild(thumb); card.appendChild(info);
+        card.tabIndex = 0; card.addEventListener('keydown',(e)=>{ if(e.key==='Enter'||e.key===' '){ e.preventDefault(); openPlayerForYear(y); } });
+        return card;
       }
+
+      // Player
+      function openPlayerForYear(y){
+        currentYear = y; currentPhotos = Array.isArray(y.photos)? y.photos.slice() : [];
+        if(currentPhotos.length===0){ alert('No photos for ' + (y.label||y.id)); return; }
+        currentIndex = 0; isPlaying = true; renderPlayer(); setPlayerOpen(true); startAutoPlay();
+      }
+
+      function renderPlayer(){
+        playerStage.innerHTML = ''; const img = document.createElement('img'); img.src = currentPhotos[currentIndex]; img.alt = `${currentYear.label} ${currentIndex+1}`; img.loading='eager'; playerStage.appendChild(img);
+        playerMeta.textContent = currentYear.city || currentYear.label || '';
+        playerIndex.textContent = (currentIndex+1) + ' / ' + currentPhotos.length;
+        progressBar.style.width = '0%';
+      }
+
+      function prev(){ if(!currentPhotos.length) return; currentIndex = (currentIndex -1 + currentPhotos.length)%currentPhotos.length; renderPlayer(); resetAutoPlay(); }
+      function next(){ if(!currentPhotos.length) return; currentIndex = (currentIndex +1) % currentPhotos.length; renderPlayer(); resetAutoPlay(); }
+
+      function startAutoPlay(){ stopAutoPlay(); intervalId = setInterval(()=>{ next(); }, autoPlayInterval); playPauseBtn.textContent='Pause'; isPlaying=true; animateProgress(); }
+      function stopAutoPlay(){ if(intervalId) { clearInterval(intervalId); intervalId=null; } if(rafId){ cancelAnimationFrame(rafId); rafId=null; } playPauseBtn.textContent='Play'; isPlaying=false; }
+      function togglePlay(){ if(isPlaying) stopAutoPlay(); else startAutoPlay(); }
+      function resetAutoPlay(){ if(isPlaying){ stopAutoPlay(); startAutoPlay(); } }
+
+      // progress animation
+      let progressStart = null;
+      function animateProgress(){ if(!isPlaying || !intervalId) return; progressStart = performance.now(); const duration = autoPlayInterval; function step(now){ const elapsed = (now - progressStart) % duration; const pct = (elapsed / duration) * 100; progressBar.style.width = pct + '%'; rafId = requestAnimationFrame(step); } rafId = requestAnimationFrame(step); }
+
+      function closePlayer(){ stopAutoPlay(); setPlayerOpen(false); }
+
+      // events
+      playPauseBtn.addEventListener('click', togglePlay);
+      prevBtn.addEventListener('click', prev);
+      nextBtn.addEventListener('click', next);
+      closeBtn.addEventListener('click', closePlayer);
+      playerEl.addEventListener('click',(e)=>{ if(e.target && e.target.dataset && e.target.dataset.close) closePlayer(); });
+      document.addEventListener('keydown',(e)=>{ if(playerEl.classList.contains('is-open')){ if(e.key==='Escape') closePlayer(); else if(e.key==='ArrowLeft') prev(); else if(e.key==='ArrowRight') next(); else if(e.key===' ') { e.preventDefault(); togglePlay(); } } });
 
       init();
     })();
