@@ -5,6 +5,7 @@
   <title>Contact | Fourplay Dance Band</title>
   <meta name="viewport" content="width=device-width, initial-scale=1" />
   <link rel="stylesheet" href="style.css" />
+  <script defer src="nav.js"></script>
 </head>
 <body>
 <div class="page">
@@ -44,30 +45,52 @@
     <section class="section-narrow">
       <div class="page-header">
         <h1>Contact</h1>
-        <p>Booking inquiries, private events, festivals, and more.</p>
+        <p>Book the band or send a message.</p>
       </div>
 
-      <div class="panel">
-        <div class="contact-info">
-          <p>
-            <strong>Email:</strong>
-            <a href="mailto:info@fourplaydanceband.com">info@fourplaydanceband.com</a>
-          </p>
-          <p>
-            <strong>Tel:</strong> (925) 588-5911
-          </p>
-          <p>
-            <strong>Facebook:</strong>
-            <a href="https://www.facebook.com/fourplaydanceband" target="_blank" rel="noreferrer">
-              fourplaydanceband
-            </a>
-          </p>
-          <p style="margin-top: 18px; color: rgba(255,255,255,0.8);">
-            Let us know your date, location, and event type, and we’ll follow up
-            with availability, pricing, and options tailored for your party or venue.
-          </p>
+      <div class="panel" style="display:grid;grid-template-columns: 1fr 360px;gap:18px;align-items:start;">
+        <div>
+          <p><strong>Email:</strong> <a href="mailto:info@fourplaydanceband.com">info@fourplaydanceband.com</a></p>
+          <p><strong>Tel:</strong> (925) 588-5911</p>
+          <p><strong>Facebook:</strong> <a href="https://www.facebook.com/fourplaydanceband" target="_blank" rel="noopener">fourplaydanceband</a></p>
+          <p style="margin-top:12px;opacity:.95;">Let us know your date, location, and event type, and we'll follow up with availability, pricing, and options tailored for your party or venue.</p>
+        </div>
+
+        <div>
+          <form id="inquireForm" style="display:flex;flex-direction:column;gap:8px;">
+            <input id="inquireName" type="text" name="name" placeholder="Your name" required aria-required="true" style="padding:10px;border-radius:8px;border:1px solid rgba(255,255,255,0.06);background:transparent;color:inherit;" />
+            <input id="inquireEmail" type="email" name="email" placeholder="Email" required aria-required="true" style="padding:10px;border-radius:8px;border:1px solid rgba(255,255,255,0.06);background:transparent;color:inherit;" />
+            <input id="inquirePhone" type="tel" name="phone" placeholder="Phone number" required aria-required="true" style="padding:10px;border-radius:8px;border:1px solid rgba(255,255,255,0.06);background:transparent;color:inherit;" />
+            <textarea id="inquireMessage" name="message" placeholder="Message" rows="6" required aria-required="true" style="padding:10px;border-radius:8px;border:1px solid rgba(255,255,255,0.06);background:transparent;color:inherit;"></textarea>
+            <button id="inquireSubmit" class="btn btn-primary" type="submit" style="width:160px;">Send Inquiry</button>
+          </form>
         </div>
       </div>
+      <script>
+        (function(){
+          const form = document.getElementById('inquireForm');
+          form.addEventListener('submit', function(e){
+            e.preventDefault();
+            const name = document.getElementById('inquireName').value.trim();
+            const email = document.getElementById('inquireEmail').value.trim();
+            const phone = document.getElementById('inquirePhone').value.trim();
+            const message = document.getElementById('inquireMessage').value.trim();
+            if(!name || !email || !phone || !message){ alert('Please fill all required fields (name, email, phone, message).'); return; }
+            const to = 'info@fourplaydanceband.com';
+            const subject = encodeURIComponent('Booking inquiry from ' + name);
+            const bodyParts = [
+              'Name: ' + name,
+              'Email: ' + email,
+              'Phone: ' + phone,
+              '',
+              'Message:',
+              message
+            ];
+            const body = encodeURIComponent(bodyParts.join('\n'));
+            window.location.href = `mailto:${to}?subject=${subject}&body=${body}`;
+          });
+        })();
+      </script>
     </section>
   </main>
 
@@ -76,20 +99,5 @@
   </footer>
 </div>
 
-<script>
-document.addEventListener('DOMContentLoaded', () => {
-  const navToggle = document.querySelector('.nav-toggle');
-  const nav = document.querySelector('.nav');
-
-  if (!navToggle || !nav) return;
-
-  navToggle.addEventListener('click', () => {
-    navToggle.classList.toggle('open');   // 控制汉堡变 X
-    nav.classList.toggle('nav-open');     // 控制菜单显示/隐藏
-  });
-});
-</script>
-</body>
-</html>
 </body>
 </html>
