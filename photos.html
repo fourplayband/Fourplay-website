@@ -5,8 +5,9 @@
   <meta name="viewport" content="width=device-width,initial-scale=1" />
   <title>Photos — Fourplay Dance Band</title>
   <link rel="stylesheet" href="style.css" />
-  <script defer src="nav.js"></script>
   <link rel="stylesheet" href="photos.css" />
+  <script defer src="nav.js"></script>
+  <script defer src="photos.js"></script>
 </head>
 <body>
   <div class="page">
@@ -36,13 +37,17 @@
       </div>
     </header>
 
-    <main class="main-content">
-      <h1>Photos</h1>
-      <p class="lead">A timeline gallery by year — cinematic, neon-lit, data-driven.</p>
+    <main class="main-content photos-page">
+      <section class="section-narrow">
+        <div class="page-header">
+          <h1>Photos</h1>
+          <p class="lead">A cinematic year hub — select a year to view the full gallery.</p>
+        </div>
 
-      <div id="timeline" class="timeline" role="list">
-        <!-- years injected here -->
-      </div>
+        <div id="yearHub" class="year-hub" role="list">
+          <!-- year cards injected by photos.js -->
+        </div>
+      </section>
     </main>
     <footer class="site-footer">
       © 2025 Fourplay Dance Band. All rights reserved.
