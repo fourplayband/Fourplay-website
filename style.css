@@ -34,6 +34,9 @@ footer, .site-footer { margin-top: auto; }
   border-bottom: 1px solid rgba(255,255,255,0.08);
 }
 
+/* Stronger header background on the home page (40% opacity) */
+body.home .site-header { background: rgba(0,0,0,0.40); }
+
 .header-inner {
   max-width: 1200px;
   margin: 0 auto;
@@ -312,6 +315,19 @@ body.home { background: #05081a; }
   z-index: 0;
 }
 
+/* Make the looping homepage video cover the full viewport and sit behind page content */
+body.home .hero-video {
+  position: fixed !important;
+  inset: 0 !important;
+  width: 100% !important;
+  height: 100% !important;
+  object-fit: cover !important;
+  z-index: -1 !important;
+}
+
+/* Ensure hero content sits above the fixed video */
+.hero-inner { position: relative; z-index: 1; }
+
 .hero-inner {
   position: relative;
   z-index: 1;
@@ -555,6 +571,8 @@ body:not(.home){
     width: 86px !important;
     height: 86px !important;
   }
+  /* Center member bio text on mobile so avatar aligns visually above it */
+  .member-bio{ text-align: center !important; }
 }
 
 /* Improve spacing and layout for members list */
