@@ -1,0 +1,15 @@
+{
+  "year": 2020,
+  "galleries": [
+    {
+      "section": "gig-photos",
+      "title": "2020 Gig Photos",
+      "images": [
+        {
+          "image": "/assets/uploads/img_1422.jpg",
+          "caption": "2020 Sample"
+        }
+      ]
+    }
+  ]
+}

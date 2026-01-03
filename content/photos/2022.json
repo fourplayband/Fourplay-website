@@ -1,0 +1,15 @@
+{
+  "year": 2022,
+  "galleries": [
+    {
+      "section": "gig-photos",
+      "title": "2022 Gig Photos",
+      "images": [
+        {
+          "image": "/assets/uploads/img_8132.jpg",
+          "caption": "2022 Sample"
+        }
+      ]
+    }
+  ]
+}

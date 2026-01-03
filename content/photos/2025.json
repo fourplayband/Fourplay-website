@@ -1,0 +1,30 @@
+{
+  "year": 2025,
+  "galleries": [
+    {
+      "section": "gig-photos",
+      "title": "2025 Gig Photos",
+      "images": [
+        {
+          "image": "/assets/uploads/img_1421.jpg",
+          "caption": "2025 Sample"
+        }
+      ]
+    }
+  ]
+}
+{
+  "year": 2025,
+  "galleries": [
+    {
+      "section": "gig-photos",
+      "title": "2025 Gig Photos",
+      "images": [
+        {
+          "image": "/assets/uploads/img_1422.jpg",
+          "caption": "New Year Gig 2025"
+        }
+      ]
+    }
+  ]
+}

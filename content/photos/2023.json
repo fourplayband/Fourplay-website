@@ -1,0 +1,15 @@
+{
+  "year": 2023,
+  "galleries": [
+    {
+      "section": "gig-photos",
+      "title": "2023 Gig Photos",
+      "images": [
+        {
+          "image": "/assets/uploads/img_8132.jpg",
+          "caption": "2023 Sample"
+        }
+      ]
+    }
+  ]
+}
