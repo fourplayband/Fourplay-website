@@ -487,6 +487,26 @@ collections:
                   - { label: "Image", name: "image", widget: "image" }
                   - { label: "Caption", name: "caption", widget: "string", required: false }
                   - { label: "Subtitle", name: "subtitle", widget: "string", required: false }
+      # (index.json handled by dedicated collection below)
+  # Dedicated single-file collection for the CMS-managed Years index with stable media folder
+  - name: "photos_years"
+    label: "Photos — Years Index (covers)"
+    editor:
+      preview: false
+    media_folder: "uploads/photos/covers"
+    public_folder: "/uploads/photos/covers"
+    files:
+      - file: "content/photos/index.json"
+        label: "Photos — Years Index (CMS)"
+        name: "photos_years_master"
+        fields:
+          - label: "Years"
+            name: "years"
+            widget: "list"
+            fields:
+              - { label: "Year ID (slug)", name: "year", widget: "string" }
+              - { label: "Label", name: "label", widget: "string" }
+              - { label: "Cover Image", name: "cover", widget: "image" }
   # Schedule (Booked / Available)
   # Booked：可填写详情+海报；点开显示
   # Available：点开去 book（给一个 booking link）
