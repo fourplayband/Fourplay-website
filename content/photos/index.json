@@ -1,11 +1,39 @@
 {
   "years": [
-    { "slug": "2026", "label": "2026", "cover": "assets/uploads/img_1422.jpg" },
-    { "slug": "2025", "label": "2025", "cover": "assets/uploads/october-30-2016-founding-gig-tracy.jpg" },
-    { "slug": "2024", "label": "2024", "cover": "assets/uploads/img_1421.jpg" },
-    { "slug": "2023", "label": "2023", "cover": "assets/uploads/img_8132.jpg" },
-    { "slug": "2022", "label": "2022", "cover": "assets/uploads/fourplay-flyer-front.jpg" },
-    { "slug": "2020-2021", "label": "2020–2021", "cover": "assets/uploads/mark-caroson.jpg" },
-    { "slug": "2016-2019", "label": "2016 - 2019", "cover": "assets/uploads/october-30-2016-founding-gig-tracy.jpg" }
+    {
+      "slug": "2026",
+      "label": "2026",
+      "cover": "assets/uploads/img_1422.jpg"
+    },
+    {
+      "slug": "2025",
+      "label": "2025",
+      "cover": "assets/uploads/october-30-2016-founding-gig-tracy.jpg"
+    },
+    {
+      "slug": "2024",
+      "label": "2024",
+      "cover": "assets/uploads/img_1421.jpg"
+    },
+    {
+      "slug": "2023",
+      "label": "2023",
+      "cover": "assets/uploads/img_8132.jpg"
+    },
+    {
+      "slug": "2022",
+      "label": "2022",
+      "cover": "assets/uploads/fourplay-flyer-front.jpg"
+    },
+    {
+      "slug": "2020-2021",
+      "label": "2020–2021",
+      "cover": "assets/uploads/mark-caroson.jpg"
+    },
+    {
+      "slug": "2016-2019",
+      "label": "2016 - 2019",
+      "cover": "/assets/uploads/img_8134.jpg"
+    }
   ]
 }
