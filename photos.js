@@ -66,17 +66,21 @@
       a.href = `/photos-year.html?year=${encodeURIComponent(y.id)}`;
       a.setAttribute('role','listitem');
 
-      const img = document.createElement('img'); img.className='cover'; img.alt = y.label + ' cover'; img.loading='lazy';
+      let coverEl;
       let coverUrl = (y.cover || y.thumbnail || '');
       if(coverUrl && !coverUrl.startsWith('/') && !coverUrl.startsWith('http')) coverUrl = '/' + coverUrl;
-      img.src = coverUrl;
       if(coverUrl){
+        const img = document.createElement('img'); img.className='cover'; img.alt = y.label + ' cover'; img.loading='lazy';
+        img.src = coverUrl;
         img.addEventListener('error', ()=>{
           img.style.display = 'none';
           console.warn('Cover failed to load', coverUrl);
         });
+        coverEl = img;
       } else {
-        img.style.display = 'none';
+        // fallback gradient block when no cover image provided
+        const fb = document.createElement('div'); fb.className = 'cover-fallback'; fb.setAttribute('aria-hidden','true');
+        coverEl = fb;
       }
       const meta = document.createElement('div'); meta.className='year-meta';
       const label = document.createElement('div'); label.className='year-label'; label.textContent = y.label || y.id;
@@ -84,7 +88,7 @@
       const cta = document.createElement('div'); cta.className='year-cta'; cta.innerHTML = '<span class="tap-play">Open Gallery</span>';
 
       meta.appendChild(label); meta.appendChild(sub); meta.appendChild(cta);
-      a.appendChild(img); a.appendChild(meta);
+      a.appendChild(coverEl); a.appendChild(meta);
       hub.appendChild(a);
     });
   }
