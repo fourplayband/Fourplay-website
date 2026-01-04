@@ -1,4 +1,4 @@
-backend:
+﻿backend:
   name: git-gateway
   branch: main
 
@@ -18,6 +18,9 @@ collections:
         name: "global"
         fields:
           - { label: "Site Name", name: "site_name", widget: "string", default: "FOURPLAY Dance Band" }
+          - { label: "Header Logo (optional)", name: "logo", widget: "image", required: false }
+          - { label: "Footer Text (optional)", name: "footer", widget: "string", required: false }
+          - { label: "Contact Email", name: "contact_email", widget: "string", required: false }
 
   - name: "pages"
     label: "Pages"
@@ -25,75 +28,117 @@ collections:
       - file: "content/pages/home.md"
         label: "Home"
         name: "home"
+        fields:
+          - { label: "Browser Title", name: "title", widget: "string", default: "FOURPLAY Dance Band" }
+          - { label: "Hero Title", name: "hero_title", widget: "string", required: false }
+          - { label: "Hero Subtitle", name: "hero_subtitle", widget: "string", required: false }
       - file: "content/pages/contact.md"
         label: "Contact"
         name: "contact"
+        fields:
+          - { label: "Title", name: "title", widget: "string", default: "Contact" }
+          - { label: "Intro", name: "intro", widget: "text", required: false }
 
   - name: "members"
     label: "Band Members"
-    format: "json"
     files:
       - file: "content/members.json"
         label: "Members Page"
         name: "members_page"
+        fields:
+          - { label: "Band Photo", name: "bandPhoto", widget: "image", required: false }
+          - { label: "Band Bio", name: "bandBio", widget: "text", required: false }
+          - label: "Members"
+            name: "members"
+            widget: "list"
+            fields:
+              - { label: "Name", name: "name", widget: "string" }
+              - { label: "Role", name: "role", widget: "string" }
+              - { label: "Photo", name: "photo", widget: "image" }
 
   - name: "artists"
     label: "Artists"
     folder: "content/artists"
     create: true
     format: "json"
+    fields:
+      - { label: "Name", name: "name", widget: "string" }
 
   - name: "videos"
     label: "Videos"
     folder: "content/videos"
     create: true
     format: "json"
+    fields:
+      - { label: "Title", name: "title", widget: "string" }
+      - { label: "Video URL", name: "url", widget: "string" }
+      - { label: "Thumbnail (optional)", name: "thumbnail", widget: "image", required: false }
 
-  # Photo entry folders (one JSON file per uploaded photo entry)
+  # Photo entry folders: one file per uploaded photo entry
   - name: "photos_2026_entries"
-    label: "Photos  2026 Entries"
+    label: "Photos — 2026 Entries"
     folder: "content/photos/2026"
     create: true
     format: "json"
+    fields:
+      - { label: "Title / Caption", name: "title", widget: "string" }
+      - { label: "Image", name: "image", widget: "image" }
+      - { label: "Date", name: "date", widget: "datetime", required: false }
 
   - name: "photos_2025_entries"
-    label: "Photos  2025 Entries"
+    label: "Photos — 2025 Entries"
     folder: "content/photos/2025"
     create: true
     format: "json"
+    fields:
+      - { label: "Title / Caption", name: "title", widget: "string" }
+      - { label: "Image", name: "image", widget: "image" }
+      - { label: "Date", name: "date", widget: "datetime", required: false }
 
   - name: "photos_2024_entries"
-    label: "Photos  2024 Entries"
+    label: "Photos — 2024 Entries"
     folder: "content/photos/2024"
     create: true
     format: "json"
+    fields:
+      - { label: "Title / Caption", name: "title", widget: "string" }
+      - { label: "Image", name: "image", widget: "image" }
 
   - name: "photos_2023_entries"
-    label: "Photos  2023 Entries"
+    label: "Photos — 2023 Entries"
     folder: "content/photos/2023"
     create: true
     format: "json"
+    fields:
+      - { label: "Title / Caption", name: "title", widget: "string" }
+      - { label: "Image", name: "image", widget: "image" }
 
   - name: "photos_2020_2022_entries"
-    label: "Photos  2020-2022 Entries"
+    label: "Photos — 2020-2022 Entries"
     folder: "content/photos/2020-2022"
     create: true
     format: "json"
+    fields:
+      - { label: "Title / Caption", name: "title", widget: "string" }
+      - { label: "Image", name: "image", widget: "image" }
 
   - name: "photos_2016_2019_entries"
-    label: "Photos  2016-2019 Entries"
+    label: "Photos — 2016-2019 Entries"
     folder: "content/photos/2016-2019"
     create: true
     format: "json"
+    fields:
+      - { label: "Title / Caption", name: "title", widget: "string" }
+      - { label: "Image", name: "image", widget: "image" }
 
-  # Single-file Years index for hub tiles (frontend reads this)
+  # Single-file Years index that the frontend reads for hub tiles
   - name: "photos_index"
-    label: "Photos  Years Index"
+    label: "Photos — Years Index"
     editor:
       preview: false
     files:
       - file: "content/photos/index.json"
-        label: "Photos  Years Index (CMS)"
+        label: "Photos — Years Index (CMS)"
         name: "photos_years_master"
         fields:
           - label: "Years"
@@ -109,3 +154,6 @@ collections:
     folder: "content/schedule"
     create: true
     format: "json"
+    fields:
+      - { label: "Date", name: "date", widget: "datetime" }
+      - { label: "Status", name: "status", widget: "select", options: ["available","booked"] }
