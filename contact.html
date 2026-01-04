@@ -57,73 +57,57 @@
         </div>
 
         <div style="max-width:720px;margin:12px auto 0 auto;">
-          <form id="inquireForm" name="inquiry" method="POST" data-netlify="true" data-netlify-honeypot="bot-field" style="display:flex;flex-direction:column;gap:8px;">
+          <form
+            name="inquiry"
+            method="POST"
+            data-netlify="true"
+            netlify-honeypot="bot-field"
+            id="contact-form"
+            style="display:flex;flex-direction:column;gap:8px;"
+          >
             <input type="hidden" name="form-name" value="inquiry" />
-            <p hidden><label>Don’t fill this out if you're human: <input name="bot-field" /></label></p>
-            <input id="inquireName" type="text" name="name" placeholder="Your name" required aria-required="true" style="padding:10px;border-radius:8px;border:1px solid rgba(255,255,255,0.06);background:transparent;color:inherit;" />
-            <input id="inquireEmail" type="email" name="email" placeholder="Email" required aria-required="true" style="padding:10px;border-radius:8px;border:1px solid rgba(255,255,255,0.06);background:transparent;color:inherit;" />
-            <input id="inquirePhone" type="tel" name="phone" placeholder="Phone number" required aria-required="true" style="padding:10px;border-radius:8px;border:1px solid rgba(255,255,255,0.06);background:transparent;color:inherit;" />
-            <textarea id="inquireMessage" name="message" placeholder="Message" rows="6" required aria-required="true" style="padding:10px;border-radius:8px;border:1px solid rgba(255,255,255,0.06);background:transparent;color:inherit;"></textarea>
-            <div id="inquireStatus" role="status" aria-live="polite" style="min-height:1.2em;color:var(--muted);"></div>
-            <button id="inquireSubmit" class="btn btn-primary" type="submit" style="width:160px;">Send Inquiry</button>
+
+            <input name="name" required placeholder="Name" style="padding:10px;border-radius:8px;border:1px solid rgba(255,255,255,0.06);background:transparent;color:inherit;" />
+            <input name="email" type="email" required placeholder="Email" style="padding:10px;border-radius:8px;border:1px solid rgba(255,255,255,0.06);background:transparent;color:inherit;" />
+            <input name="phone" type="tel" placeholder="Phone" style="padding:10px;border-radius:8px;border:1px solid rgba(255,255,255,0.06);background:transparent;color:inherit;" />
+            <textarea name="message" required placeholder="Message" rows="6" style="padding:10px;border-radius:8px;border:1px solid rgba(255,255,255,0.06);background:transparent;color:inherit;"></textarea>
+
+            <button type="submit" class="btn btn-primary" style="width:160px;">Send Inquiry</button>
           </form>
+
+          <p id="form-status" style="display:none; margin-top:12px;">Thank You</p>
         </div>
       </div>
       <style>
         /* Contact: make inquiry inputs wider on desktop and responsive on mobile */
-        #inquireForm input,
-        #inquireForm textarea { width:100% !important; max-width:1080px; box-sizing: border-box; }
+        #contact-form input,
+        #contact-form textarea { width:100% !important; max-width:1080px; box-sizing: border-box; }
         /* Make the Send button ~3x wider on desktop (was 160px) */
-        #inquireSubmit{ width:480px !important; }
+        #contact-form button[type="submit"]{ width:480px !important; }
         @media (max-width: 480px){
-          #inquireSubmit{ width:100% !important; }
+          #contact-form button[type="submit"]{ width:100% !important; }
           .contact-panel{ padding:12px; }
         }
       </style>
-      <!-- Netlify form submission (AJAX) — posts to Netlify and shows in-page success without mail client -->
+
       <script>
-        (function(){
-          const form = document.getElementById('inquireForm');
-          const statusEl = document.getElementById('inquireStatus');
+        const form = document.getElementById('contact-form');
+        const status = document.getElementById('form-status');
 
-          async function submitForm(e){
+        if (form) {
+          form.addEventListener('submit', function (e) {
             e.preventDefault();
-            statusEl.textContent = '';
-            const btn = document.getElementById('inquireSubmit');
-            btn.disabled = true; const prevText = btn.textContent; btn.textContent = 'Sending...';
-
-            const fd = new FormData(form);
-            // Netlify requires form-name to be present (we included it)
-            try{
-              // Post to Netlify root endpoint so Netlify Forms captures submission
-              const res = await fetch('/', { method: 'POST', body: fd });
-              if(res.ok || res.status === 200 || res.status === 204){
-                statusEl.style.color = 'var(--muted)';
-                statusEl.textContent = 'Message sent. Thank you!';
-                disableFields();
-              } else {
-                statusEl.style.color = '#f88';
-                statusEl.textContent = 'Failed to send. Please try again.';
-                btn.disabled = false; btn.textContent = prevText;
-              }
-            }catch(err){
-              statusEl.style.color = '#f88';
-              statusEl.textContent = 'Network error. Please try again later.';
-              btn.disabled = false; btn.textContent = prevText;
-            }
-          }
-
-          function disableFields(){
-            ['inquireName','inquireEmail','inquirePhone','inquireMessage'].forEach(id=>{
-              const el = document.getElementById(id);
-              if(el){ el.disabled=true; el.style.opacity='0.6'; el.style.background='rgba(255,255,255,0.03)'; }
-            });
-            const btn = document.getElementById('inquireSubmit');
-            if(btn){ btn.disabled=true; btn.textContent='Message Sent'; btn.style.opacity='0.7'; }
-          }
-
-          form.addEventListener('submit', submitForm);
-        })();
+            const data = new FormData(form);
+            fetch('/', { method: 'POST', body: data })
+              .then(() => {
+                try { form.reset(); } catch (e) {}
+                if (status) { status.style.display = 'block'; status.textContent = 'Thank You'; }
+              })
+              .catch(() => {
+                if (status) { status.style.display = 'block'; status.textContent = 'Failed to send. Please try again.'; }
+              });
+          });
+        }
       </script>
     </section>
   </main>
