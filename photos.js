@@ -2,21 +2,24 @@
 (() => {
   const PRIORITY_ORDER = ["2026","2025","2024","2023","2022","2020-2021","2016-2019"];
 
-  // utility: fetch JSON with friendly fallback
-  async function fetchJson(path){
+  // utility: fetch JSON and return { json, status }
+  async function fetchJsonWithStatus(path){
     try{
-      const res = await fetch(path, {cache:'no-store'});
-      if(!res.ok) throw new Error('Not found');
-      return await res.json();
-    }catch(e){ return null; }
+      const url = (path.startsWith('/') || path.startsWith('http')) ? path : '/' + path;
+      const res = await fetch(url + (url.includes('?') ? '&' : '?') + 'v=' + Date.now(), { cache: 'no-store' });
+      const status = res.status;
+      if(!res.ok){ console.error('fetch failed', url, status); return { json: null, status }; }
+      const json = await res.json();
+      return { json, status };
+    }catch(e){ console.error('fetch error', path, e); return { json: null, status: 'network' }; }
   }
 
   function normalizePhotos(data){
     if(!data) return [];
-    // format A: { photos: [...] }
+    // format A: array
     if(Array.isArray(data)) return data.map(normalizePhoto);
     if(Array.isArray(data.photos)) return data.photos.map(normalizePhoto);
-    // some files use 'galleries' -> images array inside; try to flatten
+    // galleries -> flatten
     if(Array.isArray(data.galleries)){
       const imgs = [];
       data.galleries.forEach(g=>{ if(Array.isArray(g.images)) imgs.push(...g.images.map(normalizePhoto)); });
@@ -25,55 +28,34 @@
     return [];
   }
   function normalizePhoto(p){
-    if(!p) return { src:'', alt:'', caption:'' };
-    if(typeof p === 'string') return { src:p, alt:'', caption:'' };
-    return { src: p.image || p.src || p.url || p.path || '', alt: p.alt || p.caption || p.title || '', caption: p.caption || p.title || '' };
+    if(!p) return { src:'', alt:'', caption:'', subtitle: '' };
+    if(typeof p === 'string') return { src:p, alt:'', caption:'', subtitle: '' };
+    return {
+      src: p.image || p.src || p.url || p.path || '',
+      alt: p.alt || p.title || p.caption || '',
+      caption: p.title || p.caption || p.subtitle || '',
+      subtitle: p.subtitle || ''
+    };
   }
 
   // YEAR HUB
   async function renderYearHub(){
     const hub = document.getElementById('yearHub');
     if(!hub) return;
-
-    // try index.json then photos.json
-    let index = await fetchJson('content/photos/index.json');
-    if(!index) index = await fetchJson('content/photos/photos.json');
-
-    let years = [];
-    // If CMS-provided index.json exists, use it exactly (order and covers are CMS-managed)
-    if(index && Array.isArray(index.years) && index.years.length){
-      years = index.years.map(y=>({ id: String(y.year || y.id || y.label || ''), label: String(y.label || y.year || y.id || ''), cover: String(y.cover || '') }));
-    }
-
-    // if no CMS index, fallback: build from PRIORITY_ORDER by fetching each year json to get a cover
-    if(years.length === 0){
-      const promises = PRIORITY_ORDER.map(async id => {
-        const path = `content/photos/${id}.json`;
-        const json = await fetchJson(path);
-        if(!json) return null;
-        // cover fallback: json.thumbnail or first photo
-        let cover = '';
-        if(json.thumbnail) cover = json.thumbnail;
-        else if(json.cover) cover = json.cover;
-        else {
-          const photos = normalizePhotos(json);
-          if(photos.length) cover = photos[0].src;
-        }
-        return { id, label: id, cover };
+    // Only render hub tiles from the CMS-managed index.json
+    const { json: indexJson } = await fetchJsonWithStatus('/content/photos/index.json');
+    const years = [];
+    if(indexJson && Array.isArray(indexJson.years) && indexJson.years.length){
+      indexJson.years.forEach(y=>{
+        years.push({ id: String(y.slug || y.year || y.id || ''), label: String(y.label || y.year || y.id || ''), cover: String(y.cover || '') });
       });
-      const results = await Promise.all(promises);
-      years = results.filter(Boolean);
+    } else {
+      // nothing to render — surface friendly message
+      hub.innerHTML = '<div class="panel">No photo hubs configured. Please add content/photos/index.json in CMS.</div>';
+      return;
     }
 
-    // If we used CMS index, keep that order; otherwise order by PRIORITY_ORDER
-    let ordered = [];
-    if(index && Array.isArray(index.years) && index.years.length){
-      ordered = years;
-    } else {
-      const map = new Map(years.map(y=>[y.id,y]));
-      PRIORITY_ORDER.forEach(k=>{ if(map.has(k)) ordered.push(map.get(k)); map.delete(k); });
-      for(const v of map.values()) ordered.push(v);
-    }
+    const ordered = years; // keep CMS order
 
     // render cards
     hub.innerHTML = '';
@@ -81,11 +63,12 @@
       const a = document.createElement('a');
       a.className = 'year-card' + (y.id.includes('-')||y.id.includes('–')? ' archive':'');
       if(y.id === '2026') a.classList.add('featured');
-      a.href = `photos-year.html?year=${encodeURIComponent(y.id)}`;
+      a.href = `/photos-year.html?year=${encodeURIComponent(y.id)}`;
       a.setAttribute('role','listitem');
 
       const img = document.createElement('img'); img.className='cover'; img.alt = y.label + ' cover'; img.loading='lazy';
-      const coverUrl = (y.cover || y.thumbnail || '');
+      let coverUrl = (y.cover || y.thumbnail || '');
+      if(coverUrl && !coverUrl.startsWith('/') && !coverUrl.startsWith('http')) coverUrl = '/' + coverUrl;
       img.src = coverUrl;
       if(coverUrl){
         img.addEventListener('error', ()=>{
@@ -111,6 +94,7 @@
     const grid = document.getElementById('photoGrid');
     if(!grid) return;
     const noPhotos = document.getElementById('noPhotos');
+    const debugEl = document.getElementById('photoDebug');
     const params = new URLSearchParams(window.location.search);
     const year = params.get('year');
     const title = document.getElementById('galleryTitle');
@@ -119,10 +103,44 @@
     title.textContent = year;
     sub.textContent = `Photos for ${year}`;
 
-    const jsonUrl = `content/photos/${year}.json?v=${Date.now()}`;
-    console.log('Photos year:', year, 'JSON:', jsonUrl);
-    const json = await fetchJson(jsonUrl);
-    if(!json){ grid.style.display='none'; noPhotos.style.display='block'; noPhotos.textContent = 'Unable to load photos.'; return; }
+    // Fetch hub index first (to get label/title from CMS)
+    const { json: hubIndex } = await fetchJsonWithStatus('/content/photos/index.json');
+    if(hubIndex && Array.isArray(hubIndex.years)){
+      const found = hubIndex.years.find(y => String(y.slug || y.year || y.id) === String(year));
+      if(found){ title.textContent = found.label || (found.year || year); sub.textContent = found.subtitle || `Photos for ${found.label || year}`; }
+    }
+
+    // Attempt candidate files in order with cache-busting
+    const candidates = [
+      `/content/photos/${year}.json`,
+      `/content/photos/${year}/index.json`,
+      `/content/photos/${year}/photos.json`,
+      `content/photos/${year}.json`,
+      `content/photos/${year}/index.json`,
+      `content/photos/${year}/photos.json`
+    ];
+
+    if(debugEl) debugEl.textContent = 'Loading: trying candidates...';
+
+    let resolved = null;
+    const attempts = [];
+    for(const p of candidates){
+      const { json, status } = await fetchJsonWithStatus(p);
+      attempts.push({ url: p, status });
+      if(json){ resolved = { json, url: p, status }; break; }
+    }
+
+    if(resolved){
+      if(debugEl) debugEl.textContent = `Loading: ${resolved.url}`;
+    } else {
+      grid.style.display='none'; noPhotos.style.display='block';
+      const statuses = attempts.map(a=>`${a.url} (${a.status})`).join(', ');
+      noPhotos.textContent = `Unable to load photos. Tried: ${statuses}`;
+      if(debugEl) debugEl.textContent = `Failed: ${statuses}`;
+      return;
+    }
+
+    const json = resolved.json;
 
     // If the JSON uses galleries (preferred), render each gallery with its own section
     if(Array.isArray(json.galleries) && json.galleries.length){
@@ -139,8 +157,13 @@
           const p = document.createElement('div'); p.className='panel'; p.textContent = 'No photos yet.'; section.appendChild(p);
         } else {
           const innerGrid = document.createElement('div'); innerGrid.className = 'photo-grid';
-          // prepare mapped photos for lightbox
-          const mapped = g.images.map(img => ({ src: img.image || img.src || img.url || '', caption: img.caption || '', subtitle: img.subtitle || '' }));
+          // prepare mapped photos for lightbox (use normalizePhoto to prefer title)
+          const mapped = g.images.map(img => {
+            const norm = normalizePhoto(img);
+            let src = norm.src || '';
+            if(src && !src.startsWith('/') && !src.startsWith('http')) src = '/' + src;
+            return { src, caption: norm.caption || '', subtitle: norm.subtitle || '', alt: norm.alt || '' };
+          });
           mapped.forEach((p, idx) => {
             const fig = document.createElement('figure'); fig.className='photo-thumb'; fig.tabIndex=0; fig.setAttribute('role','button');
             const imgEl = document.createElement('img'); imgEl.src = p.src; imgEl.alt = p.caption || p.subtitle || '';
