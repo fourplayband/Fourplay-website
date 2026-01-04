@@ -5,7 +5,8 @@
   // utility: fetch JSON and return { json, status }
   async function fetchJsonWithStatus(path){
     try{
-      const url = (path.startsWith('/') || path.startsWith('http')) ? path : '/' + path;
+      // keep paths relative so local file or subdirectory hosting works
+      const url = (path.startsWith('http')) ? path : path;
       const res = await fetch(url + (url.includes('?') ? '&' : '?') + 'v=' + Date.now(), { cache: 'no-store' });
       const status = res.status;
       if(!res.ok){ console.error('fetch failed', url, status); return { json: null, status }; }
@@ -42,6 +43,7 @@
   async function renderYearHub(){
     const hub = document.getElementById('yearHub');
     if(!hub) return;
+    try{
     // Only render hub tiles from the CMS-managed index.json
     const { json: indexJson } = await fetchJsonWithStatus('/content/photos/index.json');
     const years = [];
@@ -55,20 +57,27 @@
       return;
     }
 
-    const ordered = years; // keep CMS order
+    // Order the hub tiles with a lightweight priority list first (keeps code generic)
+    // Items listed in PRIORITY_ORDER appear first in that order; remaining items keep CMS order.
+    const byId = new Map(years.map(y => [y.id, y]));
+    const ordered = [];
+    // push prioritized ids if present
+    PRIORITY_ORDER.forEach(k => { if(byId.has(String(k))) { ordered.push(byId.get(String(k))); byId.delete(String(k)); } });
+    // append remaining years in the original CMS order
+    years.forEach(y => { if(byId.has(y.id)) { ordered.push(y); byId.delete(y.id); } });
 
     // render cards
     hub.innerHTML = '';
     ordered.forEach(y=>{
       const a = document.createElement('a');
       a.className = 'year-card' + (y.id.includes('-')||y.id.includes('–')? ' archive':'');
-      if(y.id === '2026') a.classList.add('featured');
       a.href = `/photos-year.html?year=${encodeURIComponent(y.id)}`;
       a.setAttribute('role','listitem');
 
       let coverEl;
       let coverUrl = (y.cover || y.thumbnail || '');
-      if(coverUrl && !coverUrl.startsWith('/') && !coverUrl.startsWith('http')) coverUrl = '/' + coverUrl;
+      // leave coverUrl as-provided so relative paths resolve relative to the current page
+      if(coverUrl && coverUrl.startsWith('./')) coverUrl = coverUrl.slice(2);
       if(coverUrl){
         const img = document.createElement('img'); img.className='cover'; img.alt = y.label + ' cover'; img.loading='lazy';
         img.src = coverUrl;
@@ -91,6 +100,11 @@
       a.appendChild(coverEl); a.appendChild(meta);
       hub.appendChild(a);
     });
+    }catch(e){
+      console.error('renderYearHub failed', e);
+      const hub = document.getElementById('yearHub');
+      if(hub) hub.innerHTML = '<div class="panel">Unable to load photo hub. See console for details.</div>';
+    }
   }
 
   // GALLERY PAGE
@@ -114,37 +128,24 @@
       if(found){ title.textContent = found.label || (found.year || year); sub.textContent = found.subtitle || `Photos for ${found.label || year}`; }
     }
 
-    // Attempt candidate files in order with cache-busting
-    const candidates = [
-      `/content/photos/${year}.json`,
-      `/content/photos/${year}/index.json`,
-      `/content/photos/${year}/photos.json`,
-      `content/photos/${year}.json`,
-      `content/photos/${year}/index.json`,
-      `content/photos/${year}/photos.json`
-    ];
+    // Only fetch the merged year file (generated at build-time)
+    const candidate = `/content/photos/${year}.json`;
+    if(debugEl) debugEl.textContent = `Loading: ${candidate}`;
 
-    if(debugEl) debugEl.textContent = 'Loading: trying candidates...';
-
-    let resolved = null;
-    const attempts = [];
-    for(const p of candidates){
-      const { json, status } = await fetchJsonWithStatus(p);
-      attempts.push({ url: p, status });
-      if(json){ resolved = { json, url: p, status }; break; }
-    }
-
-    if(resolved){
-      if(debugEl) debugEl.textContent = `Loading: ${resolved.url}`;
-    } else {
+    const fetchRes = await fetchJsonWithStatus(candidate);
+    if(!fetchRes || !fetchRes.json){
       grid.style.display='none'; noPhotos.style.display='block';
-      const statuses = attempts.map(a=>`${a.url} (${a.status})`).join(', ');
-      noPhotos.textContent = `Unable to load photos. Tried: ${statuses}`;
-      if(debugEl) debugEl.textContent = `Failed: ${statuses}`;
+      const msg = `Failed to load ${candidate} (status: ${fetchRes ? fetchRes.status : 'network'})`;
+      console.error(msg);
+      noPhotos.textContent = `Unable to load photos for ${year}. See console for details.`;
+      if(debugEl) debugEl.textContent = `Failed: ${candidate} (${fetchRes ? fetchRes.status : 'network'})`;
       return;
     }
 
-    const json = resolved.json;
+    const json = fetchRes.json;
+    if(Array.isArray(json.galleries) && json.galleries.length === 0){
+      console.warn(`Photos: ${resolved.url} contains galleries array but no galleries`);
+    }
 
     // If the JSON uses galleries (preferred), render each gallery with its own section
     if(Array.isArray(json.galleries) && json.galleries.length){
@@ -165,7 +166,8 @@
           const mapped = g.images.map(img => {
             const norm = normalizePhoto(img);
             let src = norm.src || '';
-            if(src && !src.startsWith('/') && !src.startsWith('http')) src = '/' + src;
+            // leave relative paths as-is (do not force leading slash)
+            if(src && src.startsWith('./')) src = src.slice(2);
             return { src, caption: norm.caption || '', subtitle: norm.subtitle || '', alt: norm.alt || '' };
           });
           mapped.forEach((p, idx) => {
