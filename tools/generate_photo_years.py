@@ -13,6 +13,16 @@ ROOT = os.path.dirname(os.path.dirname(__file__))
 PHOTOS_DIR = os.path.join(ROOT, 'content', 'photos')
 YEARS = list(range(2016, 2027))
 
+# read hub index if present to determine desired hub slugs (e.g. "2020-2021")
+def read_hub_index():
+    idx_path = os.path.join(PHOTOS_DIR, 'index.json')
+    try:
+        with open(idx_path, 'r', encoding='utf-8') as f:
+            j = json.load(f)
+            return j.get('years') if isinstance(j, dict) else None
+    except Exception:
+        return None
+
 def read_json(path):
     try:
         with open(path, 'r', encoding='utf-8') as f:
@@ -98,32 +108,76 @@ for dirpath, dirnames, filenames in os.walk(PHOTOS_DIR):
             entries_by_year_section[year][section].append({'image': img, 'caption': caption})
 
 # write master files
-for y in YEARS:
-    galleries = []
-    # posters first
-    if entries_by_year_section[y].get('posters'):
-        galleries.append({
-            'section': 'posters',
-            'title': f'{y} Posters',
-            'images': entries_by_year_section[y]['posters']
-        })
-    if entries_by_year_section[y].get('gig-photos'):
-        galleries.append({
-            'section': 'gig-photos',
-            'title': f'{y} Gig Photos',
-            'images': entries_by_year_section[y]['gig-photos']
-        })
-    if galleries:
-        out = {'year': y, 'galleries': galleries}
-        outpath = os.path.join(PHOTOS_DIR, f'{y}.json')
-        try:
-            with open(outpath, 'w', encoding='utf-8') as f:
-                json.dump(out, f, indent=2)
-            print(f'Wrote {outpath}')
-        except Exception as e:
-            print('Failed to write', outpath, e)
-    else:
-        # no galleries for this year; do not overwrite existing master
-        pass
+hub_index = read_hub_index()
+if hub_index and isinstance(hub_index, list) and len(hub_index):
+    # build per-hub aggregated files
+    for hub in hub_index:
+        slug = str(hub.get('year') or hub.get('slug') or hub.get('id') or '')
+        label = str(hub.get('label') or slug)
+        if not slug:
+            continue
+        # determine years covered by this hub
+        years_to_include = []
+        m = re.match(r"^(20\d{2})-(20\d{2})$", slug)
+        if m:
+            start = int(m.group(1)); end = int(m.group(2))
+            years_to_include = [y for y in YEARS if y >= start and y <= end]
+        else:
+            # single-year hub (e.g. '2025') or non-numeric slug
+            m2 = re.match(r"^(20\d{2})$", slug)
+            if m2:
+                years_to_include = [int(m2.group(1))]
+            else:
+                # unknown slug: try to include all YEARS whose folder name matches the slug
+                years_to_include = []
+
+        galleries = []
+        # gather posters then gig-photos across years in order
+        posters = []
+        gigs = []
+        for y in years_to_include:
+            posters.extend(entries_by_year_section[y].get('posters', []))
+            gigs.extend(entries_by_year_section[y].get('gig-photos', []))
+
+        if posters:
+            galleries.append({'section': 'posters', 'title': f'{label} Posters', 'images': posters})
+        if gigs:
+            galleries.append({'section': 'gig-photos', 'title': f'{label} Gig Photos', 'images': gigs})
+
+        if galleries:
+            out = {'slug': slug, 'label': label, 'galleries': galleries}
+            outpath = os.path.join(PHOTOS_DIR, f'{slug}.json')
+            try:
+                with open(outpath, 'w', encoding='utf-8') as f:
+                    json.dump(out, f, indent=2)
+                print(f'Wrote {outpath}')
+            except Exception as e:
+                print('Failed to write', outpath, e)
+else:
+    # legacy behavior: write per-year master files for numeric years
+    for y in YEARS:
+        galleries = []
+        # posters first
+        if entries_by_year_section[y].get('posters'):
+            galleries.append({
+                'section': 'posters',
+                'title': f'{y} Posters',
+                'images': entries_by_year_section[y]['posters']
+            })
+        if entries_by_year_section[y].get('gig-photos'):
+            galleries.append({
+                'section': 'gig-photos',
+                'title': f'{y} Gig Photos',
+                'images': entries_by_year_section[y]['gig-photos']
+            })
+        if galleries:
+            out = {'year': y, 'galleries': galleries}
+            outpath = os.path.join(PHOTOS_DIR, f'{y}.json')
+            try:
+                with open(outpath, 'w', encoding='utf-8') as f:
+                    json.dump(out, f, indent=2)
+                print(f'Wrote {outpath}')
+            except Exception as e:
+                print('Failed to write', outpath, e)
 
 print('Done')
