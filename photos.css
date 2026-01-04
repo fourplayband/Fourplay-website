@@ -106,7 +106,7 @@ p.lead{text-align:center;color:var(--muted);margin-top:0;margin-bottom:18px}
   transition: transform .22s ease, box-shadow .22s ease;
 }
 .year-card:hover{ transform: translateY(-6px) scale(1.01); box-shadow: 0 26px 70px rgba(0,0,0,0.7); }
-.year-card .cover{ position:absolute; inset:0; z-index:0; display:block; width:100%; height:100%; object-fit:contain; object-position:center; background:#000; filter:brightness(.45) saturate(1.05); }
+.year-card .cover{ position:absolute; inset:0; z-index:0; display:block; width:100%; height:100%; object-fit:contain; object-position:center; background: linear-gradient(135deg, rgba(5,0,30,0.55), rgba(68,227,255,0.06)); filter:brightness(.6) saturate(1.05); }
 /* inner frame to give a visible 'photo frame' without altering layout */
 .year-card .cover{ box-shadow: inset 0 0 0 6px rgba(0,0,0,0.18), inset 0 0 0 2px rgba(255,255,255,0.03); }
 .year-card .cover-fallback{ box-shadow: inset 0 0 0 6px rgba(0,0,0,0.18), inset 0 0 0 2px rgba(255,255,255,0.03); }
