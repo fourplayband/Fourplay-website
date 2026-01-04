@@ -1,5 +1,576 @@
 backend:
   name: git-gateway
+  branch: main
+
+local_backend: true
+
+media_folder: "assets/uploads"
+public_folder: "/assets/uploads"
+
+publish_mode: simple
+
+collections:
+
+  - name: "settings"
+    label: "Site Settings"
+    editor:
+      preview: false
+    files:
+      - file: "content/settings/global.json"
+        label: "Global"
+        name: "global"
+        fields:
+          - { label: "Site Name", name: "site_name", widget: "string", default: "FOURPLAY Dance Band" }
+          - { label: "Header Logo (optional)", name: "logo", widget: "image", required: false }
+          - { label: "Footer Text (optional)", name: "footer", widget: "string", required: false }
+          - { label: "Contact Email", name: "contact_email", widget: "string", required: false }
+
+  - name: "pages"
+    label: "Pages (Optional Text)"
+    editor:
+      preview: false
+    files:
+      - file: "content/pages/home.md"
+        label: "Home"
+        name: "home"
+        fields:
+          - { label: "Browser Title", name: "title", widget: "string", default: "FOURPLAY Dance Band" }
+      - file: "content/pages/contact.md"
+        label: "Contact"
+        name: "contact"
+        fields:
+          - { label: "Title", name: "title", widget: "string", default: "Contact" }
+          - { label: "Intro", name: "intro", widget: "text", required: false }
+
+  - name: "members"
+    label: "Band Members"
+    format: "json"
+    extension: "json"
+    files:
+      - file: "content/members.json"
+        label: "Members Page"
+        name: "members_page"
+        fields:
+          - { label: "Band Photo", name: "bandPhoto", widget: "image", required: false }
+          - { label: "Band Bio", name: "bandBio", widget: "text", required: false }
+          - label: "Members"
+            name: "members"
+            widget: "list"
+            min: 1
+            summary: "{{fields.name}} – {{fields.role}}"
+            fields:
+              - { label: "Name", name: "name", widget: "string" }
+              - { label: "Role / Instrument", name: "role", widget: "string" }
+              - { label: "Photo", name: "photo", widget: "image" }
+              - { label: "Bio", name: "bio", widget: "text", required: false }
+
+  - name: "artists"
+    label: "Artists"
+    folder: "content/artists"
+    create: true
+    format: "json"
+    extension: "json"
+    slug: "{{fields.order}}-{{slug}}"
+    sortable_fields: ["order", "name"]
+    fields:
+      - { label: "Name", name: "name", widget: "string" }
+      - { label: "Order (small first)", name: "order", widget: "number", value_type: "int", default: 1 }
+
+  - name: "videos"
+    label: "Videos"
+    folder: "content/videos"
+    create: true
+    format: "json"
+    extension: "json"
+    slug: "{{fields.posted}}-{{slug}}"
+    sortable_fields: ["posted", "title"]
+    fields:
+      - { label: "Title", name: "title", widget: "string" }
+      - { label: "Video URL (YouTube or MP4)", name: "url", widget: "string" }
+      - { label: "Thumbnail (optional)", name: "thumbnail", widget: "image", required: false }
+
+  - name: "photo_hubs"
+    label: "Photos — Hubs"
+    editor:
+      preview: false
+    files:
+      - file: "content/photos/2026.json"
+        label: "Photos — 2026 (Primary)"
+        name: "photos_2026"
+        fields:
+          - { label: "Slug", name: "slug", widget: "string", default: "2026" }
+          - { label: "Label", name: "label", widget: "string", default: "2026" }
+          - { label: "Cover (hub)", name: "cover", widget: "image", required: false }
+          - label: "Galleries"
+            name: "galleries"
+            widget: "list"
+            fields:
+              - { label: "Section", name: "section", widget: "string" }
+              - { label: "Title", name: "title", widget: "string", required: false }
+              - label: "Images"
+                name: "images"
+                widget: "list"
+                fields:
+                  - { label: "Image", name: "image", widget: "image" }
+                  - { label: "Caption", name: "caption", widget: "string", required: false }
+                  - { label: "Subtitle", name: "subtitle", widget: "string", required: false }
+      - file: "content/photos/2025.json"
+        label: "Photos — 2025"
+        name: "photos_2025"
+        fields:
+          - { label: "Slug", name: "slug", widget: "string", default: "2025" }
+          - { label: "Label", name: "label", widget: "string", default: "2025" }
+          - { label: "Cover (hub)", name: "cover", widget: "image", required: false }
+          - label: "Galleries"
+            name: "galleries"
+            widget: "list"
+            fields:
+              - { label: "Section", name: "section", widget: "string" }
+              - { label: "Title", name: "title", widget: "string", required: false }
+              - label: "Images"
+                name: "images"
+                widget: "list"
+                fields:
+                  - { label: "Image", name: "image", widget: "image" }
+                  - { label: "Caption", name: "caption", widget: "string", required: false }
+                  - { label: "Subtitle", name: "subtitle", widget: "string", required: false }
+      - file: "content/photos/2024.json"
+        label: "Photos — 2024"
+        name: "photos_2024"
+        fields:
+          - { label: "Slug", name: "slug", widget: "string", default: "2024" }
+          - { label: "Label", name: "label", widget: "string", default: "2024" }
+          - { label: "Cover (hub)", name: "cover", widget: "image", required: false }
+          - label: "Galleries"
+            name: "galleries"
+            widget: "list"
+            fields:
+              - { label: "Section", name: "section", widget: "string" }
+              - { label: "Title", name: "title", widget: "string", required: false }
+              - label: "Images"
+                name: "images"
+                widget: "list"
+                fields:
+                  - { label: "Image", name: "image", widget: "image" }
+                  - { label: "Caption", name: "caption", widget: "string", required: false }
+                  - { label: "Subtitle", name: "subtitle", widget: "string", required: false }
+      - file: "content/photos/2023.json"
+        label: "Photos — 2023"
+        name: "photos_2023"
+        fields:
+          - { label: "Slug", name: "slug", widget: "string", default: "2023" }
+          - { label: "Label", name: "label", widget: "string", default: "2023" }
+          - { label: "Cover (hub)", name: "cover", widget: "image", required: false }
+          - label: "Galleries"
+            name: "galleries"
+            widget: "list"
+            fields:
+              - { label: "Section", name: "section", widget: "string" }
+              - { label: "Title", name: "title", widget: "string", required: false }
+              - label: "Images"
+                name: "images"
+                widget: "list"
+                fields:
+                  - { label: "Image", name: "image", widget: "image" }
+                  - { label: "Caption", name: "caption", widget: "string", required: false }
+                  - { label: "Subtitle", name: "subtitle", widget: "string", required: false }
+      - file: "content/photos/2020-2022.json"
+        label: "Photos — 2020-2022"
+        name: "photos_2020_2022"
+        fields:
+          - { label: "Slug", name: "slug", widget: "string", default: "2020-2022" }
+          - { label: "Label", name: "label", widget: "string", default: "2020–2022" }
+          - { label: "Cover (hub)", name: "cover", widget: "image", required: false }
+          - label: "Galleries"
+            name: "galleries"
+            widget: "list"
+            fields:
+              - { label: "Section", name: "section", widget: "string" }
+              - { label: "Title", name: "title", widget: "string", required: false }
+              - label: "Images"
+                name: "images"
+                widget: "list"
+                fields:
+                  - { label: "Image", name: "image", widget: "image" }
+                  - { label: "Caption", name: "caption", widget: "string", required: false }
+                  - { label: "Subtitle", name: "subtitle", widget: "string", required: false }
+      - file: "content/photos/2016-2019.json"
+        label: "Photos — 2016-2019"
+        name: "photos_2016_2019"
+        fields:
+          - { label: "Slug", name: "slug", widget: "string", default: "2016-2019" }
+          - { label: "Label", name: "label", widget: "string", default: "2016 - 2019" }
+          - { label: "Cover (hub)", name: "cover", widget: "image", required: false }
+          - label: "Galleries"
+            name: "galleries"
+            widget: "list"
+            fields:
+              - { label: "Section", name: "section", widget: "string" }
+              - { label: "Title", name: "title", widget: "string", required: false }
+              - label: "Images"
+                name: "images"
+                widget: "list"
+                fields:
+                  - { label: "Image", name: "image", widget: "image" }
+                  - { label: "Caption", name: "caption", widget: "string", required: false }
+                  - { label: "Subtitle", name: "subtitle", widget: "string", required: false }
+
+  - name: "photos_index"
+    label: "Photos — Years Index"
+    editor:
+      preview: false
+    files:
+      - file: "content/photos/index.json"
+        label: "Photos — Years Index (CMS)"
+        name: "photos_years_master"
+        fields:
+          - label: "Years"
+            name: "years"
+            widget: "list"
+            fields:
+              - { label: "Year ID (slug)", name: "slug", widget: "string" }
+              - { label: "Label", name: "label", widget: "string" }
+              - { label: "Cover Image", name: "cover", widget: "image" }
+
+  - name: "schedule"
+    label: "Schedule"
+    folder: "content/schedule"
+    create: true
+    format: "json"
+    extension: "json"
+    slug: "{{fields.date}}-{{slug}}"
+    sortable_fields: ["date", "status", "venue"]
+    fields:
+      - label: "Date"
+        name: "date"
+        widget: "datetime"
+        format: "YYYY-MM-DD"
+        time_format: false
+
+      - label: "Status"
+        name: "status"
+        widget: "select"
+        options: ["available", "booked"]
+        default: "available"
+
+      - { label: "Event Title (Booked)", name: "title", widget: "string", required: false }
+      - label: "Start Time (optional)"
+        name: "start_time"
+        widget: "string"
+        required: false
+        hint: "Example: 8:00 PM"
+
+      - { label: "Venue (Booked)", name: "venue", widget: "string", required: false }
+      - { label: "Address (optional)", name: "address", widget: "string", required: false }
+      - { label: "Note / Details (optional)", name: "note", widget: "text", required: false }
+
+      - label: "Performers (optional)"
+        name: "performers"
+        widget: "list"
+        required: false
+        field: { label: "Name", name: "name", widget: "string" }
+
+      - { label: "Poster Image (optional)", name: "poster", widget: "image", required: false }
+
+      - { label: "Booking Link (for Available)", name: "booking_link", widget: "string", required: false }
+backend:
+  name: git-gateway
+  branch: main
+
+local_backend: true
+
+media_folder: "assets/uploads"
+public_folder: "/assets/uploads"
+
+publish_mode: simple
+
+collections:
+
+  - name: "settings"
+    label: "Site Settings"
+    editor:
+      preview: false
+    files:
+      - file: "content/settings/global.json"
+        label: "Global"
+        name: "global"
+        fields:
+          - { label: "Site Name", name: "site_name", widget: "string", default: "FOURPLAY Dance Band" }
+          - { label: "Header Logo (optional)", name: "logo", widget: "image", required: false }
+          - { label: "Footer Text (optional)", name: "footer", widget: "string", required: false }
+          - { label: "Contact Email", name: "contact_email", widget: "string", required: false }
+          - { label: "Instagram", name: "instagram", widget: "string", required: false }
+          - { label: "Facebook", name: "facebook", widget: "string", required: false }
+          - { label: "YouTube", name: "youtube", widget: "string", required: false }
+
+  - name: "pages"
+    label: "Pages (Optional Text)"
+    editor:
+      preview: false
+    files:
+      - file: "content/pages/home.md"
+        label: "Home"
+        name: "home"
+        fields:
+          - { label: "Browser Title", name: "title", widget: "string", default: "FOURPLAY Dance Band" }
+          - { label: "Hero Title", name: "hero_title", widget: "string", required: false }
+          - { label: "Hero Subtitle", name: "hero_subtitle", widget: "string", required: false }
+
+      - file: "content/pages/contact.md"
+        label: "Contact"
+        name: "contact"
+        fields:
+          - { label: "Title", name: "title", widget: "string", default: "Contact" }
+          - { label: "Intro", name: "intro", widget: "text", required: false }
+
+  - name: "members"
+    label: "Band Members"
+    format: "json"
+    extension: "json"
+    files:
+      - file: "content/members.json"
+        label: "Members Page"
+        name: "members_page"
+        fields:
+          - { label: "Band Photo", name: "bandPhoto", widget: "image", required: false }
+          - { label: "Band Bio", name: "bandBio", widget: "text", required: false }
+
+          - label: "Members"
+            name: "members"
+            widget: "list"
+            min: 1
+            summary: "{{fields.name}} – {{fields.role}}"
+            fields:
+              - { label: "Name", name: "name", widget: "string" }
+              - { label: "Role / Instrument", name: "role", widget: "string" }
+              - { label: "Photo", name: "photo", widget: "image" }
+              - { label: "Bio", name: "bio", widget: "text", required: false }
+
+  - name: "artists"
+    label: "Artists"
+    folder: "content/artists"
+    create: true
+    format: "json"
+    extension: "json"
+    slug: "{{fields.order}}-{{slug}}"
+    sortable_fields: ["order", "name"]
+    fields:
+      - { label: "Name", name: "name", widget: "string" }
+      - { label: "Order (small first)", name: "order", widget: "number", value_type: "int", default: 1 }
+
+  - name: "videos"
+    label: "Videos"
+    folder: "content/videos"
+    create: true
+    format: "json"
+    extension: "json"
+    slug: "{{fields.posted}}-{{slug}}"
+    sortable_fields: ["posted", "title"]
+    fields:
+      - { label: "Title", name: "title", widget: "string" }
+      - { label: "Video URL (YouTube or MP4)", name: "url", widget: "string" }
+      - { label: "Thumbnail (optional)", name: "thumbnail", widget: "image", required: false }
+      - { label: "Description", name: "description", widget: "text", required: false }
+      - label: "Posted Time"
+        name: "posted"
+        widget: "datetime"
+        format: "YYYY-MM-DD HH:mm"
+        time_format: "HH:mm"
+
+  # Photos Hubs: six hub files (CMS-managed). Each writes to content/photos/<slug>.json
+  - name: "photo_hubs"
+    label: "Photos — Hubs"
+    editor:
+      preview: false
+    files:
+      - file: "content/photos/2026.json"
+        label: "Photos — 2026 (Primary)"
+        name: "photos_2026"
+        fields:
+          - { label: "Slug", name: "slug", widget: "string", default: "2026" }
+          - { label: "Label", name: "label", widget: "string", default: "2026" }
+          - { label: "Cover (hub)", name: "cover", widget: "image", required: false }
+          - label: "Galleries"
+            name: "galleries"
+            widget: "list"
+            fields:
+              - { label: "Section", name: "section", widget: "string" }
+              - { label: "Title", name: "title", widget: "string", required: false }
+              - label: "Images"
+                name: "images"
+                widget: "list"
+                fields:
+                  - { label: "Image", name: "image", widget: "image" }
+                  - { label: "Caption", name: "caption", widget: "string", required: false }
+                  - { label: "Subtitle", name: "subtitle", widget: "string", required: false }
+                  - { label: "Date", name: "date", widget: "datetime", required: false, format: "YYYY-MM-DD" }
+      - file: "content/photos/2025.json"
+        label: "Photos — 2025"
+        name: "photos_2025"
+        fields:
+          - { label: "Slug", name: "slug", widget: "string", default: "2025" }
+          - { label: "Label", name: "label", widget: "string", default: "2025" }
+          - { label: "Cover (hub)", name: "cover", widget: "image", required: false }
+          - label: "Galleries"
+            name: "galleries"
+            widget: "list"
+            fields:
+              - { label: "Section", name: "section", widget: "string" }
+              - { label: "Title", name: "title", widget: "string", required: false }
+              - label: "Images"
+                name: "images"
+                widget: "list"
+                fields:
+                  - { label: "Image", name: "image", widget: "image" }
+                  - { label: "Caption", name: "caption", widget: "string", required: false }
+                  - { label: "Subtitle", name: "subtitle", widget: "string", required: false }
+                  - { label: "Date", name: "date", widget: "datetime", required: false, format: "YYYY-MM-DD" }
+      - file: "content/photos/2024.json"
+        label: "Photos — 2024"
+        name: "photos_2024"
+        fields:
+          - { label: "Slug", name: "slug", widget: "string", default: "2024" }
+          - { label: "Label", name: "label", widget: "string", default: "2024" }
+          - { label: "Cover (hub)", name: "cover", widget: "image", required: false }
+          - label: "Galleries"
+            name: "galleries"
+            widget: "list"
+            fields:
+              - { label: "Section", name: "section", widget: "string" }
+              - { label: "Title", name: "title", widget: "string", required: false }
+              - label: "Images"
+                name: "images"
+                widget: "list"
+                fields:
+                  - { label: "Image", name: "image", widget: "image" }
+                  - { label: "Caption", name: "caption", widget: "string", required: false }
+                  - { label: "Subtitle", name: "subtitle", widget: "string", required: false }
+                  - { label: "Date", name: "date", widget: "datetime", required: false, format: "YYYY-MM-DD" }
+      - file: "content/photos/2023.json"
+        label: "Photos — 2023"
+        name: "photos_2023"
+        fields:
+          - { label: "Slug", name: "slug", widget: "string", default: "2023" }
+          - { label: "Label", name: "label", widget: "string", default: "2023" }
+          - { label: "Cover (hub)", name: "cover", widget: "image", required: false }
+          - label: "Galleries"
+            name: "galleries"
+            widget: "list"
+            fields:
+              - { label: "Section", name: "section", widget: "string" }
+              - { label: "Title", name: "title", widget: "string", required: false }
+              - label: "Images"
+                name: "images"
+                widget: "list"
+                fields:
+                  - { label: "Image", name: "image", widget: "image" }
+                  - { label: "Caption", name: "caption", widget: "string", required: false }
+                  - { label: "Subtitle", name: "subtitle", widget: "string", required: false }
+                  - { label: "Date", name: "date", widget: "datetime", required: false, format: "YYYY-MM-DD" }
+      - file: "content/photos/2020-2022.json"
+        label: "Photos — 2020-2022"
+        name: "photos_2020_2022"
+        fields:
+          - { label: "Slug", name: "slug", widget: "string", default: "2020-2022" }
+          - { label: "Label", name: "label", widget: "string", default: "2020–2022" }
+          - { label: "Cover (hub)", name: "cover", widget: "image", required: false }
+          - label: "Galleries"
+            name: "galleries"
+            widget: "list"
+            fields:
+              - { label: "Section", name: "section", widget: "string" }
+              - { label: "Title", name: "title", widget: "string", required: false }
+              - label: "Images"
+                name: "images"
+                widget: "list"
+                fields:
+                  - { label: "Image", name: "image", widget: "image" }
+                  - { label: "Caption", name: "caption", widget: "string", required: false }
+                  - { label: "Subtitle", name: "subtitle", widget: "string", required: false }
+                  - { label: "Date", name: "date", widget: "datetime", required: false, format: "YYYY-MM-DD" }
+      - file: "content/photos/2016-2019.json"
+        label: "Photos — 2016-2019"
+        name: "photos_2016_2019"
+        fields:
+          - { label: "Slug", name: "slug", widget: "string", default: "2016-2019" }
+          - { label: "Label", name: "label", widget: "string", default: "2016 - 2019" }
+          - { label: "Cover (hub)", name: "cover", widget: "image", required: false }
+          - label: "Galleries"
+            name: "galleries"
+            widget: "list"
+            fields:
+              - { label: "Section", name: "section", widget: "string" }
+              - { label: "Title", name: "title", widget: "string", required: false }
+              - label: "Images"
+                name: "images"
+                widget: "list"
+                fields:
+                  - { label: "Image", name: "image", widget: "image" }
+                  - { label: "Caption", name: "caption", widget: "string", required: false }
+                  - { label: "Subtitle", name: "subtitle", widget: "string", required: false }
+                  - { label: "Date", name: "date", widget: "datetime", required: false, format: "YYYY-MM-DD" }
+
+  # Single-file index that the frontend reads for hub tiles
+  - name: "photos_index"
+    label: "Photos — Years Index"
+    editor:
+      preview: false
+    files:
+      - file: "content/photos/index.json"
+        label: "Photos — Years Index (CMS)"
+        name: "photos_years_master"
+        fields:
+          - label: "Years"
+            name: "years"
+            widget: "list"
+            fields:
+              - { label: "Year ID (slug)", name: "slug", widget: "string" }
+              - { label: "Label", name: "label", widget: "string" }
+              - { label: "Cover Image", name: "cover", widget: "image" }
+
+  - name: "schedule"
+    label: "Schedule"
+    folder: "content/schedule"
+    create: true
+    format: "json"
+    extension: "json"
+    slug: "{{fields.date}}-{{slug}}"
+    sortable_fields: ["date", "status", "venue"]
+    fields:
+      - label: "Date"
+        name: "date"
+        widget: "datetime"
+        format: "YYYY-MM-DD"
+        time_format: false
+
+      - label: "Status"
+        name: "status"
+        widget: "select"
+        options: ["available", "booked"]
+        default: "available"
+
+      - { label: "Event Title (Booked)", name: "title", widget: "string", required: false }
+      - label: "Start Time (optional)"
+        name: "start_time"
+        widget: "string"
+        required: false
+        hint: "Example: 8:00 PM"
+
+      - { label: "Venue (Booked)", name: "venue", widget: "string", required: false }
+      - { label: "Address (optional)", name: "address", widget: "string", required: false }
+      - { label: "Note / Details (optional)", name: "note", widget: "text", required: false }
+
+      - label: "Performers (optional)"
+        name: "performers"
+        widget: "list"
+        required: false
+        field: { label: "Name", name: "name", widget: "string" }
+
+      - { label: "Poster Image (optional)", name: "poster", widget: "image", required: false }
+
+      - { label: "Booking Link (for Available)", name: "booking_link", widget: "string", required: false }
+backend:
+  name: git-gateway
   branch: main   # 如果你的默认分支是 master，就改成 master
 
 local_backend: true
@@ -52,285 +623,55 @@ collections:
       - file: "content/pages/contact.md"
         label: "Contact"
         name: "contact"
-        fields:
-          - { label: "Title", name: "title", widget: "string", default: "Contact" }
-          - { label: "Intro", name: "intro", widget: "text", required: false }
-
-
-  # ======================
-  # Members (保持你现在不变：单文件 JSON)
-  # ======================
-  - name: "members"
-    label: "Band Members"
-    format: "json"
-    extension: "json"
-    files:
-      - label: "Members Page"
-        name: "members_page"
-        file: "content/members.json"
-        fields:
-          - { label: "Band Photo", name: "bandPhoto", widget: "image", required: false }
-          - { label: "Band Bio", name: "bandBio", widget: "text", required: false }
-
-          - label: "Members"
-            name: "members"
-            widget: "list"
-            min: 1
-            summary: "{{fields.name}} – {{fields.role}}"
-            fields:
-              - { label: "Name", name: "name", widget: "string" }
-              - { label: "Role / Instrument", name: "role", widget: "string" }
-              - { label: "Photo", name: "photo", widget: "image" }
-              - { label: "Bio", name: "bio", widget: "text", required: false }
-
-
-  # ======================
-  # Artists (可无限加 artist，前端按“每行顺序”显示)
-  # ======================
-  - name: "artists"
-    label: "Artists"
-    folder: "content/artists"
-    create: true
-    format: "json"
-    extension: "json"
-    slug: "{{fields.order}}-{{slug}}"
-    sortable_fields: ["order", "name"]
-    fields:
-      - { label: "Name", name: "name", widget: "string" }
-      - { label: "Order (small first)", name: "order", widget: "number", value_type: "int", default: 1 }
-
-
-  # ======================
-  # Videos (按 post time 排列；有简介)
-  # ======================
-  - name: "videos"
-    label: "Videos"
-    folder: "content/videos"
-    create: true
-    format: "json"
-    extension: "json"
-    slug: "{{fields.posted}}-{{slug}}"
-    sortable_fields: ["posted", "title"]
-    fields:
-      - { label: "Title", name: "title", widget: "string" }
-
-      # 你可以放 YouTube / Vimeo / 或直接 mp4 url
-      - { label: "Video URL (YouTube or MP4)", name: "url", widget: "string" }
-
-      # 用于封面（可选）
-      - { label: "Thumbnail (optional)", name: "thumbnail", widget: "image", required: false }
-
-      # 简介
-      - { label: "Description", name: "description", widget: "text", required: false }
-
-      # 排序关键：posted
-      - label: "Posted Time"
-        name: "posted"
-        widget: "datetime"
-        format: "YYYY-MM-DD HH:mm"
-        time_format: "HH:mm"
-
-
-  # ======================
-  # Photos (一张照片一个条目；不做裁剪；小图同一张图即可)
-  # ======================
-  # Photos split into year sections so CMS uploads are organized
-  - name: "photos_2026"
-    label: "Photos — 2026 (Primary)"
-    folder: "content/photos/2026"
-    create: true
-    format: "json"
-    extension: "json"
-    slug: "{{fields.date}}-{{slug}}"
-    sortable_fields: ["date", "title"]
-    fields:
-      - { label: "Title / Caption (optional)", name: "title", widget: "string", required: false }
-      - { label: "Image", name: "image", widget: "image" }
-      - label: "Category"
-        name: "category"
-        widget: "select"
-        options: ["posters", "gig_photos"]
-        default: "gig_photos"
-      - label: "Date (optional)"
-        name: "date"
-        widget: "datetime"
-        required: false
-        format: "YYYY-MM-DD"
-        time_format: false
-
-  - name: "photos_2025"
-    label: "Photos — 2025"
-    folder: "content/photos/2025"
-    create: true
-    format: "json"
-    extension: "json"
-    slug: "{{fields.date}}-{{slug}}"
-    fields:
-      - { label: "Title / Caption (optional)", name: "title", widget: "string", required: false }
-      - { label: "Image", name: "image", widget: "image" }
-      - label: "Category"
-        name: "category"
-        widget: "select"
-        options: ["posters", "gig_photos"]
-        default: "gig_photos"
-      - label: "Date (optional)"
-        name: "date"
-        widget: "datetime"
-        required: false
-        format: "YYYY-MM-DD"
-        time_format: false
-
-  - name: "photos_2024"
-    label: "Photos — 2024"
-    folder: "content/photos/2024"
-    create: true
-    format: "json"
-    extension: "json"
-    slug: "{{fields.date}}-{{slug}}"
-    fields:
-      - { label: "Title / Caption (optional)", name: "title", widget: "string", required: false }
-      - { label: "Image", name: "image", widget: "image" }
-      - label: "Category"
-        name: "category"
-        widget: "select"
-        options: ["posters", "gig_photos"]
-        default: "gig_photos"
-      - label: "Date (optional)"
-        name: "date"
-        widget: "datetime"
-        required: false
-        format: "YYYY-MM-DD"
-        time_format: false
-
-  - name: "photos_2023"
-    label: "Photos — 2023"
-    folder: "content/photos/2023"
-    create: true
-    format: "json"
-    extension: "json"
-    slug: "{{fields.date}}-{{slug}}"
-    fields:
-      - { label: "Title / Caption (optional)", name: "title", widget: "string", required: false }
-      - { label: "Image", name: "image", widget: "image" }
-      - label: "Category"
-        name: "category"
-        widget: "select"
-        options: ["posters", "gig_photos"]
-        default: "gig_photos"
-      - label: "Date (optional)"
-        name: "date"
-        widget: "datetime"
-        required: false
-        format: "YYYY-MM-DD"
-        time_format: false
-
-  - name: "photos_2020_2022"
-    label: "Photos — 2020-2022"
-    folder: "content/photos/2020-2022"
-    create: true
-    format: "json"
-    extension: "json"
-    slug: "{{fields.date}}-{{slug}}"
-    fields:
-      - { label: "Title / Caption (optional)", name: "title", widget: "string", required: false }
-      - { label: "Image", name: "image", widget: "image" }
-      - label: "Category"
-        name: "category"
-        widget: "select"
-        options: ["posters", "gig_photos"]
-        default: "gig_photos"
-      - label: "Date (optional)"
-        name: "date"
-        widget: "datetime"
-        required: false
-        format: "YYYY-MM-DD"
-        time_format: false
-
-  - name: "photos_2016_2019"
-    label: "Photos — 2016-2019"
-    folder: "content/photos/2016-2019"
-    create: true
-    format: "json"
-    extension: "json"
-    slug: "{{fields.date}}-{{slug}}"
-    fields:
-      - { label: "Title / Caption (optional)", name: "title", widget: "string", required: false }
-      - { label: "Image", name: "image", widget: "image" }
-      - label: "Category"
-        name: "category"
-        widget: "select"
-        options: ["posters", "gig_photos"]
-        default: "gig_photos"
-      - label: "Date (optional)"
-        name: "date"
-        widget: "datetime"
-        required: false
-        format: "YYYY-MM-DD"
-        time_format: false
-
-
-  # ======================
-  # Photos Index Files (allow editing the year JSON files the frontend reads)
-  # This provides a single-file editor for content/photos/2016.json ... content/photos/2026.json
-  # so the Photos page can continue to fetch content/photos/{year}.json
-  - name: "photos_index"
-    label: "Photos — Year Indexes"
-    editor:
-      preview: false
-    files:
-      - file: "content/photos/2016.json"
-        label: "Photos 2016 (index)"
-        name: "photos_2016"
-        fields:
-          - { label: "Year", name: "year", widget: "number" }
-          - { label: "Thumbnail (optional)", name: "thumbnail", widget: "image", required: false }
-          - label: "Galleries"
-            name: "galleries"
-            widget: "list"
-            fields:
-              - { label: "Section", name: "section", widget: "string", hint: "e.g. posters or gig-photos" }
-              - { label: "Title", name: "title", widget: "string", required: false }
-              - label: "Images"
-                name: "images"
-                widget: "list"
-                fields:
-                  - { label: "Image", name: "image", widget: "image" }
-                  - { label: "Caption", name: "caption", widget: "string", required: false }
-                  - { label: "Subtitle", name: "subtitle", widget: "string", required: false }
-      - file: "content/photos/2017.json"
-        label: "Photos 2017 (index)"
-        name: "photos_2017"
-        fields:
-          - { label: "Year", name: "year", widget: "number" }
-          - { label: "Thumbnail (optional)", name: "thumbnail", widget: "image", required: false }
-          - label: "Galleries"
-            name: "galleries"
-            widget: "list"
-            fields:
-              - { label: "Section", name: "section", widget: "string", hint: "e.g. posters or gig-photos" }
-              - { label: "Title", name: "title", widget: "string", required: false }
-              - label: "Images"
-                name: "images"
-                widget: "list"
-                fields:
-                  - { label: "Image", name: "image", widget: "image" }
-                  - { label: "Caption", name: "caption", widget: "string", required: false }
-                  - { label: "Subtitle", name: "subtitle", widget: "string", required: false }
-      - file: "content/photos/2018.json"
-        label: "Photos 2018 (index)"
-        name: "photos_2018"
-        fields:
-          - { label: "Year", name: "year", widget: "number" }
-          - { label: "Thumbnail (optional)", name: "thumbnail", widget: "image", required: false }
-          - label: "Galleries"
-            name: "galleries"
-            widget: "list"
-            fields:
-              - { label: "Section", name: "section", widget: "string", hint: "e.g. posters or gig-photos" }
-              - { label: "Title", name: "title", widget: "string", required: false }
-              - label: "Images"
-                name: "images"
-                widget: "list"
+        # ======================
+        # Photos Hubs — replace per-entry collections with 6 hub files
+        # Each file is content/photos/<slug>.json and contains: slug/label, cover, galleries:[{section,title,images:[{image,caption,subtitle,date}]}]
+        - name: "photo_hubs"
+          label: "Photos — Hubs"
+          editor:
+            preview: false
+          files:
+            - file: "content/photos/2026.json"
+              label: "Photos — 2026 (Primary)"
+              name: "photos_2026"
+              fields:
+                - { label: "Slug", name: "slug", widget: "string", default: "2026" }
+                - { label: "Label", name: "label", widget: "string", default: "2026" }
+                - { label: "Cover (hub)", name: "cover", widget: "image", required: false }
+                - label: "Galleries"
+                  name: "galleries"
+                  widget: "list"
+                  fields:
+                    - { label: "Section", name: "section", widget: "string" }
+                    - { label: "Title", name: "title", widget: "string", required: false }
+                    - label: "Images"
+                      name: "images"
+                      widget: "list"
+                      fields:
+                        - { label: "Image", name: "image", widget: "image" }
+                        - { label: "Caption", name: "caption", widget: "string", required: false }
+                        - { label: "Subtitle", name: "subtitle", widget: "string", required: false }
+                        - { label: "Date", name: "date", widget: "datetime", required: false, format: "YYYY-MM-DD" }
+            - file: "content/photos/2025.json"
+              label: "Photos — 2025"
+              name: "photos_2025"
+              fields: *photos_2026_fields
+            - file: "content/photos/2024.json"
+              label: "Photos — 2024"
+              name: "photos_2024"
+              fields: *photos_2026_fields
+            - file: "content/photos/2023.json"
+              label: "Photos — 2023"
+              name: "photos_2023"
+              fields: *photos_2026_fields
+            - file: "content/photos/2020-2022.json"
+              label: "Photos — 2020-2022"
+              name: "photos_2020_2022"
+              fields: *photos_2026_fields
+            - file: "content/photos/2016-2019.json"
+              label: "Photos — 2016-2019"
+              name: "photos_2016_2019"
+              fields: *photos_2026_fields
                 fields:
                   - { label: "Image", name: "image", widget: "image" }
                   - { label: "Caption", name: "caption", widget: "string", required: false }
