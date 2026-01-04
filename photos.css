@@ -106,16 +106,30 @@ p.lead{text-align:center;color:var(--muted);margin-top:0;margin-bottom:18px}
   transition: transform .22s ease, box-shadow .22s ease;
 }
 .year-card:hover{ transform: translateY(-6px) scale(1.01); box-shadow: 0 26px 70px rgba(0,0,0,0.7); }
-.year-card .cover{ position:absolute; inset:0; z-index:0; display:block; width:100%; height:100%; object-fit:cover; filter:brightness(.45) saturate(1.05); }
+.year-card .cover{ position:absolute; inset:0; z-index:0; display:block; width:100%; height:100%; object-fit:contain; object-position:center; background:#000; filter:brightness(.45) saturate(1.05); }
+/* inner frame to give a visible 'photo frame' without altering layout */
+.year-card .cover{ box-shadow: inset 0 0 0 6px rgba(0,0,0,0.18), inset 0 0 0 2px rgba(255,255,255,0.03); }
+.year-card .cover-fallback{ box-shadow: inset 0 0 0 6px rgba(0,0,0,0.18), inset 0 0 0 2px rgba(255,255,255,0.03); }
 /* Fallback when no cover image exists */
 .year-card .cover-fallback{ position:absolute; inset:0; z-index:0; display:block; width:100%; height:100%; background: linear-gradient(135deg, rgba(255,79,211,0.85), rgba(68,227,255,0.85)); filter:brightness(.6); }
 .year-meta{ position:relative; z-index:1; color: #fff; text-shadow: 0 6px 40px rgba(68,227,255,0.06); }
 .year-label{ font-size:2.4rem; font-weight:800; letter-spacing:0.12em; text-transform:uppercase; }
 .year-sub{ opacity:0.92; margin-top:6px; font-size:0.95rem; }
 .year-cta{ margin-top:12px; }
-.year-card.featured{ grid-column: span 2; min-height:360px; align-items:center; padding:28px; }
-.year-card.featured .year-label{ font-size:3.2rem; }
 .year-card.archive{ min-height:160px; }
+
+/* HERO (first card only): full width, wider aspect ratio */
+.year-hub > .year-card:first-child{
+  grid-column: 1 / -1;
+  aspect-ratio: 21 / 9;
+  min-height: 220px;
+  align-items: center;
+  padding: 28px;
+}
+.year-hub > .year-card:first-child .year-label{ font-size:3.2rem; }
+
+/* NON-HERO year cards: single rule for all (consistent sizing) */
+.year-hub > .year-card{ aspect-ratio: 16 / 9; }
 
 .photo-grid{ display:grid; grid-template-columns: repeat(4, 1fr); gap: 12px; max-width:1200px; margin: 0 auto 28px; }
 .photo-thumb{ border-radius:12px; overflow:hidden; position:relative; background:#000; border:1px solid rgba(255,255,255,0.04); }
