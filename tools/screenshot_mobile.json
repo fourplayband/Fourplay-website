@@ -1,0 +1,27 @@
+const puppeteer = require('puppeteer');
+const path = require('path');
+
+(async () => {
+  try {
+    const filePath = path.resolve(__dirname, '..', 'members.html');
+    // Convert Windows backslashes to forward slashes for file:// URL
+    const fileUrl = 'file://' + filePath.replace(/\\/g, '/');
+
+    const browser = await puppeteer.launch({ args: ['--no-sandbox', '--disable-setuid-sandbox'] });
+    const page = await browser.newPage();
+
+    // iPhone 12 / 13 size (portrait)
+    await page.setViewport({ width: 390, height: 844, deviceScaleFactor: 2 });
+    await page.goto(fileUrl, { waitUntil: 'networkidle2' });
+    await page.waitForTimeout(1200);
+
+    const outPath = path.resolve(__dirname, '..', 'assets', 'members-mobile-snapshot.png');
+    await page.screenshot({ path: outPath, fullPage: true });
+    console.log('Screenshot saved to', outPath);
+
+    await browser.close();
+  } catch (err) {
+    console.error(err);
+    process.exit(1);
+  }
+})();
