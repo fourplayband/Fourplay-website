@@ -1,0 +1,67 @@
+backend:
+  name: git-gateway
+  branch: main
+
+local_backend: true
+
+media_folder: "assets/uploads"
+public_folder: "/assets/uploads"
+
+publish_mode: simple
+
+collections:
+  - name: "settings"
+    label: "Site Settings"
+    files:
+      - file: "content/settings/global.json"
+        label: "Global"
+        name: "global"
+        fields:
+          - { label: "Site Name", name: "site_name", widget: "string", default: "FOURPLAY Dance Band" }
+
+  - name: "pages"
+    label: "Pages"
+    files:
+      - file: "content/pages/home.md"
+        label: "Home"
+        name: "home"
+      - file: "content/pages/contact.md"
+        label: "Contact"
+        name: "contact"
+
+  - name: "members"
+    label: "Band Members"
+    format: "json"
+    files:
+      - file: "content/members.json"
+        label: "Members Page"
+        name: "members_page"
+
+  - name: "artists"
+    label: "Artists"
+    folder: "content/artists"
+    create: true
+    format: "json"
+
+  - name: "videos"
+    label: "Videos"
+    folder: "content/videos"
+    create: true
+    format: "json"
+
+  - name: "photos_index"
+    label: "Photos — Years Index"
+    editor:
+      preview: false
+    files:
+      - file: "content/photos/index.json"
+        label: "Photos — Years Index (CMS)"
+        name: "photos_years_master"
+        fields:
+          - label: "Years"
+            name: "years"
+            widget: "list"
+            fields:
+              - { label: "Year ID (slug)", name: "slug", widget: "string" }
+              - { label: "Label", name: "label", widget: "string" }
+              - { label: "Cover Image", name: "cover", widget: "image" }
