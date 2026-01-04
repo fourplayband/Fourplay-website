@@ -1,0 +1,9 @@
+{
+  "name": "fourplay-website",
+  "version": "1.0.0",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "build:photos": "node scripts/build-photos-years.mjs"
+  }
+}
