@@ -1,4 +1,4 @@
-/* Photos page specific styles (scoped) */
+/* Photos page specific styles (scoped) */ 
 :root{
   --bg:#05081a;
   --panel:rgba(5,0,30,0.72);
@@ -33,7 +33,7 @@ p.lead{text-align:center;color:var(--muted);margin-top:0;margin-bottom:18px}
 @keyframes heroPulse{0%{transform:scale(1)}50%{transform:scale(1.02)}100%{transform:scale(1)}}
 .hero-cta{margin-top:8px;color:var(--text);font-weight:700;background:linear-gradient(90deg, rgba(255,79,211,0.12), rgba(68,227,255,0.04));padding:8px 12px;border-radius:10px;display:inline-flex;gap:10px;align-items:center}
 
-/* Year cards */
+/* Year cards (legacy list styles — kept for compatibility) */
 .year-card{display:flex;gap:16px;align-items:center;padding:12px;border-radius:14px;background:var(--panel);border:1px solid rgba(255,255,255,0.04);box-shadow:0 10px 30px rgba(0,0,0,0.5)}
 .year-thumb{width:160px;height:110px;border-radius:10px;overflow:hidden;flex:0 0 160px;border:1px solid rgba(255,255,255,0.06)}
 .year-thumb img{width:100%;height:100%;object-fit:cover;display:block;transition:transform .6s ease}
@@ -64,8 +64,18 @@ p.lead{text-align:center;color:var(--muted);margin-top:0;margin-bottom:18px}
 .year-tab{appearance:none;border:1px solid rgba(255,255,255,0.06);background:rgba(0,0,0,0.28);color:var(--text);padding:6px 10px;border-radius:12px;display:inline-flex;align-items:center;gap:8px;cursor:pointer}
 .year-thumb-small{width:36px;height:36px;border-radius:8px;object-fit:cover}
 
-@media (max-width:900px){.hero-year{flex-direction:column;min-height:360px}.hero-left{order:2;width:100%}.hero-right{order:1;width:100%}.year-label{font-size:64px}.year-thumb{width:120px;height:84px}}
-@media (max-width:540px){.photos-page{padding:12px}.year-card{flex-direction:column;align-items:flex-start}.year-thumb{width:100%;height:180px;flex:unset}}
+@media (max-width:900px){
+  .hero-year{flex-direction:column;min-height:360px}
+  .hero-left{order:2;width:100%}
+  .hero-right{order:1;width:100%}
+  .year-label{font-size:64px}
+  .year-thumb{width:120px;height:84px}
+}
+@media (max-width:540px){
+  .photos-page{padding:12px}
+  .year-card{flex-direction:column;align-items:flex-start}
+  .year-thumb{width:100%;height:180px;flex:unset}
+}
 
 /* Make the hero section full-bleed while keeping content centered
    (applies to the first hero inserted into the timeline) */
@@ -85,6 +95,7 @@ p.lead{text-align:center;color:var(--muted);margin-top:0;margin-bottom:18px}
 
 /* ---------------- New Photos Hub & Gallery styles ---------------- */
 
+/* ✅ Grid: 3 columns; 2026 will span full first row via .featured */
 .year-hub{
   display:grid;
   grid-template-columns: repeat(3, 1fr);
@@ -92,51 +103,212 @@ p.lead{text-align:center;color:var(--muted);margin-top:0;margin-bottom:18px}
   max-width:1200px;
   margin: 0 auto 40px;
 }
-.year-card{
+
+/* ✅ Year card frame: keep neon vibe, no black edge feel */
+.year-hub .year-card{
   position:relative;
   border-radius:16px;
   overflow:hidden;
-  background: linear-gradient(180deg, rgba(255,255,255,0.02), rgba(0,0,0,0.36));
-  border: 1px solid rgba(255,255,255,0.04);
-  min-height: 180px;
+
+  /* glass/panel feel; avoid heavy black gradient */
+  background: rgba(5,0,30,0.55);
+  border: 1px solid rgba(255,255,255,0.06);
+
+  /* consistent frame proportions */
+  aspect-ratio: 16 / 9;
+  min-height: 0;
+
   display:flex;
   align-items:flex-end;
   padding:18px;
+
   box-shadow: 0 18px 50px rgba(0,0,0,0.6);
   transition: transform .22s ease, box-shadow .22s ease;
+  cursor: pointer;
 }
-.year-card:hover{ transform: translateY(-6px) scale(1.01); box-shadow: 0 26px 70px rgba(0,0,0,0.7); }
-.year-card .cover{ position:absolute; inset:0; z-index:0; display:block; width:100%; height:100%; object-fit:cover; filter:brightness(.45) saturate(1.05); }
-/* Fallback when no cover image exists */
-.year-card .cover-fallback{ position:absolute; inset:0; z-index:0; display:block; width:100%; height:100%; background: linear-gradient(135deg, rgba(255,79,211,0.85), rgba(68,227,255,0.85)); filter:brightness(.6); }
-.year-meta{ position:relative; z-index:1; color: #fff; text-shadow: 0 6px 40px rgba(68,227,255,0.06); }
-.year-label{ font-size:2.4rem; font-weight:800; letter-spacing:0.12em; text-transform:uppercase; }
-.year-sub{ opacity:0.92; margin-top:6px; font-size:0.95rem; }
-.year-cta{ margin-top:12px; }
-.year-card.featured{ grid-column: span 2; min-height:360px; align-items:center; padding:28px; }
-.year-card.featured .year-label{ font-size:3.2rem; }
-.year-card.archive{ min-height:160px; }
+.year-hub .year-card:hover{
+  transform: translateY(-6px) scale(1.01);
+  box-shadow: 0 26px 70px rgba(0,0,0,0.7);
+}
 
-.photo-grid{ display:grid; grid-template-columns: repeat(4, 1fr); gap: 12px; max-width:1200px; margin: 0 auto 28px; }
-.photo-thumb{ border-radius:12px; overflow:hidden; position:relative; background:#000; border:1px solid rgba(255,255,255,0.04); }
-.photo-thumb img{ width:100%; height:220px; object-fit:cover; display:block; }
-.photo-thumb .cap{ position:absolute; left:8px; bottom:8px; right:8px; color:#fff; font-weight:700; font-size:0.92rem; text-shadow: 0 6px 20px rgba(0,0,0,0.6); display:flex; flex-direction:column; gap:4px }
+/* ✅ Cover: fit in frame, no crop, no stretch, no black fill */
+.year-hub .year-card .cover{
+  position:absolute;
+  inset:0;
+  z-index:0;
+  display:block;
+  width:100%;
+  height:100%;
+  object-fit: contain;          /* no crop/no distortion */
+  object-position: center;
+  background: transparent;      /* no black background */
+  filter: none;                 /* keep original photo color */
+}
+
+/* Fallback when no cover image exists (keep neon palette) */
+.year-hub .year-card .cover-fallback{
+  position:absolute;
+  inset:0;
+  z-index:0;
+  display:block;
+  width:100%;
+  height:100%;
+  background: linear-gradient(135deg, rgba(255,79,211,0.85), rgba(68,227,255,0.85));
+  filter:brightness(.75);
+}
+
+/* ✅ Meta: move year to LEFT-BOTTOM; keep fonts/colors */
+.year-hub .year-meta{
+  position:absolute;
+  left:18px;
+  bottom:16px;
+  z-index:2;
+  color:#fff;
+  text-align:left;
+  pointer-events:none; /* do not block clicking on card */
+  text-shadow: 0 10px 30px rgba(0,0,0,0.55);
+}
+
+/* Year label in hub (keep style, better sizing for cards) */
+.year-hub .year-label{
+  font-size: clamp(1.6rem, 3.2vw, 2.8rem);
+  font-weight:900;
+  letter-spacing:0.12em;
+  text-transform:uppercase;
+  line-height:1;
+}
+
+/* Optional sub text (if present in markup) */
+.year-hub .year-sub{
+  opacity:0.85;
+  margin-top:6px;
+  font-size:0.85rem;
+}
+
+/* ✅ Remove "Open Gallery" completely */
+.year-hub .year-cta{
+  display:none !important;
+}
+
+/* ✅ 2026 featured: full first row, bigger, still no distortion */
+.year-hub .year-card.featured{
+  grid-column: 1 / -1;     /* full first row */
+  aspect-ratio: 21 / 9;    /* bigger but stable */
+  min-height: 0;
+  align-items:flex-end;
+  padding:18px;
+}
+.year-hub .year-card.featured .year-label{
+  font-size: clamp(2.2rem, 5.2vw, 3.2rem);
+}
+
+/* archive cards in hub (if any) */
+.year-hub .year-card.archive{ min-height:0; }
+
+/* Photo grid (year page) */
+.photo-grid{
+  display:grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 12px;
+  max-width:1200px;
+  margin: 0 auto 28px;
+}
+.photo-thumb{
+  border-radius:12px;
+  overflow:hidden;
+  position:relative;
+  background: rgba(5,0,30,0.55);
+  border:1px solid rgba(255,255,255,0.04);
+  transition: transform .18s ease, box-shadow .18s ease;
+}
+
+/* keep year page thumbs as you had (cover) */
+.photo-thumb img{
+  width:100%;
+  height:220px;
+  object-fit:cover;
+  display:block;
+}
+.photo-thumb .cap{
+  position:absolute;
+  left:8px;
+  bottom:8px;
+  right:8px;
+  color:#fff;
+  font-weight:700;
+  font-size:0.92rem;
+  text-shadow: 0 6px 20px rgba(0,0,0,0.6);
+  display:flex;
+  flex-direction:column;
+  gap:4px
+}
 .photo-thumb .cap-title{ font-weight:800 }
 .photo-thumb .cap-sub{ font-size:0.85rem; opacity:0.9; font-weight:600 }
-.photo-thumb:hover{ transform: translateY(-4px); box-shadow: 0 20px 50px rgba(0,0,0,0.6); }
+.photo-thumb:hover{
+  transform: translateY(-4px);
+  box-shadow: 0 20px 50px rgba(0,0,0,0.6);
+}
 
-.photos-lightbox{ position:fixed; inset:0; display:none; background: rgba(0,0,0,0.88); z-index:10000; align-items:center; justify-content:center; padding:18px; }
+.photos-lightbox{
+  position:fixed;
+  inset:0;
+  display:none;
+  background: rgba(0,0,0,0.88);
+  z-index:10000;
+  align-items:center;
+  justify-content:center;
+  padding:18px;
+}
 .photos-lightbox.open{ display:flex; }
-.photos-lightbox .panel{ max-width:1200px; width:100%; max-height:92vh; display:flex; flex-direction:column; align-items:stretch; }
-.photos-lightbox img{ width:100%; height:auto; max-height:82vh; object-fit:contain; display:block; border-radius:10px; }
-.lb-controls{ display:flex; align-items:center; justify-content:space-between; margin-top:10px; color:#fff; }
+.photos-lightbox .panel{
+  max-width:1200px;
+  width:100%;
+  max-height:92vh;
+  display:flex;
+  flex-direction:column;
+  align-items:stretch;
+}
+.photos-lightbox img{
+  width:100%;
+  height:auto;
+  max-height:82vh;
+  object-fit:contain;
+  display:block;
+  border-radius:10px;
+}
+.lb-controls{
+  display:flex;
+  align-items:center;
+  justify-content:space-between;
+  margin-top:10px;
+  color:#fff;
+}
 .lb-controls .nav{ display:flex; gap:12px; }
-.lb-btn{ background: rgba(255,255,255,0.06); border:1px solid rgba(255,255,255,0.08); color:#fff; padding:10px 14px; border-radius:10px; cursor:pointer; }
+.lb-btn{
+  background: rgba(255,255,255,0.06);
+  border:1px solid rgba(255,255,255,0.08);
+  color:#fff;
+  padding:10px 14px;
+  border-radius:10px;
+  cursor:pointer;
+}
 .lb-meta{ font-size:0.95rem; opacity:0.95; }
 
-@media (max-width: 1100px){ .photo-grid{ grid-template-columns: repeat(3, 1fr); } }
-@media (max-width: 900px){ .year-hub{ grid-template-columns: 1fr; } .year-card.featured{ grid-column: auto; } .photo-grid{ grid-template-columns: repeat(2, 1fr); } .photo-thumb img{ height:180px; } }
-@media (max-width: 380px){ .photo-grid{ grid-template-columns: 1fr; } .photo-thumb img{ height:160px; } }
+@media (max-width: 1100px){
+  .photo-grid{ grid-template-columns: repeat(3, 1fr); }
+}
+
+@media (max-width: 900px){
+  .year-hub{ grid-template-columns: 1fr; }
+  .year-hub .year-card.featured{ grid-column: auto; aspect-ratio: 16 / 9; }
+  .photo-grid{ grid-template-columns: repeat(2, 1fr); }
+  .photo-thumb img{ height:180px; }
+}
+
+@media (max-width: 380px){
+  .photo-grid{ grid-template-columns: 1fr; }
+  .photo-thumb img{ height:160px; }
+}
 
 /* gallery section on year page */
 .gallery-section{ max-width:1200px; margin: 0 auto 28px; }
@@ -144,5 +316,3 @@ p.lead{text-align:center;color:var(--muted);margin-top:0;margin-bottom:18px}
 
 /* Keep photos page padding tidy */
 .photos-page .section-narrow{ padding: 22px 18px; }
-
-
