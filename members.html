@@ -62,15 +62,15 @@
 </div>
 
 <!-- Bio Modal -->
-<div class="bio-modal" id="bioModal" aria-hidden="true">
-  <div class="bio-modal__backdrop" data-close="true"></div>
-  <div class="bio-modal__dialog" role="dialog" aria-modal="true" aria-labelledby="bioModalTitle">
-    <button class="bio-modal__close" type="button" aria-label="Close" data-close="true">✕</button>
+<div class="bio-modal" id="bioModal">
+  <div class="bio-modal__backdrop" data-close="1"></div>
+  <div class="bio-modal__dialog" role="dialog" aria-modal="true">
+    <button class="bio-modal__close" type="button" aria-label="Close" data-close="1">×</button>
     <div class="bio-modal__header">
       <img class="bio-modal__photo" id="bioModalPhoto" alt="" />
       <div class="bio-modal__meta">
-        <div class="bio-modal__name" id="bioModalTitle"></div>
-        <div class="bio-modal__role" id="bioModalRole"></div>
+        <h3 class="bio-modal__name" id="bioModalName"></h3>
+        <p class="bio-modal__role" id="bioModalRole"></p>
       </div>
     </div>
     <div class="bio-modal__body" id="bioModalBody"></div>
@@ -192,7 +192,6 @@
 // Handle bio toggle (More/Less)
 document.addEventListener('DOMContentLoaded', function() {
   const modal = document.getElementById('bioModal');
-  const modalClose = document.querySelector('[data-close]');
 
   // Open modal when clicking "More" button
   document.addEventListener('click', function(e) {
@@ -204,30 +203,25 @@ document.addEventListener('DOMContentLoaded', function() {
         const photoEl = card.querySelector('.member-avatar');
         const bioEl = card.querySelector('.member-bio');
 
-        document.getElementById('bioModalTitle').textContent = nameEl.textContent;
+        document.getElementById('bioModalName').textContent = nameEl.textContent;
         document.getElementById('bioModalRole').textContent = roleEl.textContent;
         document.getElementById('bioModalPhoto').src = photoEl.src;
         document.getElementById('bioModalPhoto').alt = nameEl.textContent;
         
-        // Extract full bio from data if available, otherwise use the preview
+        // Extract full bio from data if available
         const fullBio = card.dataset.fullBio || bioEl.textContent;
         document.getElementById('bioModalBody').textContent = fullBio;
 
-        openModal();
+        modal.classList.add('is-open');
+        document.body.style.overflow = 'hidden';
       }
     }
   });
 
   // Close modal functions
   function closeModal() {
-    modal.setAttribute('aria-hidden', 'true');
+    modal.classList.remove('is-open');
     document.body.style.overflow = '';
-  }
-
-  function openModal() {
-    modal.setAttribute('aria-hidden', 'false');
-    document.body.style.overflow = 'hidden';
-    document.querySelector('.bio-modal__dialog').focus();
   }
 
   // Close when clicking backdrop or close button
@@ -239,7 +233,7 @@ document.addEventListener('DOMContentLoaded', function() {
 
   // Close on ESC key
   document.addEventListener('keydown', function(e) {
-    if (e.key === 'Escape' && modal.getAttribute('aria-hidden') === 'false') {
+    if (e.key === 'Escape' && modal.classList.contains('is-open')) {
       closeModal();
     }
   });

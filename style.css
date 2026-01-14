@@ -217,74 +217,7 @@ body.home .site-header { background: rgba(0,0,0,0.40); }
 .dot.available{ background: linear-gradient(90deg,#6df3b8,#2fd18a); }
 .sr-only{ position:absolute; width:1px; height:1px; padding:0; margin:-1px; overflow:hidden; clip:rect(0,0,0,0); white-space:nowrap; border:0; }
 
-/* Members page — mobile avatar centering */
-@media (max-width: 768px){
-  /* ensure single column layout */
-  #membersGrid { grid-template-columns: 1fr !important; }
 
-  /* make member card stack and center content */
-  .member-card {
-    display: flex !important;
-    flex-direction: column !important;
-    align-items: center !important;
-    text-align: center !important;
-    padding-top: 68px !important; /* keep space for absolute avatar */
-  }
-
-  /* center the avatar wrapper and remove any float/margin tricks */
-  .member-avatarWrap {
-    position: static !important;
-    left: auto !important;
-    right: auto !important;
-    transform: none !important;
-    display: flex !important;
-    justify-content: center !important;
-    width: 100% !important;
-    margin: 0 auto !important;
-    float: none !important;
-  }
-
-  .member-avatar {
-    display: block !important;
-    margin: 0 auto !important;
-  }
-
-  /* center text blocks */
-  .member-name, .member-role, .member-bio {
-    text-align: center !important;
-  }
-
-  .member-bio { margin-top: 8px !important; }
-}
-
-/* Members base styles moved from inline JS */
-.member-card{
-  position: relative;
-  padding-top: 80px;
-  border-radius: 16px;
-  background: rgba(255,255,255,0.10);
-  border: 1px solid rgba(255,255,255,0.14);
-  backdrop-filter: blur(8px);
-  box-shadow: 0 12px 30px rgba(0,0,0,0.28);
-  text-align: center;
-  padding: 18px;
-}
-.member-avatarWrap{
-  position: absolute; top: -34px; left: 50%; transform: translateX(-50%);
-  width: 86px; height:86px; border-radius:999px; padding:4px;
-  background: rgba(0,0,0,0.35); border:1px solid rgba(255,255,255,0.22);
-  display:flex; justify-content:center; align-items:center;
-}
-.member-avatar{ width:100%; height:100%; border-radius:999px; object-fit:cover; display:block }
-.member-name{ margin:8px 0 6px; font-weight:800; letter-spacing:.02em; text-transform:uppercase; color:rgba(255,255,255,0.90); }
-.member-role{ font-size:.85rem; opacity:.78; margin-bottom:8px }
-.member-bio{ font-size:.86rem; line-height:1.45; opacity:.86; text-align:left }
-
-@media (max-width: 768px){
-  /* reduce top padding on mobile so cards don't feel too tall */
-  .member-card{ padding-top: 68px }
-  .member-bio{ padding: 0 6px }
-}
 
 @media (max-width: 900px){
   .calendar-grid{ grid-template-columns: repeat(2, 1fr); gap:10px; }
@@ -543,7 +476,7 @@ body:not(.home){
 
 .members-grid{
   max-width: 1200px;
-  margin: 50px auto 0;
+  margin: 34px auto 0;
   display: grid;
   grid-template-columns: repeat(5, 1fr);
   gap: 22px;
@@ -616,7 +549,7 @@ body:not(.home){
   display: -webkit-box;
   -webkit-box-orient: vertical;
   overflow: hidden;
-  -webkit-line-clamp: 4;
+  -webkit-line-clamp: 3;
 }
 
 .bio-toggle{
@@ -637,93 +570,35 @@ body:not(.home){
   border-color: rgba(255,255,255,0.28);
 }
 
+/* Mobile: avoid avatar overlapping neighboring cards by keeping avatar in flow */
 @media (max-width: 980px){
-  .members-hero{
-    flex-direction: column;
-    align-items: stretch;
-  }
   .members-grid{
     grid-template-columns: 1fr;
-    margin-top: 50px;
+    margin-top: 28px;
   }
 }
 
-/* Mobile: avoid avatar overlapping neighboring cards by keeping avatar in flow */
-@media (max-width: 900px){
-  .member-card{
-    padding-top: 100px;
-  }
-  .member-avatarWrap{
-    position: absolute !important;
-    top: 8px !important;
-    left: 50% !important;
-    transform: translateX(-50%) !important;
-    margin: 0 auto !important;
-    width: 86px !important;
-    height: 86px !important;
-  }
-}
-
-/* Mobile-specific styles for compact cards */
+/* mobile: centered avatar + compact spacing */
 @media (max-width: 768px){
-  .members-grid{
-    margin-top: 50px;
-  }
-  
   .member-card{
-    align-items: center;
-    text-align: center;
-    display: flex;
-    flex-direction: column;
-    padding: 12px;
-    padding-top: 100px;
-    position: relative;
+    padding: 62px 14px 14px; /* less blank space */
   }
-  
   .member-avatarWrap{
-    position: absolute !important;
-    top: 8px !important;
-    left: 50% !important;
-    transform: translateX(-50%) !important;
-    margin: 0 !important;
-    width: 78px !important;
-    height: 78px !important;
+    width: 78px;
+    height: 78px;
+    top: 10px;
   }
-  
-  .member-name{
-    margin: 2px 0 2px;
-    font-size: 0.90rem;
-  }
-  
-  .member-role{
-    font-size: 0.78rem;
-    margin-bottom: 6px;
-  }
-  
+  .member-name{ margin: 4px 0 2px; }
+  .member-role{ margin-bottom: 8px; font-size: 0.80rem; }
   .member-bio{
-    font-size: 0.80rem;
-    padding: 8px;
-    margin: 0 0 8px 0;
-    -webkit-line-clamp: 3;
-    width: 100%;
+    padding: 10px;
+    text-align: center;
   }
-  
   .bio-toggle{
-    padding: 5px 12px;
-    font-size: 0.76rem;
-    margin-bottom: 0;
+    font-size: 0.78rem;
+    padding: 6px 12px;
   }
 }
-    margin: 0 auto 12px !important;
-    display: block !important;
-  }
-  .member-avatar{ margin: 0 auto !important; }
-  .member-name, .member-role, .member-bio{ text-align: center !important; }
-}
-
-/* Improve spacing and layout for members list */
-.members-grid{ gap: 22px; margin-top: 18px; }
-.member-bio{ margin-top: 10px; }
 
 /* Taryn special styling: larger avatar, neon frame, centered on wide screens, first on mobile */
 .member-card.member--taryn .member-avatarWrap{
@@ -1228,208 +1103,95 @@ header::after {
   display: none !important;
   content: none !important;
 }
-
-/* Strong, specific mobile fixes to ensure avatars center on small screens */
-@media (max-width: 768px){
-  .members-grid { grid-template-columns: 1fr !important; }
-
-  .members-grid .member-card{
-    display: flex !important;
-    flex-direction: column !important;
-    align-items: center !important;
-    text-align: center !important;
-    padding-top: 68px !important;
-  }
-
-  .members-grid .member-card .member-avatarWrap{
-    /* keep avatar visually centered above the card */
-    position: relative !important;
-    left: 50% !important;
-    right: auto !important;
-    transform: translateX(-50%) !important;
-    display: flex !important;
-    justify-content: center !important;
-    margin: 0 auto 12px !important;
-    float: none !important;
-  }
-
-  .members-grid .member-card .member-avatar{
-    display: block !important;
-    margin: 0 auto !important;
-  }
-
-  .members-grid .member-card .member-name,
-  .members-grid .member-card .member-role,
-  .members-grid .member-card .member-bio{
-    text-align: center !important;
-  }
-
-  .members-grid .member-card .member-bio{
-    margin-top: 8px !important;
-    padding: 0 8px !important;
-  }
-}
-/* ========== Bio Modal ========== */
-.bio-modal {
+/* ========== Bio Modal (FINAL) ========== */
+.bio-modal{
   position: fixed;
   inset: 0;
   display: none;
   align-items: center;
   justify-content: center;
-  z-index: 2000;
+  z-index: 99999;
 }
-
-.bio-modal[aria-hidden="false"] {
-  display: flex;
-}
-
-.bio-modal__backdrop {
+.bio-modal.is-open{ display: flex; }
+.bio-modal__backdrop{
   position: absolute;
   inset: 0;
-  background: rgba(0, 0, 0, 0.65);
-  -webkit-backdrop-filter: blur(4px);
+  background: rgba(0,0,0,0.65);
   backdrop-filter: blur(4px);
+  -webkit-backdrop-filter: blur(4px);
   cursor: pointer;
 }
-
-.bio-modal__dialog {
+.bio-modal__dialog{
   position: relative;
-  z-index: 2001;
-  max-width: 600px;
-  width: 90vw;
-  max-height: 90vh;
-  background: rgba(5, 0, 30, 0.95);
-  border: 1px solid rgba(255, 255, 255, 0.15);
+  z-index: 1;
+  width: min(680px, 92vw);
+  max-height: 88vh;
+  overflow: hidden;
   border-radius: 16px;
-  backdrop-filter: blur(12px);
-  -webkit-backdrop-filter: blur(12px);
-  box-shadow: 0 20px 60px rgba(0, 0, 0, 0.5);
+  background: rgba(5,0,30,0.92);
+  border: 1px solid rgba(255,255,255,0.14);
+  box-shadow: 0 24px 80px rgba(0,0,0,0.55);
   display: flex;
   flex-direction: column;
-  overflow: hidden;
 }
-
-.bio-modal__close {
+.bio-modal__close{
   position: absolute;
-  top: 16px;
-  right: 16px;
-  z-index: 2002;
-  width: 36px;
-  height: 36px;
-  border: none;
-  background: rgba(255, 255, 255, 0.10);
-  border-radius: 8px;
-  color: rgba(255, 255, 255, 0.85);
-  font-size: 1.4rem;
-  font-weight: 300;
-  cursor: pointer;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  transition: all 0.2s ease;
-}
-
-.bio-modal__close:hover {
-  background: rgba(255, 255, 255, 0.20);
+  top: 12px;
+  right: 12px;
+  width: 38px;
+  height: 38px;
+  border-radius: 999px;
+  border: 1px solid rgba(255,255,255,0.18);
+  background: rgba(0,0,0,0.25);
   color: #fff;
+  cursor: pointer;
+  font-size: 20px;
+  line-height: 1;
+  padding: 0;
 }
-
-.bio-modal__header {
+.bio-modal__header{
   display: flex;
-  gap: 16px;
-  padding: 20px;
-  border-bottom: 1px solid rgba(255, 255, 255, 0.08);
-  flex-shrink: 0;
+  gap: 14px;
+  padding: 18px 18px 14px;
+  border-bottom: 1px solid rgba(255,255,255,0.08);
 }
-
-.bio-modal__photo {
-  width: 80px;
-  height: 80px;
+.bio-modal__photo{
+  width: 72px;
+  height: 72px;
   border-radius: 999px;
   object-fit: cover;
-  border: 2px solid rgba(255, 255, 255, 0.20);
-  flex-shrink: 0;
+  border: 2px solid rgba(255,255,255,0.18);
+  flex: 0 0 auto;
 }
-
-.bio-modal__meta {
+.bio-modal__meta{
   display: flex;
   flex-direction: column;
   justify-content: center;
 }
-
-.bio-modal__name {
-  font-size: 1rem;
+.bio-modal__name{
+  margin: 0 0 4px;
   font-weight: 800;
   letter-spacing: 0.02em;
   text-transform: uppercase;
-  color: rgba(255, 255, 255, 0.95);
-  margin-bottom: 4px;
 }
-
-.bio-modal__role {
-  font-size: 0.85rem;
+.bio-modal__role{
+  margin: 0;
   opacity: 0.75;
-}
-
-.bio-modal__body {
-  flex: 1;
-  overflow-y: auto;
-  padding: 20px;
   font-size: 0.9rem;
+}
+.bio-modal__body{
+  padding: 16px 18px 18px;
+  overflow: auto;
   line-height: 1.6;
-  color: rgba(255, 255, 255, 0.90);
+  color: rgba(255,255,255,0.92);
+  font-size: 0.9rem;
 }
 
-.bio-modal__body::-webkit-scrollbar {
-  width: 8px;
-}
-
-.bio-modal__body::-webkit-scrollbar-track {
-  background: rgba(255, 255, 255, 0.05);
-  border-radius: 4px;
-}
-
-.bio-modal__body::-webkit-scrollbar-thumb {
-  background: rgba(68, 227, 255, 0.40);
-  border-radius: 4px;
-}
-
-.bio-modal__body::-webkit-scrollbar-thumb:hover {
-  background: rgba(68, 227, 255, 0.60);
-}
-
-/* Mobile modal adjustments */
-@media (max-width: 768px) {
-  .bio-modal__dialog {
-    width: 95vw;
-    max-height: 85vh;
-    max-width: none;
-  }
-
-  .bio-modal__header {
-    padding: 16px;
-    gap: 12px;
-  }
-
-  .bio-modal__photo {
-    width: 70px;
-    height: 70px;
-  }
-
-  .bio-modal__name {
-    font-size: 0.95rem;
-  }
-
-  .bio-modal__body {
-    padding: 16px;
-    font-size: 0.88rem;
-  }
-
-  .bio-modal__close {
-    width: 32px;
-    height: 32px;
-    font-size: 1.2rem;
-    top: 12px;
-    right: 12px;
-  }
+/* mobile modal sizing */
+@media (max-width: 768px){
+  .bio-modal__dialog{ width: 95vw; max-height: 85vh; }
+  .bio-modal__header{ padding: 16px; }
+  .bio-modal__photo{ width: 64px; height: 64px; }
+  .bio-modal__body{ padding: 14px 16px 16px; }
+  .bio-modal__close{ width: 34px; height: 34px; }
 }
