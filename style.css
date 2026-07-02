@@ -1,348 +1,1247 @@
-<!DOCTYPE html>
-<html lang="en">
-<head>
-  <meta charset="UTF-8" />
-  <title>Schedule | Fourplay Dance Band</title>
-  <meta name="viewport" content="width=device-width, initial-scale=1" />
-  <link rel="stylesheet" href="style.css" />
-  <script defer src="nav.js"></script>
+/* ========== Global ========== */
+* { box-sizing: border-box; margin: 0; padding: 0; }
+html, body { height: 100%; }
 
-  <style>
-    /* Schedule card grid override */
-    .upcoming-wrapper {
-      margin-top: 18px;
-    }
+body {
+  font-family: system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+  color: #ffffff;
+  background: #05081a url("assets/logo-bg.jpg") center top fixed;
+  background-size: cover;
+  min-height: 100vh;
+  display: flex;
+  flex-direction: column;
+}
 
-    .upcoming-shows {
-      display: grid;
-      grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
-      gap: 16px;
-      padding: 0;
-      margin: 22px 0 0;
-      list-style: none;
-    }
+a { color: inherit; text-decoration: none; }
 
-    .show-item {
-      list-style: none;
-      background: transparent;
-      border-radius: 0;
-      padding: 0;
-    }
+.page {
+  min-height: 100vh;
+  display: flex;
+  flex-direction: column;
+}
 
-    .show-card {
-      min-height: 165px;
-      padding: 18px 16px;
-      border-radius: 18px;
-      background: rgba(255, 255, 255, 0.08);
-      border: 1px solid rgba(255, 255, 255, 0.16);
-      box-shadow: 0 12px 30px rgba(0, 0, 0, 0.22);
-      display: flex;
-      flex-direction: column;
-      justify-content: space-between;
-      gap: 12px;
-      transition: transform 0.2s ease, background 0.2s ease, border-color 0.2s ease;
-    }
+main, .main-content { flex: 1 0 auto; }
+footer, .site-footer { margin-top: auto; }
 
-    .show-card:hover {
-      transform: translateY(-3px);
-      background: rgba(255, 255, 255, 0.12);
-      border-color: rgba(255, 255, 255, 0.26);
-    }
+/* ========== Header & Nav ========== */
+.site-header {
+  position: sticky;
+  top: 0;
+  z-index: 1000;
+  background: rgba(0,0,0,0.20);
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
+  border-bottom: 1px solid rgba(255,255,255,0.08);
+}
 
-    .show-card-date {
-      font-size: 0.9rem;
-      font-weight: 800;
-      line-height: 1.35;
-      color: rgba(255, 255, 255, 0.95);
-    }
+/* Stronger header background on the home page (40% opacity) */
+body.home .site-header { background: rgba(0,0,0,0.40); }
 
-    .show-card-venue {
-      font-size: 1.05rem;
-      font-weight: 900;
-      text-transform: uppercase;
-      line-height: 1.25;
-      color: #ffffff;
-    }
+.header-inner {
+  max-width: 1200px;
+  margin: 0 auto;
+  padding: 10px 20px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 18px;
+  position: relative; /* ✅ 给移动端绝对定位菜单做参照 */
+}
 
-    .show-card-location {
-      font-size: 0.78rem;
-      line-height: 1.4;
-      opacity: 0.82;
-      text-transform: uppercase;
-    }
+.header-left {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  min-width: 0; /* allow children to shrink on narrow screens */
+}
 
-    .show-card.cancelled {
-      opacity: 0.55;
-    }
+.header-logo {
+  height: 34px;
+  width: auto;
+  display: block;
+}
 
-    .show-card.cancelled .show-card-venue {
-      text-decoration: line-through;
-    }
+.site-title-small {
+  font-size: 0.8rem;
+  letter-spacing: 0.25em;
+  text-transform: uppercase;
+  color: rgba(255,255,255,0.7);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
 
-    .featured-show {
-      margin-bottom: 18px;
-    }
+/* Desktop nav */
+.nav {
+  display: flex;
+  align-items: center;
+  gap: 20px;
+  font-size: 0.98rem;
+  font-weight: 600;
+}
 
-    .featured-panel {
-      display: none;
-    }
+.nav a {
+  position: relative;
+  padding: 4px 0;
+  color: rgba(255,255,255,0.88);
+  transition: color 0.2s ease, text-shadow 0.2s ease;
+}
 
-    @media (max-width: 700px) {
-      .upcoming-shows {
-        grid-template-columns: repeat(2, minmax(0, 1fr));
-        gap: 12px;
-      }
+.nav a:hover,
+.nav a.active {
+  color: #fff;
+  text-shadow: 0 0 10px rgba(68,227,255,0.7);
+}
 
-      .show-card {
-        min-height: 150px;
-        padding: 15px 13px;
-      }
+.nav a::after {
+  content: "";
+  position: absolute;
+  left: 0;
+  bottom: -6px;
+  width: 0;
+  height: 2px;
+  background: linear-gradient(90deg, #ff4fd3, #44e3ff);
+  box-shadow: 0 0 10px rgba(127,255,255,0.7);
+  transition: width 0.25s ease;
+}
+.nav a:hover::after,
+.nav a.active::after { width: 100%; }
 
-      .show-card-date {
-        font-size: 0.82rem;
-      }
+/* Hamburger button (mobile) */
+.nav-toggle{
+  display:none;
+  flex-direction:column;
+  justify-content:center;
+  gap:4px;
+  width:44px;
+  height:44px;
+  padding:10px;
+  margin:0;
+  background:transparent;
+  border:0;
+  cursor:pointer;
+  border-radius:12px;
+}
+.nav-toggle span{
+  width:24px;
+  height:2px;
+  border-radius:999px;
+  background:#ffffff;
+  transition:transform .2s ease, opacity .2s ease;
+}
+.nav-toggle.open span:nth-child(1){ transform: translateY(6px) rotate(45deg); }
+.nav-toggle.open span:nth-child(2){ opacity:0; }
+.nav-toggle.open span:nth-child(3){ transform: translateY(-6px) rotate(-45deg); }
 
-      .show-card-venue {
-        font-size: 0.92rem;
-      }
+/* Mobile nav dropdown */
+@media (max-width: 768px){
+  .site-header { overflow: visible; }
+  .nav-toggle{ display:flex !important; z-index: 1002; }
 
-      .show-card-location {
-        font-size: 0.7rem;
-      }
-    }
+  .nav{
+    display:none;                /* hidden until .nav-open */
+    position:absolute;
+    top:58px;
+    right:14px;
+    width:min(220px, calc(100vw - 28px));
+    flex-direction:column;
+    align-items:flex-start;
+    gap:12px;
+    padding:16px 18px;
+    background: rgba(5,0,30,0.80); /* ✅ 80% */
+    border: 1px solid rgba(255,255,255,0.18);
+    border-radius:16px;
+    box-shadow:0 14px 35px rgba(0,0,0,0.65);
+    z-index:1001;
+  }
+  .nav.nav-open{ display:flex; }
+  .nav a{
+    width:100%;
+    padding:6px 0;
+    font-size:1rem;
+  }
+  .nav a::after{ bottom:-2px; }
+}
 
-    @media (max-width: 420px) {
-      .upcoming-shows {
-        grid-template-columns: 1fr;
-      }
-    }
-  </style>
-</head>
+/* ========== Layout (non-home) ========== */
+.main-content {
+  flex: 1;
+  padding: 90px 20px 40px;
+}
 
-<body>
-<div class="page">
+.home-main { padding: 0; }
 
-  <!-- Header -->
-  <header class="site-header">
-    <div class="header-inner">
-      <div class="header-left">
-        <a href="index.html" aria-label="Fourplay Home">
-          <img src="assets/logo.png" alt="FOURPLAY" class="header-logo" />
-        </a>
-        <div class="site-title-small">FOURPLAY DANCE BAND</div>
-      </div>
+.section-narrow {
+  max-width: 1000px;
+  margin: 0 auto 50px;
+}
 
-      <!-- ✅ Hamburger -->
-      <button class="nav-toggle" aria-label="Toggle navigation" aria-expanded="false">
-        <span></span><span></span><span></span>
-      </button>
+.page-header {
+  text-align: center;
+  margin-bottom: 26px;
+}
+.page-header h1 {
+  font-size: 2rem;
+  letter-spacing: 0.18em;
+  text-transform: uppercase;
+  margin-bottom: 8px;
+}
+.page-header p { color: rgba(255,255,255,0.75); }
 
-      <nav class="nav" aria-label="Primary Navigation">
-        <a href="index.html">Home</a>
-        <a href="members.html">Members</a>
-        <a href="artists.html">Artists We Cover</a>
-        <a href="videos.html">Videos</a>
-        <a href="photos.html">Photos</a>
-        <a href="schedule.html" class="active">Schedule</a>
-        <a href="contact.html">Contact</a>
-      </nav>
-    </div>
-  </header>
+.panel {
+  background: rgba(5,0,30,0.72);
+  border-radius: 18px;
+  padding: 20px 20px 22px;
+  box-shadow: 0 18px 45px rgba(0,0,0,0.65);
+  border: 1px solid rgba(255,255,255,0.06);
+}
 
-  <main class="main-content">
-    <section class="section-narrow">
-      <div class="page-header">
-        <h1>Schedule</h1>
-        <p>Upcoming shows for 2026.</p>
-      </div>
+/* ========== Schedule / Calendar (simplified modern) ========== */
+.calendar-section .calendar-wrapper { margin-top: 18px; }
+.calendar-panel { background: transparent; padding: 8px 0 20px; }
+.calendar-panel-header { display:flex; flex-direction:column; align-items:center; gap:6px; }
+.calendar-hint { color: rgba(255,255,255,0.62); font-size:0.92rem; }
+.calendar-legend { display:flex; gap:12px; justify-content:center; margin:8px 0 12px; color: rgba(255,255,255,0.85); font-size:0.95rem; }
+.calendar-legend .dot { display:inline-block; width:10px; height:10px; border-radius:50%; margin-right:8px; vertical-align:middle; }
 
-      <div class="calendar-wrapper">
-        <div class="calendar-panel">
-          <div class="calendar-panel-header">
-            <h2 class="calendar-title" id="calendar-title">2026</h2>
-            <p class="calendar-hint">Click a show to see details</p>
-          </div>
+.calendar-grid { display:grid; grid-template-columns: repeat(7, 1fr); gap:8px; }
+.day-card { background: rgba(255,255,255,0.03); border-radius:10px; padding:12px 8px; min-height:72px; display:flex; flex-direction:column; align-items:center; justify-content:center; gap:8px; cursor:default; transition: transform .12s ease, box-shadow .12s ease; }
+.day-card:hover{ transform: translateY(-4px); box-shadow: 0 8px 20px rgba(0,0,0,0.45); }
+.day-card.is-empty{ background: transparent; box-shadow: none; }
+.day-card__date{ font-weight:700; font-size:1.05rem; color:#fff; }
+.day-card__status{ display:flex; align-items:center; gap:8px; }
+.status-dot{ width:12px; height:12px; border-radius:999px; display:inline-block; box-shadow:0 6px 18px rgba(0,0,0,0.45); }
+.status-dot.booked{ background: linear-gradient(90deg,#ff4fd3,#ff7a6b); }
+.status-dot.available{ background: linear-gradient(90deg,#6df3b8,#2fd18a); }
+.dot.booked{ background: linear-gradient(90deg,#ff4fd3,#ff7a6b); }
+.dot.available{ background: linear-gradient(90deg,#6df3b8,#2fd18a); }
+.sr-only{ position:absolute; width:1px; height:1px; padding:0; margin:-1px; overflow:hidden; clip:rect(0,0,0,0); white-space:nowrap; border:0; }
 
-          <div class="upcoming-wrapper">
-            <div class="featured-show" id="featured-show" aria-live="polite"></div>
-            <ul class="upcoming-shows" id="shows-list" aria-live="polite"></ul>
-          </div>
-        </div>
-      </div>
-    </section>
-  </main>
 
-  <!-- Event details modal -->
-  <div class="event-modal" id="event-modal" aria-hidden="true">
-    <div class="event-modal__backdrop" data-close="true"></div>
-    <div class="event-modal__panel" role="dialog" aria-modal="true" aria-label="Event details">
-      <button class="event-modal__close" type="button" id="event-modal-close" aria-label="Close">✕</button>
-      <h3 class="event-modal__title" id="event-title">Event</h3>
-      <p class="event-modal__meta" id="event-meta"></p>
-      <p class="event-modal__note" id="event-note"></p>
-    </div>
-  </div>
 
-  <script>
-  document.addEventListener("DOMContentLoaded", () => {
-    const YEAR = 2026;
+@media (max-width: 900px){
+  .calendar-grid{ grid-template-columns: repeat(2, 1fr); gap:10px; }
+  .day-card{ min-height:78px; padding:14px 12px; }
+}
 
-    const showsList = document.getElementById('shows-list');
+/* Year calendar layout */
+.year-grid{
+  display:grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap:14px;
+  margin-top: 12px;
+}
+.month-block{
+  background: rgba(255,255,255,0.03);
+  border-radius: 12px;
+  padding: 10px;
+}
+.month-block__header{
+  text-align:center;
+  font-weight:700;
+  margin-bottom:8px;
+  font-size:0.95rem;
+  text-transform:uppercase;
+  color:#fff;
+}
+.month-block__days{
+  display:grid;
+  grid-template-columns: repeat(7, 1fr);
+  gap:6px;
+}
+.month-day{
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  gap:6px;
+  padding:6px;
+  background: rgba(0,0,0,0.12);
+  border-radius:8px;
+  border:1px solid rgba(255,255,255,0.03);
+  transition: transform .08s ease;
+}
+.month-day:hover{ transform: translateY(-3px); }
+.month-day__num{ font-size:0.82rem; color: rgba(255,255,255,0.92); font-weight:600; }
+.month-day__dot{ width:8px; height:8px; border-radius:999px; display:inline-block; box-shadow:0 6px 12px rgba(0,0,0,0.45); }
+.month-day__dot.booked{ background: linear-gradient(90deg,#ff4fd3,#ff7a6b); }
+.month-day__dot.available{ background: linear-gradient(90deg,#6df3b8,#2fd18a); }
+.month-day.is-booked{ cursor:pointer; }
 
-    // Try to load CMS schedule data for the year from common locations
-    async function loadSchedule(year){
-      const candidates = [
-        `content/schedule/${year}.json`,
-        `/content/schedule/${year}.json`,
-        `content/schedule.json`,
-        `/content/schedule.json`
-      ];
+@media (max-width: 1100px){ .year-grid{ grid-template-columns: repeat(2, 1fr); } }
+@media (max-width: 700px){ .year-grid{ grid-template-columns: 1fr; } .month-block__days{ grid-template-columns: repeat(7, 1fr); } }
 
-      for (const url of candidates){
-        try{
-          const res = await fetch(url, { cache: 'no-store' });
-          if (!res || !res.ok) continue;
-          const json = await res.json();
+/* Upcoming shows list styles */
+.upcoming-wrapper{ margin-top:12px; }
+.upcoming-shows{ list-style:none; padding:0; margin:0; display:flex; flex-direction:column; gap:10px; }
+.show-item{ background: rgba(255,255,255,0.03); border-radius:12px; padding:8px; }
+.show-btn{ width:100%; display:flex; align-items:center; gap:12px; padding:8px; border:0; background:transparent; color:inherit; text-align:left; cursor:pointer; }
+.show-dot{ width:12px; height:12px; border-radius:999px; display:inline-block; box-shadow:0 6px 16px rgba(0,0,0,0.45); flex:0 0 auto; }
+.show-dot.booked{ background: linear-gradient(90deg,#ff4fd3,#ff7a6b); }
+.show-date{ font-weight:700; min-width:110px; color:rgba(255,255,255,0.95); }
+.show-venue{ color:rgba(255,255,255,0.9); }
+.no-shows{ color:rgba(255,255,255,0.75); padding:12px; }
 
-          // expected shape: { year: 2026, events: [ { date, venue, location }, ... ] }
-          if (json && Array.isArray(json.events)) return json.events;
+@media (max-width: 700px){
+  .show-date{ min-width:84px; font-size:0.92rem; }
+}
 
-          // allow top-level array as fallback
-          if (Array.isArray(json)) return json;
-        }catch(e){ /* try next */ }
-      }
+/* featured show styles */
+.featured-show{ margin-bottom:12px; }
+.featured-panel{ background: linear-gradient(90deg, rgba(255,79,211,0.08), rgba(68,227,255,0.04)); padding:12px; border-radius:12px; border:1px solid rgba(255,255,255,0.06); }
+.featured-date{ font-weight:800; font-size:1rem; }
+.featured-venue{ margin-top:6px; font-size:0.95rem; color:rgba(255,255,255,0.95); }
+.featured-members{ margin-top:8px; opacity:0.9; font-size:0.92rem; }
 
-      return null;
-    }
 
-    function renderShows(events){
-      showsList.innerHTML = '';
 
-      const featuredEl = document.getElementById('featured-show');
-      if (featuredEl) featuredEl.innerHTML = '';
+/* ========== Home (Video Fullscreen) ========== */
+body.home { background: #05081a; }
 
-      if (!events || !events.length){
-        showsList.innerHTML = '<li class="no-shows">No upcoming shows listed for 2026.</li>';
-        return;
-      }
+.hero-video-full {
+  position: relative;
+  height: 100vh;
+  min-height: 100vh;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  text-align: center;
+  overflow: hidden;
+}
 
-      events.sort((a,b)=> (a.sortDate || a.date || '').localeCompare(b.sortDate || b.date || ''));
+.hero-video {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  z-index: 0;
+}
 
-      events.forEach((ev) => {
-        const li = document.createElement('li');
-        li.className = 'show-item';
+/* Make the looping homepage video cover the full viewport and sit behind page content */
+body.home .hero-video {
+  position: fixed !important;
+  inset: 0 !important;
+  width: 100% !important;
+  height: 100% !important;
+  object-fit: cover !important;
+  z-index: -1 !important;
+}
 
-        const isCancelled = (ev.venue || '').toLowerCase().includes('cancelled');
+/* Ensure hero content sits above the fixed video */
+.hero-inner { position: relative; z-index: 1; }
 
-        li.innerHTML = `
-          <div class="show-card ${isCancelled ? 'cancelled' : ''}">
-            <div class="show-card-date">${ev.date || ''}</div>
-            <div class="show-card-venue">${ev.venue || ''}</div>
-            <div class="show-card-location">${ev.location || ''}</div>
-          </div>
-        `;
+.hero-inner {
+  position: relative;
+  z-index: 1;
+  max-width: 1050px;
+  margin: 0 auto;
+  padding: 110px 20px 80px;
+}
 
-        showsList.appendChild(li);
-      });
-    }
+.hero-logo {
+  max-width: 100%;
+  width: 900px;
+  filter: drop-shadow(0 0 25px rgba(0,0,0,1.0));
+  opacity: 1.0;
+}
 
-    (async function(){
-      const events = await loadSchedule(YEAR);
+.hero-tagline {
+  margin-top: 22px;
+  font-size: 1.1rem;
+  letter-spacing: 0.25em;
+  text-transform: uppercase;
+  color: rgba(255,255,255,0.9);
+}
 
-      if (!events) {
-        // fallback to inline schedule if no CMS file found
-        renderShows([
-          {
-            sortDate: '2026-01-24',
-            date: 'January 24, 2026 Saturday',
-            venue: 'R PLACE',
-            location: 'LOCATION: 562 Old First St, Livermore, CA'
-          },
-          {
-            sortDate: '2026-02-07',
-            date: 'February 7, 2026 Saturday',
-            venue: "MEENAR'S MUSIC CLUB",
-            location: 'LOCATION: 349 HARTZ AVE, DANVILLE'
-          },
-          {
-            sortDate: '2026-03-14',
-            date: 'March 14, 2026 Saturday',
-            venue: 'R PLACE',
-            location: 'LOCATION: 562 Old First St, Livermore, CA'
-          },
-          {
-            sortDate: '2026-04-18',
-            date: 'April 18, 2026 Saturday',
-            venue: "MEENAR'S MUSIC CLUB",
-            location: 'LOCATION: 349 HARTZ AVE, DANVILLE'
-          },
-          {
-            sortDate: '2026-05-16',
-            date: 'May 16, 2026 Saturday',
-            venue: 'R PLACE - CANCELLED',
-            location: 'LOCATION: 562 Old First St, Livermore, CA'
-          },
-          {
-            sortDate: '2026-05-23',
-            date: 'May 23, 2026 Saturday',
-            venue: 'R PLACE',
-            location: 'LOCATION: 562 Old First St, Livermore, CA'
-          },
-          {
-            sortDate: '2026-06-13',
-            date: 'June 13, 2026 Saturday',
-            venue: "MEENAR'S MUSIC CLUB",
-            location: 'LOCATION: 349 HARTZ AVE, DANVILLE'
-          },
-          {
-            sortDate: '2026-08-22',
-            date: 'August 22, 2026 Saturday',
-            venue: "MEENAR'S MUSIC CLUB",
-            location: 'LOCATION: 349 HARTZ AVE, DANVILLE'
-          },
-          {
-            sortDate: '2026-08-29',
-            date: 'August 29, 2026 Saturday',
-            venue: 'BACKSTAGE',
-            location: 'LOCATION: Livermore, CA'
-          },
-          {
-            sortDate: '2026-10-10',
-            date: 'October 10, 2026 Saturday',
-            venue: "MEENAR'S MUSIC CLUB",
-            location: 'LOCATION: 349 HARTZ AVE, DANVILLE'
-          },
-          {
-            sortDate: '2026-10-24',
-            date: 'October 24, 2026 Saturday',
-            venue: 'WILD IDOL',
-            location: 'LOCATION: 3918 Main St, Byron'
-          },
-          {
-            sortDate: '2026-10-31',
-            date: 'October 31, 2026 Saturday',
-            venue: 'BACKSTAGE',
-            location: 'LOCATION: Livermore, CA'
-          },
-          {
-            sortDate: '2026-12-05',
-            date: 'December 5, 2026 Saturday',
-            venue: "MEENAR'S MUSIC CLUB",
-            location: 'LOCATION: 349 HARTZ AVE, DANVILLE'
-          }
-        ]);
-        return;
-      }
+.hero-buttons {
+  margin-top: 28px;
+  display: flex;
+  justify-content: center;
+  gap: 14px;
+  flex-wrap: wrap;
+  align-items: center;
+}
 
-      renderShows(events);
-    })();
-  });
-  </script>
+.btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  text-align: center;
+  min-width: 160px;
+  padding: 10px 22px;
+  border-radius: 999px;
+  font-weight: 600;
+  font-size: 1rem;
+  border: 1px solid transparent;
+  cursor: pointer;
+  transition: transform .15s ease, box-shadow .15s ease, opacity .15s ease, background .2s ease;
+}
 
-  <footer class="site-footer">
-    © 2025 Fourplay Dance Band. All rights reserved.
-  </footer>
+.btn-primary {
+  background: linear-gradient(90deg, #ff4fd3, #44e3ff);
+  box-shadow: 0 12px 30px rgba(0,0,0,0.6);
+  color: #05081a;
+}
 
-</div>
-</body>
-</html>
+.btn-secondary {
+  background: rgba(10,13,40,0.8);
+  border-color: rgba(255,255,255,0.3);
+  color: #fff;
+}
+
+.btn:hover {
+  transform: translateY(-1px);
+  box-shadow: 0 18px 35px rgba(0,0,0,0.75);
+  opacity: 0.96;
+}
+
+/* Music toggle */
+.music-toggle {
+  width: 58px;
+  height: 58px;
+  border-radius: 999px;
+  border: 0;
+  background: linear-gradient(90deg, #ff4fd3, #44e3ff);
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  box-shadow: 0 12px 30px rgba(0,0,0,0.55);
+}
+.music-toggle svg { width: 22px; height: 22px; fill: #05081a; }
+.music-toggle .icon-play { display: none; }
+.music-toggle .icon-pause { display: block; }
+.music-toggle:not(.playing) .icon-play { display: block; }
+.music-toggle:not(.playing) .icon-pause { display: none; }
+
+/* mobile hero buttons reflow */
+@media (max-width: 768px){
+  .hero-inner { padding-top: 92px; padding-bottom: 70px; }
+  .hero-buttons { flex-direction: column; gap: 12px; }
+  .btn { width: min(320px, 86vw); }
+}
+
+/* ========== Non-home pages static background ========== */
+body:not(.home){
+  background: #05081a url("assets/logo-bg.jpg") center top fixed;
+  background-size: cover;
+}
+
+/* ========== Footer ========== */
+.site-footer {
+  padding: 14px 20px 18px;
+  text-align: center;
+  font-size: 0.82rem;
+  color: rgba(255,255,255,0.75);
+  background: linear-gradient(to top, rgba(5,0,25,0.92), rgba(5,0,25,0.7));
+  border-top: 1px solid rgba(255,255,255,0.08);
+}
+
+/* =====================================================
+   Members Page
+   ===================================================== */
+.members-hero{
+  max-width: 1200px;
+  margin: 0 auto 50px;
+  display: flex;
+  gap: 28px;
+  align-items: center;
+}
+
+.members-hero-photoWrap{ flex: 0 0 52%; }
+
+.members-hero-photo{
+  width: 100%;
+  height: auto;
+  display: block;
+  border-radius: 14px;
+  box-shadow: 0 10px 30px rgba(0,0,0,0.35);
+}
+
+.members-hero-text{ flex: 1; }
+
+.members-hero-title{
+  margin: 0 0 12px;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+}
+
+.members-hero-bio{
+  margin: 0;
+  font-size: 0.95rem;
+  line-height: 1.6;
+  opacity: 0.9;
+  text-align: left;
+}
+
+.members-grid{
+  max-width: 1200px;
+  margin: 34px auto 0;
+  display: grid;
+  grid-template-columns: repeat(5, 1fr);
+  gap: 22px;
+}
+
+.member-card{
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  position: relative;
+  background: rgba(255,255,255,0.10);
+  border: 1px solid rgba(255,255,255,0.14);
+  border-radius: 16px;
+  padding: 70px 16px 18px;
+  text-align: center;
+  backdrop-filter: blur(8px);
+  -webkit-backdrop-filter: blur(8px);
+  box-shadow: 0 12px 30px rgba(0,0,0,0.28);
+  transition: height 0.3s ease;
+}
+
+.member-avatarWrap{
+  position: absolute;
+  top: 12px;
+  left: 50%;
+  transform: translateX(-50%);
+  width: 86px;
+  height: 86px;
+  border-radius: 999px;
+  padding: 4px;
+  background: rgba(0,0,0,0.35);
+  border: 1px solid rgba(255,255,255,0.22);
+  flex-shrink: 0;
+}
+
+.member-avatar{
+  width: 100%;
+  height: 100%;
+  border-radius: 999px;
+  object-fit: cover;
+  display: block;
+}
+
+.member-name{
+  margin: 6px 0 6px;
+  font-size: 0.95rem;
+  letter-spacing: 0.02em;
+  text-transform: uppercase;
+  color: rgba(255,255,255,0.90);
+}
+
+.member-role{
+  font-size: 0.85rem;
+  opacity: 0.75;
+  margin-bottom: 10px;
+}
+
+.member-bio{
+  margin: 0 0 12px 0;
+  font-size: 0.85rem;
+  line-height: 1.5;
+  opacity: 0.9;
+  background: rgba(5,0,30,0.45);
+  padding: 12px;
+  border-radius: 10px;
+  border: 1px solid rgba(255,255,255,0.10);
+  color: rgba(255,255,255,0.95);
+  text-align: left;
+  width: 100%;
+  display: -webkit-box;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+  -webkit-line-clamp: 3;
+}
+
+.bio-toggle{
+  padding: 6px 14px;
+  margin-top: auto;
+  background: rgba(68,227,255,0.15);
+  border: 1px solid rgba(68,227,255,0.30);
+  border-radius: 8px;
+  color: rgba(68,227,255,0.95);
+  font-size: 0.82rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.member-card.singer{
+  transform: translateY(-4px);
+  border-color: rgba(255,255,255,0.28);
+}
+
+/* Mobile: avoid avatar overlapping neighboring cards by keeping avatar in flow */
+@media (max-width: 980px){
+  .members-grid{
+    grid-template-columns: 1fr;
+    margin-top: 28px;
+    gap: 24px !important;
+  }
+}
+
+/* mobile: centered avatar + compact spacing */
+@media (max-width: 768px){
+  .member-card{
+    position: relative !important;
+    overflow: visible !important;
+    padding-top: 120px !important;
+    padding-left: 14px !important;
+    padding-right: 14px !important;
+    padding-bottom: 14px !important;
+  }
+  .member-avatarWrap{
+    position: absolute !important;
+    top: 18px !important;
+    left: 50% !important;
+    transform: translateX(-50%) !important;
+    width: 86px !important;
+    height: 86px !important;
+    border-radius: 999px !important;
+    padding: 4px !important;
+    display: flex !important;
+    align-items: center !important;
+    justify-content: center !important;
+  }
+  .member-avatar{
+    width: 100% !important;
+    height: 100% !important;
+    border-radius: 999px !important;
+    display: block !important;
+    object-fit: cover !important;
+  }
+  .member-name{ margin: 4px 0 2px; }
+  .member-role{ margin-bottom: 8px; font-size: 0.80rem; }
+  .member-bio{
+    padding: 10px;
+    text-align: center;
+  }
+  .bio-toggle{
+    font-size: 0.78rem;
+    padding: 6px 12px;
+  }
+}
+
+/* Taryn special styling: larger avatar, neon frame, centered on wide screens, first on mobile */
+.member-card.member--taryn .member-avatarWrap{
+  width: 110px !important;
+  height: 110px !important;
+  top: -54px !important;
+  padding: 6px !important;
+  background: radial-gradient(circle at 30% 20%, rgba(255,79,211,0.12), rgba(68,227,255,0.02));
+  box-shadow: 0 0 28px rgba(255,79,211,0.28), 0 0 8px rgba(68,227,255,0.08) !important;
+  border: 2px solid rgba(255,255,255,0.06) !important;
+}
+
+@media (min-width: 1000px){
+  /* place Taryn visually at center column on wide layouts (3rd column of 5) */
+  .members-grid { grid-template-columns: repeat(5, 1fr); }
+  .member-card.member--taryn { grid-column: 3; }
+}
+
+@media (max-width: 900px){
+  /* On mobile, put Taryn first */
+  .member-card.member--taryn { order: -1; grid-column: auto; }
+  /* Override Taryn's avatar styling on mobile to match other cards */
+  .member-card.member--taryn .member-avatarWrap{
+    width: 78px !important;
+    height: 78px !important;
+    top: 18px !important;
+    position: absolute !important;
+    transform: translateX(-50%) !important;
+    left: 50% !important;
+    margin: 0 !important;
+    padding: 4px !important;
+    background: rgba(0,0,0,0.35) !important;
+    box-shadow: none !important;
+    border: 1px solid rgba(255,255,255,0.22) !important;
+  }
+}
+
+@media (max-width: 768px){
+  /* Taryn avatar bigger on mobile phones */
+  .member-card.member--taryn {
+    padding-top: 140px !important;
+  }
+  .member-card.member--taryn .member-avatarWrap{
+    width: 120px !important;
+    height: 120px !important;
+    top: 16px !important;
+    padding: 5px !important;
+    background: rgba(0,0,0,0.35) !important;
+    border: 1px solid rgba(255,255,255,0.22) !important;
+  }
+}
+
+/* =====================================================
+   Photos Page
+   ===================================================== */
+.photo-section-title{
+  margin: 10px 0 16px;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  opacity: 0.9;
+}
+
+.photo-grid{
+  display:grid;
+  grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+  gap: 16px;
+}
+
+.photo-item{
+  margin:0;
+  border-radius: 16px;
+  overflow:hidden;
+  border: 1px solid rgba(255,255,255,0.10);
+  background: rgba(0,0,0,0.18);
+  box-shadow: 0 14px 32px rgba(0, 0, 0, 0.55);
+  cursor:pointer;
+}
+
+.photo-item img{
+  width:100%;
+  height: 220px;
+  object-fit: cover;
+  display:block;
+}
+
+.photo-item figcaption{
+  padding:10px 12px 12px;
+  font-size: 0.9rem;
+  color: rgba(255,255,255,0.85);
+}
+
+/* lightbox */
+.photos-lightbox{
+  position:fixed;
+  inset:0;
+  display:none;
+  background: rgba(0,0,0,0.75);
+  z-index:9999;
+  padding: 20px;
+}
+.photos-lightbox.open{ display:flex; align-items:center; justify-content:center; }
+.photos-lightbox-inner{
+  width:min(980px, 96vw);
+  background: rgba(10,10,22,0.75);
+  border: 1px solid rgba(255,255,255,0.14);
+  border-radius: 18px;
+  overflow:hidden;
+  backdrop-filter: blur(14px);
+}
+.photos-lightbox-inner img{
+  width:100%;
+  height:auto;
+  display:block;
+}
+.photos-lightbox-bar{
+  display:flex;
+  align-items:center;
+  justify-content:space-between;
+  gap:12px;
+  padding: 12px 14px;
+}
+.photos-lightbox-bar p{
+  margin:0;
+  opacity:0.9;
+}
+.photos-lightbox-close{
+  width:38px;
+  height:38px;
+  border-radius:999px;
+  border:1px solid rgba(255,255,255,0.18);
+  background: rgba(0,0,0,0.25);
+  color:#fff;
+  cursor:pointer;
+}
+
+/* =====================================================
+   Photos page: modern panel + grid styles (match artists look)
+   ===================================================== */
+.photos-page .section-narrow{ padding: 26px 20px; }
+.photos-section{
+  margin-top: 18px;
+  background: rgba(5,0,30,0.72);
+  border-radius: 18px;
+  padding: 18px;
+  box-shadow: 0 18px 45px rgba(0,0,0,0.6);
+  border: 1px solid rgba(255,255,255,0.06);
+}
+.photos-section__header{ display:flex; align-items:center; justify-content:space-between; gap:12px; margin-bottom:12px; }
+.photos-section__title{ margin:0; font-size:1.05rem; text-transform:uppercase; letter-spacing:0.08em; }
+.photos-section__sub{ opacity:0.9; font-size:0.92rem; }
+
+.photos-grid{
+  display:grid;
+  grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+  gap: 14px;
+}
+.photo-card{
+  position: relative;
+  border-radius: 14px;
+  overflow: hidden;
+  border: 1px solid rgba(255,255,255,0.06);
+  background: linear-gradient(180deg, rgba(255,255,255,0.02), rgba(0,0,0,0.30));
+  box-shadow: 0 14px 36px rgba(0,0,0,0.55);
+  cursor: pointer;
+  display: block;
+}
+.photo-card img{ width:100%; height:200px; object-fit:cover; display:block; }
+.photo-cap{
+  position: absolute;
+  left: 0; right: 0; bottom: 0;
+  padding: 10px 12px;
+  background: linear-gradient(180deg, rgba(0,0,0,0.0), rgba(0,0,0,0.62));
+  color: rgba(255,255,255,0.95);
+  font-size: 0.95rem;
+}
+
+@media (max-width: 760px){
+  .photos-section__header{ flex-direction:column; align-items:flex-start; }
+  .photo-card img{ height:160px; }
+}
+
+/* year tabs (thumbnail + label) */
+.photos-years{ display:flex; gap:8px; flex-wrap:wrap; }
+.photos-year{
+  appearance:none;
+  border:1px solid rgba(255,255,255,0.06);
+  background: rgba(0,0,0,0.28);
+  color: rgba(255,255,255,0.92);
+  padding:6px 10px;
+  border-radius:12px;
+  display:inline-flex;
+  align-items:center;
+  gap:8px;
+  cursor:pointer;
+}
+.photos-year-thumb{ width:36px; height:36px; border-radius:8px; object-fit:cover; display:block; }
+.photos-year-label{ font-weight:700; margin-left:4px; }
+.photos-year.is-active, .photos-year:hover{ box-shadow: 0 10px 26px rgba(0,0,0,0.5); transform: translateY(-2px); }
+
+.photo-cap-title{ font-weight:700; }
+.photo-subtitle{ font-size:0.9rem; opacity:0.92; margin-top:4px; }
+
+/* =====================================================
+   Schedule Calendar (2026) + Modal
+   ===================================================== */
+.calendar-section {
+  width: 100%;
+  max-width: 1180px;
+  margin: 0 auto;
+}
+
+.calendar-wrapper {
+  border: 1px solid rgba(255, 255, 255, 0.12);
+  background: rgba(0, 0, 0, 0.28);
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
+  border-radius: 18px;
+  padding: 18px;
+}
+
+.month-tabs {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px;
+  margin-bottom: 14px;
+}
+
+.month-tab {
+  appearance: none;
+  border: 1px solid rgba(255, 255, 255, 0.18);
+  background: rgba(0, 0, 0, 0.25);
+  color: rgba(255, 255, 255, 0.9);
+  padding: 8px 12px;
+  border-radius: 999px;
+  cursor: pointer;
+  font-weight: 600;
+  letter-spacing: 0.3px;
+  transition: transform 120ms ease, box-shadow 120ms ease, background 120ms ease;
+}
+
+.month-tab:hover {
+  transform: translateY(-1px);
+  box-shadow: 0 0 0 3px rgba(0, 255, 255, 0.08), 0 10px 26px rgba(0, 0, 0, 0.35);
+}
+
+.month-tab.is-active {
+  background: linear-gradient(90deg, rgba(255, 0, 255, 0.35), rgba(0, 255, 255, 0.25));
+  border-color: rgba(255, 255, 255, 0.26);
+  box-shadow: 0 0 0 3px rgba(255, 0, 255, 255, 0.12);
+}
+
+.calendar-panel-header {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 6px;
+  margin: 8px 4px 10px;
+}
+
+.calendar-title {
+  margin: 0;
+  font-size: 26px;
+  letter-spacing: 1px;
+  text-transform: uppercase;
+}
+
+.calendar-hint {
+  margin: 0;
+  opacity: 0.85;
+  font-size: 13px;
+}
+
+.calendar-dow {
+  display: grid;
+  grid-template-columns: repeat(7, 1fr);
+  gap: 10px;
+  padding: 0 4px;
+  margin-bottom: 10px;
+}
+
+.calendar-dow > div {
+  text-align: center;
+  font-size: 13px;
+  letter-spacing: 0.6px;
+  opacity: 0.85;
+}
+
+.calendar-grid {
+  display: grid;
+  grid-template-columns: repeat(7, minmax(0, 1fr));
+  gap: 10px;
+  padding: 0 4px 4px;
+}
+
+.day-card {
+  position: relative;
+  min-height: 80px;
+  border-radius: 16px;
+  border: 1px solid rgba(255, 255, 255, 0.12);
+  background: rgba(0, 0, 0, 0.18);
+  box-shadow: inset 0 0 0 1px rgba(255, 255, 255, 0.05);
+  overflow: hidden;
+}
+
+.day-card.is-empty {
+  background: transparent;
+  border-color: transparent;
+  box-shadow: none;
+}
+
+.day-card__date {
+  position: absolute;
+  top: 10px;
+  left: 10px;
+  font-weight: 800;
+  font-size: 16px;
+}
+
+.day-card__pill {
+  position: absolute;
+  left: 10px;
+  bottom: 10px;
+  padding: 6px 10px;
+  border-radius: 999px;
+  font-size: 12px;
+  font-weight: 700;
+  border: 1px solid rgba(255, 255, 255, 0.16);
+  background: rgba(0, 0, 0, 0.28);
+  color: rgba(255, 255, 255, 0.92);
+}
+
+.day-card.is-booked {
+  border-color: rgba(255, 0, 255, 0.35);
+  background: rgba(255, 0, 255, 0.10);
+  cursor: pointer;
+}
+
+.day-card.is-booked .day-card__pill {
+  background: rgba(255, 0, 255, 0.18);
+  border-color: rgba(255, 0, 255, 0.35);
+}
+
+.day-card.is-available {
+  border-color: rgba(0, 255, 255, 0.22);
+  background: rgba(0, 255, 255, 0.06);
+}
+
+.day-card.is-available .day-card__pill {
+  background: rgba(0, 255, 255, 0.12);
+  border-color: rgba(0, 255, 255, 0.22);
+}
+
+/* Schedule: mobile use dots instead of text labels */
+@media (max-width: 520px){
+  .day-card__pill{
+    font-size:0;
+    width:12px;
+    height:12px;
+    padding:0;
+    border-radius:999px;
+    left:auto;
+    right:10px;
+    bottom:10px;
+    border:none;
+    background: rgba(255,255,255,0.35);
+  }
+  .day-card.is-booked .day-card__pill{ background: rgba(255,79,211,0.90); }
+  .day-card.is-available .day-card__pill{ background: rgba(68,227,255,0.90); }
+}
+
+/* Modal */
+.event-modal {
+  position: fixed;
+  inset: 0;
+  display: none;
+  z-index: 9999;
+}
+
+.event-modal.is-open {
+  display: block;
+}
+
+.event-modal__backdrop {
+  position: absolute;
+  inset: 0;
+  background: rgba(0, 0, 0, 0.72);
+  backdrop-filter: blur(6px);
+}
+
+.event-modal__panel {
+  position: relative;
+  width: min(720px, calc(100vw - 32px));
+  margin: 10vh auto 0;
+  border-radius: 18px;
+  border: 1px solid rgba(255, 255, 255, 0.14);
+  background: rgba(10, 10, 22, 0.75);
+  backdrop-filter: blur(14px);
+  -webkit-backdrop-filter: blur(14px);
+  box-shadow: 0 20px 70px rgba(0, 0, 0, 0.55);
+  padding: 18px;
+}
+
+.event-modal__close {
+  position: absolute;
+  top: 12px;
+  right: 12px;
+  width: 38px;
+  height: 38px;
+  border-radius: 999px;
+  border: 1px solid rgba(255, 255, 255, 0.18);
+  background: rgba(0, 0, 0, 0.25);
+  color: rgba(255, 255, 255, 0.9);
+  cursor: pointer;
+}
+
+.event-modal__title {
+  margin: 0 0 6px;
+  font-size: 22px;
+  letter-spacing: 0.4px;
+}
+
+.event-modal__meta {
+  margin: 0 0 14px;
+  opacity: 0.9;
+}
+
+.event-modal__note {
+  margin: 0;
+  line-height: 1.55;
+  opacity: 0.9;
+}
+
+@media (max-width: 640px) {
+  .calendar-title { font-size: 20px; }
+  .day-card { min-height: 72px; }
+}
+
+/* =====================================================
+   Artists list (pills)
+   ===================================================== */
+.artists-list{
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(160px, 1fr));
+  gap: 14px;
+  padding: 12px 6px;
+}
+.artist-pill{
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 12px 18px;
+  border-radius: 14px;
+  background: linear-gradient(180deg, rgba(255,255,255,0.02), rgba(0,0,0,0.30));
+  background-color: rgba(0,0,0,0.45);
+  color: rgba(255,255,255,0.95);
+  font-weight: 800;
+  box-shadow: inset 0 0 0 1px rgba(255,255,255,0.02), 0 10px 26px rgba(0,0,0,0.45);
+  border: 1px solid rgba(255,255,255,0.06);
+  text-align: center;
+}
+/* Ensure all artist boxes are a compact single-line pill (one name) */
+.artist-pill{
+  height: clamp(40px, 6vw, 56px);
+  min-height: clamp(40px, 6vw, 56px);
+  padding: 8px 12px;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+@media (max-width:420px){
+  .artist-pill{ height:48px; padding:8px 10px; font-size:0.95rem }
+}
+@media (max-width: 600px){
+  .artists-list{ grid-template-columns: repeat(2, 1fr); }
+}
+
+/* =====================================================
+   Videos grid & cards
+   ===================================================== */
+.video-grid{
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 28px;
+  align-items: start;
+}
+.video-card{
+  position: relative;
+  border-radius: 14px;
+  overflow: hidden;
+  background: rgba(10,10,12,0.9);
+  box-shadow: 0 18px 45px rgba(0,0,0,0.6);
+  border: 1px solid rgba(255,255,255,0.06);
+}
+.video-frame-wrap{
+  position: relative;
+  width: 100%;
+  padding-top: 56.25%; /* 16:9 */
+  background: #111;
+}
+.video-frame-wrap iframe{
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  border: 0;
+  display: block;
+}
+.video-meta{
+  position: absolute;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  padding: 12px 16px;
+  background: linear-gradient(180deg, rgba(0,0,0,0.68), rgba(0,0,0,0.25));
+  color: rgba(255,255,255,0.95);
+}
+.video-title{ font-weight:700; margin-bottom:6px; }
+.video-desc{ font-size:0.92rem; opacity:0.9; }
+
+@media (max-width: 900px){
+  .video-grid{ grid-template-columns: 1fr; }
+}
+
+
+/* remove stray dots */
+header::before,
+header::after {
+  display: none !important;
+  content: none !important;
+}
+/* ========== Bio Modal (FINAL) ========== */
+.bio-modal{
+  position: fixed;
+  inset: 0;
+  display: none;
+  align-items: center;
+  justify-content: center;
+  z-index: 99999;
+}
+.bio-modal.is-open{ display: flex; }
+.bio-modal__backdrop{
+  position: absolute;
+  inset: 0;
+  background: rgba(0,0,0,0.65);
+  backdrop-filter: blur(4px);
+  -webkit-backdrop-filter: blur(4px);
+  cursor: pointer;
+}
+.bio-modal__dialog{
+  position: relative;
+  z-index: 1;
+  width: min(680px, 92vw);
+  max-height: 88vh;
+  overflow: hidden;
+  border-radius: 16px;
+  background: rgba(5,0,30,0.92);
+  border: 1px solid rgba(255,255,255,0.14);
+  box-shadow: 0 24px 80px rgba(0,0,0,0.55);
+  display: flex;
+  flex-direction: column;
+}
+.bio-modal__close{
+  position: absolute;
+  top: 12px;
+  right: 12px;
+  width: 38px;
+  height: 38px;
+  border-radius: 999px;
+  border: 1px solid rgba(255,255,255,0.18);
+  background: rgba(0,0,0,0.25);
+  color: #fff;
+  cursor: pointer;
+  font-size: 20px;
+  line-height: 1;
+  padding: 0;
+}
+.bio-modal__header{
+  display: flex;
+  gap: 14px;
+  padding: 18px 18px 14px;
+  border-bottom: 1px solid rgba(255,255,255,0.08);
+}
+.bio-modal__photo{
+  width: 72px;
+  height: 72px;
+  border-radius: 999px;
+  object-fit: cover;
+  border: 2px solid rgba(255,255,255,0.18);
+  flex: 0 0 auto;
+}
+.bio-modal__meta{
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+}
+.bio-modal__name{
+  margin: 0 0 4px;
+  font-weight: 800;
+  letter-spacing: 0.02em;
+  text-transform: uppercase;
+}
+.bio-modal__role{
+  margin: 0;
+  opacity: 0.75;
+  font-size: 0.9rem;
+}
+.bio-modal__body{
+  padding: 16px 18px 18px;
+  overflow: auto;
+  line-height: 1.6;
+  color: rgba(255,255,255,0.92);
+  font-size: 0.9rem;
+}
+
+/* mobile modal sizing */
+@media (max-width: 768px){
+  .bio-modal__dialog{ width: 95vw; max-height: 85vh; }
+  .bio-modal__header{ padding: 16px; }
+  .bio-modal__photo{ width: 64px; height: 64px; }
+  .bio-modal__body{ padding: 14px 16px 16px; }
+  .bio-modal__close{ width: 34px; height: 34px; }
+}
