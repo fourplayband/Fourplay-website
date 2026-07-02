@@ -123,14 +123,22 @@ events.forEach((ev, idx) => {
 
   const isPast = (ev.sortDate || '') < TODAY;
 
-  li.innerHTML = `
-    <div class="show-row">
-      <span class="show-dot ${isPast ? 'past' : 'booked'}" aria-hidden="true"></span>
-      <div class="show-date">${ev.date || ''}</div>
-      <div class="show-location">${ev.venue || ''}</div>
-      <div class="show-members">${ev.location || ''}</div>
+const dateText = ev.date || '';
+const weekdayMatch = dateText.match(/\b(Monday|Tuesday|Wednesday|Thursday|Friday|Saturday|Sunday)\b$/);
+const weekday = weekdayMatch ? weekdayMatch[0] : '';
+const cleanDate = weekday ? dateText.replace(weekday, '').trim() : dateText;
+
+li.innerHTML = `
+  <div class="show-row">
+    <span class="show-dot ${isPast ? 'past' : 'booked'}" aria-hidden="true"></span>
+    <div class="show-date">
+      <span class="show-date-main">${cleanDate}</span>
+      ${weekday ? `<span class="show-date-weekday">${weekday}</span>` : ''}
     </div>
-  `;
+    <div class="show-location">${ev.venue || ''}</div>
+    <div class="show-members">${ev.location || ''}</div>
+  </div>
+`;
 
   showsList.appendChild(li);
 
