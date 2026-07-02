@@ -94,7 +94,7 @@
           const res = await fetch(url, { cache: 'no-store' });
           if (!res || !res.ok) continue;
           const json = await res.json();
-          // expected shape: { year: 2026, events: [ { date, location, members: [] }, ... ] }
+          // expected shape: { year: 2026, events: [ { date, venue, location }, ... ] }
           if (json && Array.isArray(json.events)) return json.events;
           // allow top-level array as fallback
           if (Array.isArray(json)) return json;
@@ -107,34 +107,37 @@
       showsList.innerHTML = '';
       const featuredEl = document.getElementById('featured-show');
       if (featuredEl) featuredEl.innerHTML = '';
+
       if (!events || !events.length){
         showsList.innerHTML = '<li class="no-shows">No upcoming shows listed for 2026.</li>';
         return;
       }
 
-      events.sort((a,b)=> (a.date||'').localeCompare(b.date||''));
+      events.sort((a,b)=> (a.sortDate || a.date || '').localeCompare(b.sortDate || b.date || ''));
 
       events.forEach((ev, idx) => {
         const li = document.createElement('li');
         li.className = 'show-item';
-        const members = Array.isArray(ev.members) ? ev.members.join(', ') : '';
+
         li.innerHTML = `
           <div class="show-row">
             <span class="show-dot booked" aria-hidden="true"></span>
             <div class="show-date">${ev.date || ''}</div>
-            <div class="show-location">${ev.location || ''}</div>
-            <div class="show-members">${members}</div>
+            <div class="show-location">${ev.venue || ''}</div>
+            <div class="show-members">${ev.location || ''}</div>
           </div>
         `;
+
         showsList.appendChild(li);
+
         // render the first event as featured
         if (idx === 0 && featuredEl){
           featuredEl.innerHTML = `
             <div class="featured-panel">
               <span class="show-dot booked" aria-hidden="true"></span>
               <div class="featured-date">${ev.date || ''}</div>
-              <div class="featured-venue">${ev.location || ''}</div>
-              <div class="featured-members">${members}</div>
+              <div class="featured-venue">${ev.venue || ''}</div>
+              <div class="featured-members">${ev.location || ''}</div>
             </div>
           `;
         }
@@ -143,14 +146,92 @@
 
     (async function(){
       const events = await loadSchedule(YEAR);
+
       if (!events) {
-        // fallback to inline examples if no CMS file found
+        // fallback to inline schedule if no CMS file found
         renderShows([
-          { date: '2026-01-24', location: 'R PLACE', members: ['Taryn McCallum','Robby Rottin','Jeff Pavon'] },
-          { date: '2026-05-08', location: 'The Forum', members: ['Taryn McCallum','Adam Rogers','Mark Carlson'] }
+          {
+            sortDate: '2026-01-24',
+            date: 'January 24, 2026 Saturday',
+            venue: 'R PLACE',
+            location: 'LOCATION: 562 Old First St, Livermore, CA'
+          },
+          {
+            sortDate: '2026-02-07',
+            date: 'February 7, 2026 Saturday',
+            venue: "MEENAR'S MUSIC CLUB",
+            location: 'LOCATION: 349 HARTZ AVE, DANVILLE'
+          },
+          {
+            sortDate: '2026-03-14',
+            date: 'March 14, 2026 Saturday',
+            venue: 'R PLACE',
+            location: 'LOCATION: 562 Old First St, Livermore, CA'
+          },
+          {
+            sortDate: '2026-04-18',
+            date: 'April 18, 2026 Saturday',
+            venue: "MEENAR'S MUSIC CLUB",
+            location: 'LOCATION: 349 HARTZ AVE, DANVILLE'
+          },
+          {
+            sortDate: '2026-05-16',
+            date: 'May 16, 2026 Saturday',
+            venue: 'R PLACE - CANCELLED',
+            location: 'LOCATION: 562 Old First St, Livermore, CA'
+          },
+          {
+            sortDate: '2026-05-23',
+            date: 'May 23, 2026 Saturday',
+            venue: 'R PLACE',
+            location: 'LOCATION: 562 Old First St, Livermore, CA'
+          },
+          {
+            sortDate: '2026-06-13',
+            date: 'June 13, 2026 Saturday',
+            venue: "MEENAR'S MUSIC CLUB",
+            location: 'LOCATION: 349 HARTZ AVE, DANVILLE'
+          },
+          {
+            sortDate: '2026-08-22',
+            date: 'August 22, 2026 Saturday',
+            venue: "MEENAR'S MUSIC CLUB",
+            location: 'LOCATION: 349 HARTZ AVE, DANVILLE'
+          },
+          {
+            sortDate: '2026-08-29',
+            date: 'August 29, 2026 Saturday',
+            venue: 'BACKSTAGE',
+            location: 'LOCATION: Livermore, CA'
+          },
+          {
+            sortDate: '2026-10-10',
+            date: 'October 10, 2026 Saturday',
+            venue: "MEENAR'S MUSIC CLUB",
+            location: 'LOCATION: 349 HARTZ AVE, DANVILLE'
+          },
+          {
+            sortDate: '2026-10-24',
+            date: 'October 24, 2026 Saturday',
+            venue: 'WILD IDOL',
+            location: 'LOCATION: 3918 Main St, Byron'
+          },
+          {
+            sortDate: '2026-10-31',
+            date: 'October 31, 2026 Saturday',
+            venue: 'BACKSTAGE',
+            location: 'LOCATION: Livermore, CA'
+          },
+          {
+            sortDate: '2026-12-05',
+            date: 'December 5, 2026 Saturday',
+            venue: "MEENAR'S MUSIC CLUB",
+            location: 'LOCATION: 349 HARTZ AVE, DANVILLE'
+          }
         ]);
         return;
       }
+
       renderShows(events);
     })();
   });
