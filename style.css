@@ -1326,3 +1326,8 @@ header::after {
 .featured-show {
   display: none !important;
 }
+/* Past shows: gray dot */
+.show-dot.past {
+  background: rgba(180, 180, 190, 0.75) !important;
+  box-shadow: 0 6px 16px rgba(0,0,0,0.35);
+}
