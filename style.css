@@ -1322,3 +1322,7 @@ header::after {
     font-size: 0.92rem; 
   }
 }
+/* Hide featured first show on schedule page */
+.featured-show {
+  display: none !important;
+}
