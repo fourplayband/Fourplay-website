@@ -115,20 +115,24 @@
 
       events.sort((a,b)=> (a.sortDate || a.date || '').localeCompare(b.sortDate || b.date || ''));
 
-      events.forEach((ev, idx) => {
-        const li = document.createElement('li');
-        li.className = 'show-item';
+     const TODAY = '2026-07-12';
 
-        li.innerHTML = `
-          <div class="show-row">
-            <span class="show-dot booked" aria-hidden="true"></span>
-            <div class="show-date">${ev.date || ''}</div>
-            <div class="show-location">${ev.venue || ''}</div>
-            <div class="show-members">${ev.location || ''}</div>
-          </div>
-        `;
+events.forEach((ev, idx) => {
+  const li = document.createElement('li');
+  li.className = 'show-item';
 
-        showsList.appendChild(li);
+  const isPast = (ev.sortDate || '') < TODAY;
+
+  li.innerHTML = `
+    <div class="show-row">
+      <span class="show-dot ${isPast ? 'past' : 'booked'}" aria-hidden="true"></span>
+      <div class="show-date">${ev.date || ''}</div>
+      <div class="show-location">${ev.venue || ''}</div>
+      <div class="show-members">${ev.location || ''}</div>
+    </div>
+  `;
+
+  showsList.appendChild(li);
 
         // render the first event as featured
         if (idx === 0 && featuredEl){
