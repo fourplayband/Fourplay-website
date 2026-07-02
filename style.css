@@ -1331,3 +1331,12 @@ header::after {
   background: rgba(180, 180, 190, 0.75) !important;
   box-shadow: 0 6px 16px rgba(0,0,0,0.35);
 }
+/* Force weekday onto second line in schedule grid */
+.show-date-main,
+.show-date-weekday {
+  display: block;
+}
+
+.show-date {
+  line-height: 1.35;
+}
