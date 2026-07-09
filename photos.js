@@ -28,6 +28,42 @@
     }
     return [];
   }
+
+  function buildGallerySections(json, fallbackTitle){
+    if(!json) return [];
+    if(Array.isArray(json.galleries) && json.galleries.length){
+      return json.galleries;
+    }
+    if(Array.isArray(json.entries) && json.entries.length){
+      return [{ title: json.title || fallbackTitle || 'Photos', images: json.entries.map(normalizePhoto) }];
+    }
+    if(Array.isArray(json.photos) && json.photos.length){
+      return [{ title: json.title || fallbackTitle || 'Photos', images: json.photos.map(normalizePhoto) }];
+    }
+    if(Array.isArray(json.images) && json.images.length){
+      return [{ title: json.title || fallbackTitle || 'Photos', images: json.images.map(normalizePhoto) }];
+    }
+    return [];
+  }
+
+  async function loadGalleryData(year){
+    const candidates = [
+      `/content/photos/${year}/index.json`,
+      `/content/photos/${year}.json`
+    ];
+
+    let lastResult = null;
+    for(const candidate of candidates){
+      const result = await fetchJsonWithStatus(candidate);
+      if(result && result.json){
+        return { ...result, candidate };
+      }
+      lastResult = result;
+    }
+
+    return { json: null, status: lastResult ? lastResult.status : 'missing', candidate: null };
+  }
+
   function normalizePhoto(p){
     if(!p) return { src:'', alt:'', caption:'', subtitle: '' };
     if(typeof p === 'string') return { src:p, alt:'', caption:'', subtitle: '' };
@@ -128,32 +164,35 @@
       if(found){ title.textContent = found.label || (found.year || year); sub.textContent = found.subtitle || `Photos for ${found.label || year}`; }
     }
 
-    // Only fetch the merged year file (generated at build-time)
-    const candidate = `/content/photos/${year}.json`;
-    if(debugEl) debugEl.textContent = `Loading: ${candidate}`;
+    const candidateCandidates = [
+      `/content/photos/${year}/index.json`,
+      `/content/photos/${year}.json`
+    ];
+    if(debugEl) debugEl.textContent = `Loading: ${candidateCandidates.join(' | ')}`;
 
-    const fetchRes = await fetchJsonWithStatus(candidate);
+    const fetchRes = await loadGalleryData(year);
     if(!fetchRes || !fetchRes.json){
       grid.style.display='none'; noPhotos.style.display='block';
-      const msg = `Failed to load ${candidate} (status: ${fetchRes ? fetchRes.status : 'network'})`;
+      const msg = `Failed to load photo data for ${year} (checked ${candidateCandidates.join(', ')})`;
       console.error(msg);
       noPhotos.textContent = `Unable to load photos for ${year}. See console for details.`;
-      if(debugEl) debugEl.textContent = `Failed: ${candidate} (${fetchRes ? fetchRes.status : 'network'})`;
+      if(debugEl) debugEl.textContent = `Failed: ${candidateCandidates.join(' | ')} (${fetchRes ? fetchRes.status : 'network'})`;
       return;
     }
 
     const json = fetchRes.json;
+    const gallerySections = buildGallerySections(json, year);
     if(Array.isArray(json.galleries) && json.galleries.length === 0){
-      console.warn(`Photos: ${resolved.url} contains galleries array but no galleries`);
+      console.warn(`Photos: ${fetchRes.candidate || '/content/photos/<year>'} contains galleries array but no galleries`);
     }
 
     // If the JSON uses galleries (preferred), render each gallery with its own section
-    if(Array.isArray(json.galleries) && json.galleries.length){
+    if(gallerySections.length){
       grid.innerHTML = '';
       grid.style.display = 'block';
       noPhotos.style.display = 'none';
 
-      json.galleries.forEach(g => {
+      gallerySections.forEach(g => {
         const section = document.createElement('section'); section.className = 'gallery-section';
         const h = document.createElement('h2'); h.className = 'gallery-title'; h.textContent = g.title || g.section || '';
         section.appendChild(h);
