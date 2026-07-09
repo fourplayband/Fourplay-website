@@ -9,10 +9,10 @@
       const url = (path.startsWith('http')) ? path : path;
       const res = await fetch(url + (url.includes('?') ? '&' : '?') + 'v=' + Date.now(), { cache: 'no-store' });
       const status = res.status;
-      if(!res.ok){ console.error('fetch failed', url, status); return { json: null, status }; }
+      if(!res.ok){ return { json: null, status }; }
       const json = await res.json();
       return { json, status };
-    }catch(e){ console.error('fetch error', path, e); return { json: null, status: 'network' }; }
+    }catch(e){ return { json: null, status: 'network' }; }
   }
 
   function normalizePhotos(data){
@@ -137,9 +137,8 @@
       hub.appendChild(a);
     });
     }catch(e){
-      console.error('renderYearHub failed', e);
       const hub = document.getElementById('yearHub');
-      if(hub) hub.innerHTML = '<div class="panel">Unable to load photo hub. See console for details.</div>';
+      if(hub) hub.innerHTML = '<div class="panel">Unable to load photo hub.</div>';
     }
   }
 
@@ -148,7 +147,6 @@
     const grid = document.getElementById('photoGrid');
     if(!grid) return;
     const noPhotos = document.getElementById('noPhotos');
-    const debugEl = document.getElementById('photoDebug');
     const params = new URLSearchParams(window.location.search);
     const year = params.get('year');
     const title = document.getElementById('galleryTitle');
@@ -164,27 +162,15 @@
       if(found){ title.textContent = found.label || (found.year || year); sub.textContent = found.subtitle || `Photos for ${found.label || year}`; }
     }
 
-    const candidateCandidates = [
-      `/content/photos/${year}/index.json`,
-      `/content/photos/${year}.json`
-    ];
-    if(debugEl) debugEl.textContent = `Loading: ${candidateCandidates.join(' | ')}`;
-
     const fetchRes = await loadGalleryData(year);
     if(!fetchRes || !fetchRes.json){
       grid.style.display='none'; noPhotos.style.display='block';
-      const msg = `Failed to load photo data for ${year} (checked ${candidateCandidates.join(', ')})`;
-      console.error(msg);
-      noPhotos.textContent = `Unable to load photos for ${year}. See console for details.`;
-      if(debugEl) debugEl.textContent = `Failed: ${candidateCandidates.join(' | ')} (${fetchRes ? fetchRes.status : 'network'})`;
+      noPhotos.textContent = `Unable to load photos for ${year}.`;
       return;
     }
 
     const json = fetchRes.json;
     const gallerySections = buildGallerySections(json, year);
-    if(Array.isArray(json.galleries) && json.galleries.length === 0){
-      console.warn(`Photos: ${fetchRes.candidate || '/content/photos/<year>'} contains galleries array but no galleries`);
-    }
 
     // If the JSON uses galleries (preferred), render each gallery with its own section
     if(gallerySections.length){
