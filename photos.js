@@ -47,21 +47,12 @@
   }
 
   async function loadGalleryData(year){
-    const candidates = [
-      `/content/photos/${year}/index.json`,
-      `/content/photos/${year}.json`
-    ];
-
-    let lastResult = null;
-    for(const candidate of candidates){
-      const result = await fetchJsonWithStatus(candidate);
-      if(result && result.json){
-        return { ...result, candidate };
-      }
-      lastResult = result;
+    const folderIndexPath = `/content/photos/${year}/index.json`;
+    const folderResult = await fetchJsonWithStatus(folderIndexPath);
+    if(folderResult && folderResult.json){
+      return { json: folderResult.json, status: folderResult.status, candidate: folderIndexPath };
     }
-
-    return { json: null, status: lastResult ? lastResult.status : 'missing', candidate: null };
+    return { json: null, status: folderResult ? folderResult.status : 'missing', candidate: null };
   }
 
   function normalizePhoto(p){

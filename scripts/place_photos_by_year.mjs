@@ -9,19 +9,10 @@ function isJson(name){ return String(name).toLowerCase().endsWith('.json'); }
 
 async function readJson(p){ try{ const txt = await fs.readFile(p,'utf8'); return JSON.parse(txt);}catch(e){return null;} }
 
-function determineYear(entry, filePath){
-  if(entry && typeof entry === 'object'){
-    const date = typeof entry.date === 'string' ? entry.date : null;
-    if(date){ const m = date.match(/^(20\d{2})/); if(m) return Number(m[1]); }
-    const fname = path.basename(filePath);
-    let m = fname.match(/(20\d{2})/);
-    if(m) return Number(m[1]);
-    const parent = path.basename(path.dirname(filePath));
-    m = parent.match(/(20\d{2})/);
-    if(m) return Number(m[1]);
-    const img = entry.image || entry.url || entry.src || entry.path || '';
-    if(typeof img === 'string'){ m = img.match(/(20\d{2})/); if(m) return Number(m[1]); }
-  }
+function extractFolderSlug(filePath){
+  const parent = path.basename(path.dirname(filePath));
+  const normalized = String(parent || '').trim();
+  if (/^(20\d{2})([–-](20\d{2}))?$/.test(normalized)) return normalized;
   return null;
 }
 
@@ -72,8 +63,12 @@ async function main(){
   console.log(`Found ${entries.length} entry files.`);
 
   for(const e of entries){
-    const yr = determineYear(e.json, e.path);
-    const targetSlug = mapYearToSlug(yr, hub) || 'unknown';
+    const targetSlug = extractFolderSlug(e.path);
+    if(!targetSlug){
+      console.warn(`Skipping ${path.relative(ROOT, e.path)} because it has no recognized CMS folder slug.`);
+      continue;
+    }
+
     const targetDir = path.join(PHOTOS_DIR, targetSlug);
     const fileName = path.basename(e.path);
     const targetPath = path.join(targetDir, fileName);

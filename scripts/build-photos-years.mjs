@@ -33,34 +33,11 @@ function normalizeSection(value) {
   return normalized.includes("poster") ? "posters" : "gig-photos";
 }
 
-function determineYearFromEntry(entry, filePath) {
-  if (entry && typeof entry === "object") {
-    const dateValue = typeof entry.date === "string" ? entry.date : null;
-    if (dateValue) {
-      const m = dateValue.match(/^(20\d{2})/);
-      if (m) return Number(m[1]);
-    }
-
-    const fileName = path.basename(filePath);
-    let m = fileName.match(/(20\d{2})/);
-    if (m) return Number(m[1]);
-
-    const parent = path.basename(path.dirname(filePath));
-    m = parent.match(/(20\d{2})/);
-    if (m) return Number(m[1]);
-
-    const imagePath = typeof entry.image === "string"
-      ? entry.image
-      : typeof entry.url === "string"
-        ? entry.url
-        : typeof entry.src === "string"
-          ? entry.src
-          : null;
-    if (imagePath) {
-      m = imagePath.match(/(20\d{2})/);
-      if (m) return Number(m[1]);
-    }
-  }
+function extractFolderSlug(filePath) {
+  const parent = path.basename(path.dirname(filePath));
+  if (!parent) return null;
+  const normalized = String(parent).trim();
+  if (/^(20\d{2})([–-](20\d{2}))?$/.test(normalized)) return normalized;
   return null;
 }
 
@@ -75,7 +52,7 @@ function normalizeRawEntry(entry, filePath) {
     title,
     section: normalizeSection(entry.section || entry.category),
     date: entry.date || null,
-    year: determineYearFromEntry(entry, filePath)
+    folderSlug: extractFolderSlug(filePath)
   };
 }
 
@@ -102,28 +79,11 @@ async function collectRawEntries(dir) {
     }
 
     const normalized = normalizeRawEntry(json, fullPath);
-    if (!normalized || !normalized.year) continue;
+    if (!normalized || !normalized.folderSlug) continue;
     entries.push(normalized);
   }
 
   return entries;
-}
-
-function parseYearsFromSlug(slug) {
-  const str = String(slug || "").trim();
-  const range = str.match(/^(20\d{2})[–-](20\d{2})$/);
-  if (range) {
-    const start = Number(range[1]);
-    const end = Number(range[2]);
-    if (start <= end) {
-      const years = [];
-      for (let y = start; y <= end; y += 1) years.push(y);
-      return years;
-    }
-  }
-  const single = str.match(/^(20\d{2})$/);
-  if (single) return [Number(single[1])];
-  return [];
 }
 
 async function writeYearJson(slug, label, sections) {
@@ -147,15 +107,30 @@ async function writeYearJson(slug, label, sections) {
   console.log(`[photos] wrote ${path.relative(ROOT, outPath)} (${galleries.length} gallery section(s))`);
 }
 
+async function writeFolderIndex(slug, entries) {
+  const folderPath = path.join(PHOTOS_DIR, slug);
+  await fs.mkdir(folderPath, { recursive: true });
+
+  const manifest = {
+    year: slug,
+    entries
+  };
+
+  const outPath = path.join(folderPath, "index.json");
+  await fs.writeFile(outPath, JSON.stringify(manifest, null, 2), "utf8");
+  console.log(`[photos] wrote ${path.relative(ROOT, outPath)} (${entries.length} entries)`);
+}
+
 async function buildFromIndex(yearsIndex, rawEntries) {
   for (const item of yearsIndex) {
     const slug = String(item.slug || item.year || item.id || "").trim();
     if (!slug) continue;
     const label = String(item.label || item.year || item.id || slug);
-    const targetYears = parseYearsFromSlug(slug);
-    const filtered = rawEntries.filter((entry) => targetYears.includes(entry.year));
+    const filtered = rawEntries.filter((entry) => entry.folderSlug === slug);
 
     const sections = new Map();
+    const folderIndexEntries = [];
+
     filtered.forEach((entry) => {
       const section = entry.section || "gig-photos";
       if (!sections.has(section)) sections.set(section, []);
@@ -165,9 +140,16 @@ async function buildFromIndex(yearsIndex, rawEntries) {
         title: entry.title,
         ...(entry.date ? { date: entry.date } : {})
       });
+
+      folderIndexEntries.push({
+        title: entry.title,
+        image: entry.image,
+        ...(entry.date ? { date: entry.date } : {})
+      });
     });
 
     await writeYearJson(slug, label, sections);
+    await writeFolderIndex(slug, folderIndexEntries);
   }
 }
 
