@@ -4,6 +4,7 @@
   "private": true,
   "type": "module",
   "scripts": {
-    "build:photos": "node scripts/build-photos-years.mjs"
+    "build:photos": "node scripts/build-photos-years.mjs",
+    "place:photos": "node scripts/place_photos_by_year.mjs"
   }
 }
