@@ -103,6 +103,21 @@
       return null;
     }
 
+    function toDateKey(value){
+      const dateText = String(value || '');
+      const isoDate = dateText.match(/^\d{4}-\d{2}-\d{2}/);
+      if (isoDate) return isoDate[0];
+
+      const parsedDate = new Date(dateText.replace(/\s+(Monday|Tuesday|Wednesday|Thursday|Friday|Saturday|Sunday)$/i, ''));
+      if (Number.isNaN(parsedDate.getTime())) return '';
+
+      return [
+        parsedDate.getFullYear(),
+        String(parsedDate.getMonth() + 1).padStart(2, '0'),
+        String(parsedDate.getDate()).padStart(2, '0')
+      ].join('-');
+    }
+
     function renderShows(events){
       showsList.innerHTML = '';
       const featuredEl = document.getElementById('featured-show');
@@ -115,13 +130,19 @@
 
       events.sort((a,b)=> (a.sortDate || a.date || '').localeCompare(b.sortDate || b.date || ''));
 
-     const TODAY = '2026-07-12';
+      const now = new Date();
+      const today = [
+        now.getFullYear(),
+        String(now.getMonth() + 1).padStart(2, '0'),
+        String(now.getDate()).padStart(2, '0')
+      ].join('-');
 
 events.forEach((ev, idx) => {
   const li = document.createElement('li');
   li.className = 'show-item';
 
-  const isPast = (ev.sortDate || '') < TODAY;
+  const eventDate = toDateKey(ev.sortDate) || toDateKey(ev.date);
+  const isPast = eventDate !== '' && eventDate < today;
 
 const dateText = ev.date || '';
 const weekdayMatch = dateText.match(/\b(Monday|Tuesday|Wednesday|Thursday|Friday|Saturday|Sunday)\b$/);
